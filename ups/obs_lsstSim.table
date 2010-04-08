@@ -1,0 +1,9 @@
+setupRequired(mysqlclient >= 5.0.45+1)
+setupRequired(pex_exceptions >= 3.2.2)
+setupRequired(pex_logging >= 3.3.2)
+setupRequired(pex_policy >= 3.3.2)
+setupRequired(daf_persistence >= 3.3.7)
+setupOptional(geom)
+setupOptional(afw)
+
+envAppend(PYTHONPATH, ${PRODUCT_DIR}/python)
