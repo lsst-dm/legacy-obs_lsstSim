@@ -120,12 +120,12 @@ class LsstSimMapper(Mapper):
 
         return exposure
 
-    def extract_ampId(dataId):
+    def extract_ampId(self, dataId):
         m = re.match(r'(\d)(\d)', dataId['channel'])
         return (extract_detectorName(dataId),
                 int(m.groups(1)), int(m.groups(2)))
 
-    def extract_detectorName(dataId):
+    def extract_detectorName(self, dataId):
         return "%(raft)s %(sensor)s" % dataId
 
     def query_bias(self, key, format, dataId):
