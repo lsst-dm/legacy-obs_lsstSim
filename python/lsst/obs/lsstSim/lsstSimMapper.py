@@ -215,5 +215,5 @@ class LsstSimMapper(Mapper):
                 "FitsStorage", path, dataId)
 
 for calibType in ["bias", "dark", "flat", "fringe"]:
-    setattr(MinMapper, "map_" + calibType, lambda self, dataId:
+    setattr(LsstSimMapper, "map_" + calibType, lambda self, dataId:
             self._calibMapper(calibType, dataId))
