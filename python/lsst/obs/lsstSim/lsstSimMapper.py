@@ -122,7 +122,7 @@ class LsstSimMapper(Mapper):
 
     def extract_ampId(self, dataId):
         m = re.match(r'(\d)(\d)', dataId['channel'])
-        return (extract_detectorName(dataId),
+        return (self.extract_detectorName(dataId),
                 int(m.groups(1)), int(m.groups(2)))
 
     def extract_detectorName(self, dataId):
