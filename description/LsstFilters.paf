@@ -1,0 +1,36 @@
+#<?cfg paf policy ?>
+#
+description: "The LSST Filters from L. Jones 04/07/10"
+
+Filter: {
+    name: "u"
+    lambdaEff: 364.59
+}
+Filter: {
+    name: "g"
+    lambdaEff: 476.31
+}
+Filter: {
+    name: "r"
+    lambdaEff: 619.42
+}
+Filter: {
+    name: "i"
+    lambdaEff: 752.06
+}
+Filter: {
+    name: "z"
+    lambdaEff: 866.85
+}
+Filter: {
+    name: "y" # This is y4, which has been adopted as the official y filter
+    lambdaEff: 971.68
+}
+Filter: {
+    name: "y3"
+    lambdaEff: 1002.44
+}
+Filter: {
+    name: "y4"
+    lambdaEff: 971.68
+}
