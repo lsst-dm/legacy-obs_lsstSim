@@ -93,7 +93,7 @@ class LsstSimMapper(Mapper):
 
     def map_raw(self, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
-        path = os.path.join(self.root, rawTemplate % pathId)
+        path = os.path.join(self.root, self.rawTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.DecoratedImageU", "DecoratedImageU",
                 "FitsStorage", path, dataId)
