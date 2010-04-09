@@ -212,51 +212,63 @@ Ccd: {
 CcdDiskLayout: {
     HduPerAmp: true
     Amp: {
-        serial: 00
+        serial: 0
         flipLR: false
         flipTB: false
         hdu: 0
     }
     Amp: {
-        serial: 01
+        serial: 1
         flipLR: false
         flipTB: false
         hdu: 0
     }
     Amp: {
-        serial: 02
+        serial: 2
         flipLR: false
         flipTB: false
         hdu: 0
     }
     Amp: {
-        serial: 03
+        serial: 3
         flipLR: false
         flipTB: false
         hdu: 0
     }
     Amp: {
-        serial: 04
+        serial: 4
         flipLR: false
         flipTB: false
         hdu: 0
     }
     Amp: {
-        serial: 05
+        serial: 5
         flipLR: false
         flipTB: false
         hdu: 0
     }
     Amp: {
-        serial: 06
+        serial: 6
         flipLR: false
         flipTB: false
         hdu: 0
     }
     Amp: {
-        serial: 07
+        serial: 7
         flipLR: false
         flipTB: false
+        hdu: 0
+    }
+    Amp: {
+        serial: 8
+        flipLR: false
+        flipTB: true
+        hdu: 0
+    }
+    Amp: {
+        serial: 9
+        flipLR: false
+        flipTB: true
         hdu: 0
     }
     Amp: {
@@ -291,18 +303,6 @@ CcdDiskLayout: {
     }
     Amp: {
         serial: 15
-        flipLR: false
-        flipTB: true
-        hdu: 0
-    }
-    Amp: {
-        serial: 16
-        flipLR: false
-        flipTB: true
-        hdu: 0
-    }
-    Amp: {
-        serial: 17
         flipLR: false
         flipTB: true
         hdu: 0
