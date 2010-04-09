@@ -132,55 +132,55 @@ class LsstSimMapper(Mapper):
         return self.calibRegistry.queryMetadata("bias", key, format, dataId)
 
     def std_bias(self, item, dataId):
-        ampId = self.convert_raftSensorChannel_to_ampId(dataId)
+        ampId = self.extract_ampId(dataId)
         detector = cameraGeomUtils.findAmp(
                 self.camera, afwCameraGeom.Id(ampId[0]), ampId[1], ampId[2])
-        exposure.setDetector(detector)
-        return exposure
+        item.setDetector(detector)
+        return item
 
     def query_dark(self, key, format, dataId):
         return self.calibRegistry.queryMetadata("dark", key, format, dataId)
 
     def std_dark(self, item, dataId):
-        ampId = self.convert_raftSensorChannel_to_ampId(dataId)
+        ampId = self.extract_ampId(dataId)
         detector = cameraGeomUtils.findAmp(
                 self.camera, afwCameraGeom.Id(ampId[0]), ampId[1], ampId[2])
-        exposure.setDetector(detector)
-        return exposure
+        item.setDetector(detector)
+        return item
 
     def query_flat(self, key, format, dataId):
         return self.calibRegistry.queryMetadata("flat", key, format, dataId)
 
     def std_flat(self, item, dataId):
-        ampId = self.convert_raftSensorChannel_to_ampId(dataId)
+        ampId = self.extract_ampId(dataId)
         detector = cameraGeomUtils.findAmp(
                 self.camera, afwCameraGeom.Id(ampId[0]), ampId[1], ampId[2])
-        exposure.setDetector(detector)
+        item.setDetector(detector)
 
         md = item.getMetadata()
         filterName = md.get("FILTER")
         filter = afwImage.Filter(filterName)
-        exposure.setFilter(filter)
+        item.setFilter(filter)
         md.remove("FILTER")
 
-        return exposure
+        return item
 
     def query_fringe(self, key, format, dataId):
         return self.calibRegistry.queryMetadata("fringe", key, format, dataId)
 
     def std_fringe(self, item, dataId):
-        ampId = self.convert_raftSensorChannel_to_ampId(dataId)
+        ampId = self.extract_ampId(dataId)
         detector = cameraGeomUtils.findAmp(
                 self.camera, afwCameraGeom.Id(ampId[0]), ampId[1], ampId[2])
-        exposure.setDetector(detector)
+        item.setDetector(detector)
 
         md = item.getMetadata()
         filterName = md.get("FILTER")
         filter = afwImage.Filter(filterName)
-        exposure.setFilter(filter)
+        item.setFilter(filter)
         md.remove("FILTER")
 
-        return exposure
+        return item
 
     def _mapIdToActual(self, dataId):
         # TODO map mapped fields in actualId to actual fields
