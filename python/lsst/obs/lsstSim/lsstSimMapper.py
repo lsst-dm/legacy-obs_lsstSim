@@ -75,21 +75,28 @@ class LsstSimMapper(Mapper):
             key = datasetType + "Template"
             setattr(self, key, self.policy.getString(key))
 
-        cameraPolicy = pexPolicy.Policy.createPolicy(
-                os.path.join(defaultFile.getRepositoryPath(),
-                    self.policy.getString('cameraDescription')),
-                defaultFile.getRepositoryPath())
+        self.cameraPolicyLocation = os.path.join(
+                defaultFile.getRepositoryPath(),
+                self.policy.getString('cameraDescription'))
+        cameraPolicy = pexPolicy.Policy.createPolicy(self.cameraPolicyLocation)
         self.camera = cameraGeomUtils.makeCamera(cameraPolicy)
 
         filterPolicy = pexPolicy.Policy.createPolicy(
                 os.path.join(defaultFile.getRepositoryPath(),
-                    self.policy.getString('filterDescription')),
-                defaultFile.getRepositoryPath())
+                    self.policy.getString('filterDescription')))
         imageUtils.defineFiltersFromPolicy(filterPolicy, reset=True)
 
 
     def getKeys(self):
         return self.keys
+
+    def map_camera(self, dataId):
+        return ButlerLocation(
+                "lsst.afw.cameraGeom.Camera", "Camera",
+                "PafStorage", self.cameraPolicyLocation, dataId)
+
+    def std_camera(self, item, dataId):
+        return cameraGeomUtils.makeCamera(item)
 
     def map_raw(self, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
