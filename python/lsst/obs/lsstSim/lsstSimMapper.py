@@ -5,6 +5,7 @@ import lsst.afw.image as afwImage
 import lsst.afw.cameraGeom as afwCameraGeom
 import lsst.afw.cameraGeom.utils as cameraGeomUtils
 import lsst.afw.image.utils as imageUtils
+import lsst.pex.policy as pexPolicy
 
 class LsstSimMapper(Mapper):
     def __init__(self, policy=None, root=".", calibRoot=None):
