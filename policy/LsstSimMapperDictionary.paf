@@ -58,9 +58,11 @@ definitions: {
         type: string
         description: "The pathname to the camera description (in PAF form).  Can be absolute or relative to the repository containing this dictionary."
         maxOccurs: 1
+        default: "../description/Full_STA_geom.paf"
     }
     filterDescription: {
         type: string
         description: "The pathname to the filter description (in PAF form).  Can be absolute or relative to the repository containing this dictionary."
+        default: "../description/LsstFilters.paf"
     }
 }
