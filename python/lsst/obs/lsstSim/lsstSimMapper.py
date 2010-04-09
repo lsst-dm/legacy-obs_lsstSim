@@ -76,12 +76,14 @@ class LsstSimMapper(Mapper):
             setattr(self, key, self.policy.getString(key))
 
         cameraPolicy = pexPolicy.Policy.createPolicy(
-                self.policy.getString('cameraDescription'),
+                os.path.join(defaultFile.getRepositoryPath(),
+                    self.policy.getString('cameraDescription')),
                 defaultFile.getRepositoryPath())
         self.camera = cameraGeomUtils.makeCamera(cameraPolicy)
 
         filterPolicy = pexPolicy.Policy.createPolicy(
-                self.policy.getString('filterDescription'),
+                os.path.join(defaultFile.getRepositoryPath(),
+                    self.policy.getString('filterDescription')),
                 defaultFile.getRepositoryPath())
         imageUtils.defineFiltersFromPolicy(filterPolicy, reset=True)
 
