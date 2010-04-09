@@ -25,13 +25,13 @@ definitions: {
         type: string
         description: "The Python substitution template for the flat image pathnames."
         maxOccurs: 1
-	default: "flat_%(filter)/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s_E000.fits"
+	default: "flat_%(filter)s/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s_E000.fits"
     }
     fringeTemplate: {
         type: string
         description: "The Python substitution template for the fringe image pathnames."
         maxOccurs: 1
-	default: "flat_%(filter)/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s_E000.fits"
+	default: "flat_%(filter)s/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s_E000.fits"
     }
     root: {
         type: string
