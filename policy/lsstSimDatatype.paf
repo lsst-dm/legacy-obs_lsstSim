@@ -1,0 +1,44 @@
+#<?cfg paf policy ?>
+
+convertDateobsToTai: false
+convertDateobsToMidExposure: true
+trimFilterName: false
+convertVisitIdToInt: false
+
+metadataPolicy: {
+# Policy configuration for ImSim metadata
+
+####
+# TO GENERATE THE EVENT
+
+# Unique visit ID
+visitId: OBSID
+
+# Time of mid-observation in TAI
+dateObs: MJD-OBS
+
+# Exposure time in seconds
+expTime: EXPTIME
+
+# Filter
+filter: FILTER
+
+# Pointing Ra and Decl
+ra: RA_DEG
+decl: DEC_DEG
+# equinox: EQUINOX
+
+# Airmass of mid-exposure
+airmass: AIRMASS
+
+datasetId: DATASET
+
+# Persisted name of file
+filename: OUTFILE
+
+####
+# FOR THE ISR
+
+trimsec: DATASEC
+overscan: BIASSEC
+}
