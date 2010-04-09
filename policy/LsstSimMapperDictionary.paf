@@ -7,7 +7,7 @@ definitions: {
         type: string
         description: "The Python substitution template for the raw image pathnames."
         maxOccurs: 1
-	default: "imsim_%(visit)d_R%(raft)s_S%(sensor)s_C%(channel)s_E%(snap)03d.fits"
+	default: "imsim_%(visit)d_R%(raft)s_S%(sensor)s_C%(channel)s_E%(snap)03d.fits.gz"
     }
     biasTemplate: {
         type: string
