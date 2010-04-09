@@ -211,6 +211,8 @@ class LsstSimMapper(Mapper):
 
     def _calibMapper(self, datasetType, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
+        # TODO get this from the metadata registry
+        pathId['filter'] = 'r'
         path = os.path.join(self.calibRoot,
                 getattr(self, datasetType + 'Template') % pathId)
         return ButlerLocation(
