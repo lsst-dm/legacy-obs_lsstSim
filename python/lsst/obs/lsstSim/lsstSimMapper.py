@@ -91,7 +91,7 @@ class LsstSimMapper(Mapper):
     def getKeys(self):
         return self.keys
 
-    def map_raw(self, datasetType, root, dataId):
+    def map_raw(self, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
         path = os.path.join(self.root, rawTemplate % pathId)
         return ButlerLocation(
