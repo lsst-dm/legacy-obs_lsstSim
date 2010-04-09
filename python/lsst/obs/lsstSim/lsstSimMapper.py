@@ -189,16 +189,12 @@ class LsstSimMapper(Mapper):
     def _mapActualToPath(self, actualId):
         pathId = dict(actualId)
         if pathId.has_key("raft"):
-            pathId['raft'] = re.sub(r'R:(\d),(\d)', r'R\1\2', pathId['raft'])
+            pathId['raft'] = re.sub(r'R:(\d),(\d)', r'\1\2', pathId['raft'])
         if pathId.has_key("sensor"):
-            pathId['sensor'] = re.sub(r'S:(\d),(\d)', r'S\1\2',
-                    pathId['sensor'])
-        if pathId.has_key("channel"):
-            pathId['channel'] = re.sub(r'C:(\d),(\d)', r'C\1\2',
-                    pathId['channel'])
+            pathId['sensor'] = re.sub(r'S:(\d),(\d)', r'\1\2', pathId['sensor'])
         if pathId.has_key("detector"):
             for m in re.finditer(r'([RSC]):(\d),(\d)', pathId['detector']):
-                id = m.groups(0) + m.groups(1) + m.groups(2)
+                id = m.groups(1) + m.groups(2)
                 if m.groups(0) == 'R':
                     pathId['raft'] = id
                 elif m.groups(0) == 'S':
