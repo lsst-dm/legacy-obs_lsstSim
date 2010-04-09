@@ -40,9 +40,13 @@ class LsstSimMapper(Mapper):
         if registryPath is None:
             registryPath = "registry.sqlite3"
             if not os.path.exists(registryPath):
-                raise pexExcept.LsstException, "Registry not found"
-        self.registry = SqliteRegistry(registryPath)
-        self.keys = self.registry.getFields()
+                pass
+                # raise pexExcept.LsstException, "Registry not found"
+        if registryPath is not None:
+            self.registry = SqliteRegistry(registryPath)
+
+        # self.keys = self.registry.getFields()
+        self.keys = ["visit", "raft", "sensor", "channel", "snap"]
 
         calibRegistryPath = None
         if self.policy.exists('calibRegistryPath'):
@@ -56,11 +60,15 @@ class LsstSimMapper(Mapper):
         if calibRegistryPath is None:
             calibRegistryPath = "calibRegistry.sqlite3"
             if not os.path.exists(calibRegistryPath):
-                raise pexExcept.LsstException, "Calibration registry not found"
-        self.calibRegistry = SqliteRegistry(calibRegistryPath)
-        for k in self.calibRegistry.getFields():
-            if k not in self.keys:
-                self.keys.append(k)
+                pass
+                # raise pexExcept.LsstException, "Calibration registry not found"
+        if calibRegistryPath is not None:
+            self.calibRegistry = SqliteRegistry(calibRegistryPath)
+
+        # for k in self.calibRegistry.getFields():
+        #     if k not in self.keys:
+        #         self.keys.append(k)
+        self.keys.append("filter")
 
         for datasetType in ["raw", "bias", "dark", "flat", "fringe"]:
             key = datasetType + "Template"

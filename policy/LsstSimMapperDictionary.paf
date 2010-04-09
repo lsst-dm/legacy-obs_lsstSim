@@ -7,31 +7,31 @@ definitions: {
         type: string
         description: "The Python substitution template for the raw image pathnames."
         maxOccurs: 1
-	default: "imsim_%(visit)d_R%(raft)s_S%(sensor)s_C%(channel)s_E%(exposure)03d.fits"
+	default: "imsim_%(visit)d_R%(raft)s_S%(sensor)s_C%(channel)s_E%(snap)03d.fits"
     }
     biasTemplate: {
         type: string
         description: "The Python substitution template for the bias image pathnames."
         maxOccurs: 1
-	default: "bias/imsim_0_R%(raft)s_S%(sensor)s_C%(channel)s_E%(exposure)03d.fits"
+	default: "bias/imsim_0_R%(raft)s_S%(sensor)s_C%(channel)s_E000.fits"
     }
     darkTemplate: {
         type: string
         description: "The Python substitution template for the dark image pathnames."
         maxOccurs: 1
-	default: "dark/imsim_1_R%(raft)s_S%(sensor)s_C%(channel)s_E%(exposure)03d.fits"
+	default: "dark/imsim_1_R%(raft)s_S%(sensor)s_C%(channel)s_E000.fits"
     }
     flatTemplate: {
         type: string
         description: "The Python substitution template for the flat image pathnames."
         maxOccurs: 1
-	default: "flat_%(filter)/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s_E%(exposure)03d.fits"
+	default: "flat_%(filter)/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s_E000.fits"
     }
     fringeTemplate: {
         type: string
         description: "The Python substitution template for the fringe image pathnames."
         maxOccurs: 1
-	default: "flat_%(filter)/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s_E%(exposure)03d.fits"
+	default: "flat_%(filter)/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s_E000.fits"
     }
     root: {
         type: string
