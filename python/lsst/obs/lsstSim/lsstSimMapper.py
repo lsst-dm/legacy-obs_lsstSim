@@ -113,6 +113,7 @@ class LsstSimMapper(Mapper):
         exposure.setDetector(detector)
 
         filterName = md.get("FILTER")
+        filterName = filterName.strip()
         filter = afwImage.Filter(filterName)
         exposure.setFilter(filter)
 
