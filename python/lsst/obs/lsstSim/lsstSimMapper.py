@@ -127,6 +127,9 @@ class LsstSimMapper(Mapper):
         exposure.setFilter(filter)
 
         exposure.setWcs(afwImage.makeWcs(md))
+        wcsMetadata = exposure.getWcs().getFitsMetadata()
+        for kw in wcsMetadata.paramNames():
+            md.remove(kw)
 
         return exposure
 
