@@ -168,6 +168,7 @@ class LsstSimMapper(Mapper):
 
         md = item.getMetadata()
         filterName = md.get("FILTER")
+        filterName = filterName.strip()
         filter = afwImage.Filter(filterName)
         item.setFilter(filter)
         md.remove("FILTER")
@@ -185,6 +186,7 @@ class LsstSimMapper(Mapper):
 
         md = item.getMetadata()
         filterName = md.get("FILTER")
+        filterName = filterName.strip()
         filter = afwImage.Filter(filterName)
         item.setFilter(filter)
         md.remove("FILTER")
