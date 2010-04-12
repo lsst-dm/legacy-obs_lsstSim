@@ -113,6 +113,7 @@ class LsstSimMapper(Mapper):
         md = item.getMetadata()
         exposure = afwImage.makeExposure(
                 afwImage.makeMaskedImage(item.getImage()))
+        stripFits(md)
         exposure.setMetadata(md)
 
         ampId = self.extract_ampId(dataId)
@@ -141,6 +142,7 @@ class LsstSimMapper(Mapper):
         return self.calibRegistry.queryMetadata("bias", key, format, dataId)
 
     def std_bias(self, item, dataId):
+        stripFits(item.getMetadata())
         ampId = self.extract_ampId(dataId)
         detector = cameraGeomUtils.findAmp(
                 self.camera, afwCameraGeom.Id(ampId[0]), ampId[1], ampId[2])
@@ -151,6 +153,7 @@ class LsstSimMapper(Mapper):
         return self.calibRegistry.queryMetadata("dark", key, format, dataId)
 
     def std_dark(self, item, dataId):
+        stripFits(item.getMetadata())
         ampId = self.extract_ampId(dataId)
         detector = cameraGeomUtils.findAmp(
                 self.camera, afwCameraGeom.Id(ampId[0]), ampId[1], ampId[2])
@@ -161,6 +164,7 @@ class LsstSimMapper(Mapper):
         return self.calibRegistry.queryMetadata("flat", key, format, dataId)
 
     def std_flat(self, item, dataId):
+        stripFits(item.getMetadata())
         ampId = self.extract_ampId(dataId)
         detector = cameraGeomUtils.findAmp(
                 self.camera, afwCameraGeom.Id(ampId[0]), ampId[1], ampId[2])
@@ -179,6 +183,7 @@ class LsstSimMapper(Mapper):
         return self.calibRegistry.queryMetadata("fringe", key, format, dataId)
 
     def std_fringe(self, item, dataId):
+        stripFits(item.getMetadata())
         ampId = self.extract_ampId(dataId)
         detector = cameraGeomUtils.findAmp(
                 self.camera, afwCameraGeom.Id(ampId[0]), ampId[1], ampId[2])
@@ -229,3 +234,9 @@ class LsstSimMapper(Mapper):
 for calibType in ["bias", "dark", "flat", "fringe"]:
     setattr(LsstSimMapper, "map_" + calibType, lambda self, dataId:
             self._calibMapper(calibType, dataId))
+
+def stripFits(propertySet):
+    for kw in ("SIMPLE", "BITPIX", "EXTEND", "NAXIS", "NAXIS1", "NAXIS2",
+            "BSCALE", "BZERO"):
+        if propertySet.exists(kw):
+            propertySet.remove(kw)
