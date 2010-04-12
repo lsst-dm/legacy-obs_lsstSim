@@ -5,7 +5,7 @@ import re
 import sqlite3
 import sys
 
-import fsScanner
+import lsst.daf.butlerUtils as butlerUtils
 import lsst.afw.image as afwImage
 import lsst.skypix as skypix
 
@@ -13,7 +13,7 @@ location = sys.argv[1]
 
 rawTemplate = "imsim_%(visit)d_%(raft)s_%(sensor)s_%(channel)s_E%(exposure)03d.fits"
 
-scanner = fsScanner.FsScanner(rawTemplate)
+scanner = butlerUtils.FsScanner(rawTemplate)
 
 if os.path.exists("registry.sqlite3"):
     os.unlink("registry.sqlite3")
@@ -24,8 +24,10 @@ first = True
 for f in scanner.getFields():
     if not first:
         cmd += ", "
-    if scanner.isIntField(f):
+    if scanner.isInt(f):
         cmd += f + " int"
+    elif scanner.isFloat(f):
+        cmd += f + " float"
     else:
         cmd += f + " text"
     first = False
@@ -36,6 +38,7 @@ conn.execute(cmd)
 
 cmd = "create table raw_md (id integer references raw(id), key text, value text)"
 conn.execute(cmd)
+
 cmd = "create table raw_skytiles (id integer references raw(id), tile int)"
 conn.execute(cmd)
 
@@ -51,14 +54,14 @@ def callback(path, dataId):
     idList = []
     for f in scanner.getFields():
         cmd += ", ?"
-        if scanner.isIntField(f):
-            idList.append(int(dataId[f]))
+        if scanner.isNumeric(f):
+            idList.append(dataId[f])
         elif f == "raft":
             idList.append(re.sub(r'R(\d)(\d)', r'R:\1,\2', dataId[f]))
         elif f == "sensor":
             idList.append(re.sub(r'S(\d)(\d)', r'S:\1,\2', dataId[f]))
         elif f == "channel":
-            idList.append(re.sub(r'C(\d)(\d)', r'C:\1,\2', dataId[f]))
+            idList.append(re.sub(r'C(\d)(\d)', r'\1\2', dataId[f]))
         else:
             idList.append(dataId[f])
     md = afwImage.readMetadata(path)
@@ -82,10 +85,7 @@ def callback(path, dataId):
         cmd = "insert into raw_md values (?, ?, ?)"
         conn.execute(cmd, (id, k, md.get(k)))
 
-    conn.commit()
-
     wcs = afwImage.makeWcs(md)
-    # idList.append(wcs)
     tiles = qsp.intersect(skypix.imageToPolygon(
         wcs, width, height, ARCSEC_TO_RAD(15)))
     for t in tiles:

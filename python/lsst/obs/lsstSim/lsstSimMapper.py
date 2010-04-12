@@ -1,6 +1,7 @@
 import os
 import re
-from lsst.daf.persistence import Mapper, SqliteRegistry, ButlerLocation
+from lsst.daf.persistence import Mapper, ButlerLocation
+import lsst.daf.butlerUtils as butlerUtils
 import lsst.afw.image as afwImage
 import lsst.afw.cameraGeom as afwCameraGeom
 import lsst.afw.cameraGeom.utils as cameraGeomUtils
@@ -44,7 +45,7 @@ class LsstSimMapper(Mapper):
                 pass
                 # raise pexExcept.LsstException, "Registry not found"
         if registryPath is not None:
-            self.registry = SqliteRegistry(registryPath)
+            self.registry = butlerUtils.SqliteRegistry(registryPath)
 
         # self.keys = self.registry.getFields()
         self.keys = ["visit", "raft", "sensor", "channel", "snap"]
@@ -64,7 +65,7 @@ class LsstSimMapper(Mapper):
                 pass
                 # raise pexExcept.LsstException, "Calibration registry not found"
         if calibRegistryPath is not None:
-            self.calibRegistry = SqliteRegistry(calibRegistryPath)
+            self.calibRegistry = butlerUtils.SqliteRegistry(calibRegistryPath)
 
         # for k in self.calibRegistry.getFields():
         #     if k not in self.keys:
