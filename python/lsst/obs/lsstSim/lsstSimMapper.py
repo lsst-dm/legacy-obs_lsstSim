@@ -224,19 +224,37 @@ class LsstSimMapper(Mapper):
             pathId['exposure'] = pathId['snap']
         return pathId
 
-    def _calibMapper(self, datasetType, dataId):
+    def map_bias(self, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
-        # TODO get this from the metadata registry
-        pathId['filter'] = 'r'
-        path = os.path.join(self.calibRoot,
-                getattr(self, datasetType + 'Template') % pathId)
+        path = os.path.join(self.calibRoot, self.biasTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.ExposureU", "ExposureU",
                 "FitsStorage", path, dataId)
 
-for calibType in ["bias", "dark", "flat", "fringe"]:
-    setattr(LsstSimMapper, "map_" + calibType, lambda self, dataId:
-            self._calibMapper(calibType, dataId))
+    def map_dark(self, dataId):
+        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
+        path = os.path.join(self.calibRoot, self.darkTemplate % pathId)
+        return ButlerLocation(
+                "lsst.afw.image.ExposureU", "ExposureU",
+                "FitsStorage", path, dataId)
+
+    def map_flat(self, dataId):
+        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
+        # TODO get this from the metadata registry
+        pathId['filter'] = 'r'
+        path = os.path.join(self.calibRoot, self.flatTemplate % pathId)
+        return ButlerLocation(
+                "lsst.afw.image.ExposureU", "ExposureU",
+                "FitsStorage", path, dataId)
+
+    def map_fringe(self, dataId):
+        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
+        # TODO get this from the metadata registry
+        pathId['filter'] = 'r'
+        path = os.path.join(self.calibRoot, self.fringeTemplate % pathId)
+        return ButlerLocation(
+                "lsst.afw.image.ExposureU", "ExposureU",
+                "FitsStorage", path, dataId)
 
 def stripFits(propertySet):
     for kw in ("SIMPLE", "BITPIX", "EXTEND", "NAXIS", "NAXIS1", "NAXIS2",
