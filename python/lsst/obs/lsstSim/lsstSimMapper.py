@@ -72,9 +72,12 @@ class LsstSimMapper(Mapper):
         #         self.keys.append(k)
         self.keys.append("filter")
 
-        for datasetType in ["raw", "bias", "dark", "flat", "fringe"]:
+        for datasetType in ["raw", "bias", "dark", "flat", "fringe",
+            "postIsr", "postIsrCcd", "satDefect", "visitImage", "sci",
+            "src", "obj"]:
             key = datasetType + "Template"
-            setattr(self, key, self.policy.getString(key))
+            if self.policy.exists(key):
+                setattr(self, key, self.policy.getString(key))
 
         self.cameraPolicyLocation = os.path.join(
                 defaultFile.getRepositoryPath(),
@@ -252,6 +255,34 @@ class LsstSimMapper(Mapper):
         # TODO get this from the metadata registry
         pathId['filter'] = 'r'
         path = os.path.join(self.calibRoot, self.fringeTemplate % pathId)
+        return ButlerLocation(
+                "lsst.afw.image.ExposureF", "ExposureF",
+                "FitsStorage", path, dataId)
+
+    def map_postIsr(self, dataId):
+        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
+        path = os.path.join(self.root, self.postIsrTemplate % pathId)
+        return ButlerLocation(
+                "lsst.afw.image.ExposureF", "ExposureF",
+                "FitsStorage", path, dataId)
+
+    def map_postIsrCcd(self, dataId):
+        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
+        path = os.path.join(self.root, self.postIsrCcdTemplate % pathId)
+        return ButlerLocation(
+                "lsst.afw.image.ExposureF", "ExposureF",
+                "FitsStorage", path, dataId)
+
+    def map_visitImage(self, dataId):
+        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
+        path = os.path.join(self.root, self.visitImageTemplate % pathId)
+        return ButlerLocation(
+                "lsst.afw.image.ExposureF", "ExposureF",
+                "FitsStorage", path, dataId)
+
+    def map_sci(self, dataId):
+        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
+        path = os.path.join(self.root, self.sciTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)

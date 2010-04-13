@@ -33,6 +33,12 @@ definitions: {
         maxOccurs: 1
 	default: "flat_%(filter)s/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s_E000.fits"
     }
+    postIsrTemplate: {
+        type: string
+        description: "The Python substitution template for the post-ISR amplifier image pathnames."
+        maxOccurs: 1
+	default: "processed/imsim_%(visit)d_R%(raft)s_S%(sensor)s_C%(channel)s_E%(snap)03d.fits"
+    }
     root: {
         type: string
         description: "The pathname to the root directory for images."
