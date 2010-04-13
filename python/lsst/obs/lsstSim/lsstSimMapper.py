@@ -26,7 +26,7 @@ class LsstSimMapper(Mapper):
             self.root = self.policy.getString('root')
         self.calibRoot = calibRoot
         if self.policy.exists('calibRoot'):
-            self.root = self.policy.getString('calibRoot')
+            self.calibRoot = self.policy.getString('calibRoot')
         if self.calibRoot is None:
             self.calibRoot = self.root
 
