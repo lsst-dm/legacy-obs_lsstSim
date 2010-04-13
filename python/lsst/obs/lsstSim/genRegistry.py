@@ -19,11 +19,9 @@ if os.path.exists("registry.sqlite3"):
     os.unlink("registry.sqlite3")
 
 conn = sqlite3.connect("registry.sqlite3")
-cmd = "create table raw (id integer primary key autoincrement,"
-first = True
+cmd = "create table raw (id integer primary key autoincrement"
 for f in scanner.getFields():
-    if not first:
-        cmd += ", "
+    cmd += ", "
     if scanner.isInt(f):
         cmd += f + " int"
     elif scanner.isFloat(f):
@@ -54,9 +52,7 @@ def callback(path, dataId):
     idList = []
     for f in scanner.getFields():
         cmd += ", ?"
-        if scanner.isNumeric(f):
-            idList.append(dataId[f])
-        elif f == "raft":
+        if f == "raft":
             idList.append(re.sub(r'R(\d)(\d)', r'R:\1,\2', dataId[f]))
         elif f == "sensor":
             idList.append(re.sub(r'S(\d)(\d)', r'S:\1,\2', dataId[f]))
@@ -67,7 +63,7 @@ def callback(path, dataId):
     md = afwImage.readMetadata(path)
     width = md.get('NAXIS1')
     height = md.get('NAXIS2')
-    filter = md.get('FILTER')
+    filter = md.get('FILTER').strip()
     idList.append(width)
     idList.append(height)
     idList.append(filter)
@@ -94,6 +90,6 @@ def callback(path, dataId):
 
     conn.commit()
 
-scanner.processDir(location, callback)
+scanner.processPath(location, callback)
 
 conn.close()
