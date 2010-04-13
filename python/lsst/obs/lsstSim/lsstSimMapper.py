@@ -228,14 +228,14 @@ class LsstSimMapper(Mapper):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
         path = os.path.join(self.calibRoot, self.biasTemplate % pathId)
         return ButlerLocation(
-                "lsst.afw.image.ExposureU", "ExposureU",
+                "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)
 
     def map_dark(self, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
         path = os.path.join(self.calibRoot, self.darkTemplate % pathId)
         return ButlerLocation(
-                "lsst.afw.image.ExposureU", "ExposureU",
+                "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)
 
     def map_flat(self, dataId):
@@ -244,7 +244,7 @@ class LsstSimMapper(Mapper):
         pathId['filter'] = 'r'
         path = os.path.join(self.calibRoot, self.flatTemplate % pathId)
         return ButlerLocation(
-                "lsst.afw.image.ExposureU", "ExposureU",
+                "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)
 
     def map_fringe(self, dataId):
@@ -253,7 +253,7 @@ class LsstSimMapper(Mapper):
         pathId['filter'] = 'r'
         path = os.path.join(self.calibRoot, self.fringeTemplate % pathId)
         return ButlerLocation(
-                "lsst.afw.image.ExposureU", "ExposureU",
+                "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)
 
 def stripFits(propertySet):
