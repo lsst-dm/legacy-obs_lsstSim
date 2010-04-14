@@ -147,7 +147,7 @@ class LsstSimMapper(Mapper):
     def _setWcs(self, item):
         md = item.getMetadata()
         item.setWcs(afwImage.makeWcs(md))
-        wcsMetadata = exposure.getWcs().getFitsMetadata()
+        wcsMetadata = item.getWcs().getFitsMetadata()
         for kw in wcsMetadata.paramNames():
             md.remove(kw)
 
