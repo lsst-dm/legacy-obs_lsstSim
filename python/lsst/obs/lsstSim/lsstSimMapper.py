@@ -94,115 +94,11 @@ class LsstSimMapper(Mapper):
     def getKeys(self):
         return self.keys
 
-    def map_camera(self, dataId):
-        return ButlerLocation(
-                "lsst.afw.cameraGeom.Camera", "Camera",
-                "PafStorage", self.cameraPolicyLocation, dataId)
-
-    def std_camera(self, item, dataId):
-        return cameraGeomUtils.makeCamera(item)
-
-    def map_raw(self, dataId):
-        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
-        path = os.path.join(self.root, self.rawTemplate % pathId)
-        return ButlerLocation(
-                "lsst.afw.image.DecoratedImageU", "DecoratedImageU",
-                "FitsStorage", path, dataId)
-
-    def query_raw(self, key, format, dataId):
-        return self.registry.getCollection(key, format, dataId)
-
-    def std_raw(self, item, dataId):
-        md = item.getMetadata()
-        exposure = afwImage.makeExposure(
-                afwImage.makeMaskedImage(item.getImage()))
-        stripFits(md)
-        exposure.setMetadata(md)
-
-        ampId = self.extract_ampId(dataId)
-        detector = cameraGeomUtils.findAmp(
-                self.camera, afwCameraGeom.Id(ampId[0]), ampId[1], ampId[2])
-        exposure.setDetector(detector)
-
-        filterName = md.get("FILTER")
-        filterName = filterName.strip()
-        filter = afwImage.Filter(filterName)
-        exposure.setFilter(filter)
-
-        exposure.setWcs(afwImage.makeWcs(md))
-        wcsMetadata = exposure.getWcs().getFitsMetadata()
-        for kw in wcsMetadata.paramNames():
-            md.remove(kw)
-
-        return exposure
-
-    def extract_ampId(self, dataId):
-        m = re.match(r'(\d)(\d)', dataId['channel'])
-        return (self.extract_detectorName(dataId),
-                int(m.group(1)), int(m.group(2)))
-
-    def extract_detectorName(self, dataId):
-        return "%(raft)s %(sensor)s" % dataId
-
-    def query_bias(self, key, format, dataId):
-        return self.calibRegistry.queryMetadata("bias", key, format, dataId)
-
-    def std_bias(self, item, dataId):
-        stripFits(item.getMetadata())
-        ampId = self.extract_ampId(dataId)
-        detector = cameraGeomUtils.findAmp(
-                self.camera, afwCameraGeom.Id(ampId[0]), ampId[1], ampId[2])
-        item.setDetector(detector)
-        return item
-
-    def query_dark(self, key, format, dataId):
-        return self.calibRegistry.queryMetadata("dark", key, format, dataId)
-
-    def std_dark(self, item, dataId):
-        stripFits(item.getMetadata())
-        ampId = self.extract_ampId(dataId)
-        detector = cameraGeomUtils.findAmp(
-                self.camera, afwCameraGeom.Id(ampId[0]), ampId[1], ampId[2])
-        item.setDetector(detector)
-        return item
-
-    def query_flat(self, key, format, dataId):
-        return self.calibRegistry.queryMetadata("flat", key, format, dataId)
-
-    def std_flat(self, item, dataId):
-        stripFits(item.getMetadata())
-        ampId = self.extract_ampId(dataId)
-        detector = cameraGeomUtils.findAmp(
-                self.camera, afwCameraGeom.Id(ampId[0]), ampId[1], ampId[2])
-        item.setDetector(detector)
-
-        md = item.getMetadata()
-        filterName = md.get("FILTER")
-        filterName = filterName.strip()
-        filter = afwImage.Filter(filterName)
-        item.setFilter(filter)
-        md.remove("FILTER")
-
-        return item
-
-    def query_fringe(self, key, format, dataId):
-        return self.calibRegistry.queryMetadata("fringe", key, format, dataId)
-
-    def std_fringe(self, item, dataId):
-        stripFits(item.getMetadata())
-        ampId = self.extract_ampId(dataId)
-        detector = cameraGeomUtils.findAmp(
-                self.camera, afwCameraGeom.Id(ampId[0]), ampId[1], ampId[2])
-        item.setDetector(detector)
-
-        md = item.getMetadata()
-        filterName = md.get("FILTER")
-        filterName = filterName.strip()
-        filter = afwImage.Filter(filterName)
-        item.setFilter(filter)
-        md.remove("FILTER")
-
-        return item
+###############################################################################
+#
+# Utility functions
+#
+###############################################################################
 
     def _mapIdToActual(self, dataId):
         # TODO map mapped fields in actualId to actual fields
@@ -227,6 +123,76 @@ class LsstSimMapper(Mapper):
             pathId['exposure'] = pathId['snap']
         return pathId
 
+    def _extractDetectorName(self, dataId):
+        return "%(raft)s %(sensor)s" % dataId
+
+    def _extractAmpId(self, dataId):
+        m = re.match(r'(\d)(\d)', dataId['channel'])
+        return (self._extractDetectorName(dataId),
+                int(m.group(1)), int(m.group(2)))
+
+    def _setDetector(self, item, dataId):
+        ampId = self._extractAmpId(dataId)
+        detector = cameraGeomUtils.findAmp(
+                self.camera, afwCameraGeom.Id(ampId[0]), ampId[1], ampId[2])
+        item.setDetector(detector)
+
+    def _setFilter(self, item):
+        filterName = item.getMetadata().get("FILTER").strip()
+        filter = afwImage.Filter(filterName)
+        item.setFilter(filter)
+
+    def _setWcs(self, item):
+        md = item.getMetadata()
+        item.setWcs(afwImage.makeWcs(md))
+        wcsMetadata = exposure.getWcs().getFitsMetadata()
+        for kw in wcsMetadata.paramNames():
+            md.remove(kw)
+
+    def _standardizeExposure(self, item, dataId):
+        stripFits(item.getMetadata())
+        self._setDetector(item, dataId)
+        self._setFilter(item)
+        self._setWcs(item)
+        return item
+
+    def _standardizeCalib(self, item, dataId, filterNeeded):
+        stripFits(item.getMetadata())
+        self._setDetector(item, dataId)
+        if filterNeeded:
+            self._setFilter(item)
+        return item
+
+###############################################################################
+
+    def map_camera(self, dataId):
+        return ButlerLocation(
+                "lsst.afw.cameraGeom.Camera", "Camera",
+                "PafStorage", self.cameraPolicyLocation, dataId)
+
+    def std_camera(self, item, dataId):
+        return cameraGeomUtils.makeCamera(item)
+
+###############################################################################
+
+    def map_raw(self, dataId):
+        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
+        path = os.path.join(self.root, self.rawTemplate % pathId)
+        return ButlerLocation(
+                "lsst.afw.image.DecoratedImageU", "DecoratedImageU",
+                "FitsStorage", path, dataId)
+
+    def query_raw(self, key, format, dataId):
+        return self.registry.getCollection(key, format, dataId)
+
+    def std_raw(self, item, dataId):
+        exposure = afwImage.makeExposure(
+                afwImage.makeMaskedImage(item.getImage()))
+        exposure.setMetadata(item.getMetadata())
+        return self._standardizeExposure(exposure, dataId)
+
+###############################################################################
+
     def map_bias(self, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
         path = os.path.join(self.calibRoot, self.biasTemplate % pathId)
@@ -234,12 +200,28 @@ class LsstSimMapper(Mapper):
                 "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)
 
+    def query_bias(self, key, format, dataId):
+        return self.calibRegistry.queryMetadata("bias", key, format, dataId)
+
+    def std_bias(self, item, dataId):
+        return self._standardizeCalib(item, dataId, False)
+
+###############################################################################
+
     def map_dark(self, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
         path = os.path.join(self.calibRoot, self.darkTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)
+
+    def query_dark(self, key, format, dataId):
+        return self.calibRegistry.queryMetadata("dark", key, format, dataId)
+
+    def std_dark(self, item, dataId):
+        return self._standardizeCalib(item, dataId, False)
+
+###############################################################################
 
     def map_flat(self, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
@@ -250,6 +232,14 @@ class LsstSimMapper(Mapper):
                 "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)
 
+    def query_flat(self, key, format, dataId):
+        return self.calibRegistry.queryMetadata("flat", key, format, dataId)
+
+    def std_flat(self, item, dataId):
+        return self._standardizeCalib(item, dataId, True)
+
+###############################################################################
+
     def map_fringe(self, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
         # TODO get this from the metadata registry
@@ -259,12 +249,25 @@ class LsstSimMapper(Mapper):
                 "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)
 
+    def query_fringe(self, key, format, dataId):
+        return self.calibRegistry.queryMetadata("fringe", key, format, dataId)
+
+    def std_fringe(self, item, dataId):
+        return self._standardizeCalib(item, dataId, True)
+
+###############################################################################
+
     def map_postIsr(self, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
         path = os.path.join(self.root, self.postIsrTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)
+
+    def std_postIsr(self, item, dataId):
+        return self._standardizeExposure(item, dataId)
+
+###############################################################################
 
     def map_postIsrCcd(self, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
@@ -273,6 +276,11 @@ class LsstSimMapper(Mapper):
                 "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)
 
+    def std_postIsrCcd(self, item, dataId):
+        return self._standardizeExposure(item, dataId)
+
+###############################################################################
+
     def map_visitImage(self, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
         path = os.path.join(self.root, self.visitImageTemplate % pathId)
@@ -280,12 +288,22 @@ class LsstSimMapper(Mapper):
                 "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)
 
+    def std_visitImage(self, item, dataId):
+        return self._standardizeExposure(item, dataId)
+
+###############################################################################
+
     def map_sci(self, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
         path = os.path.join(self.root, self.sciTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)
+
+    def std_sci(self, item, dataId):
+        return self._standardizeExposure(item, dataId)
+
+###############################################################################
 
 def stripFits(propertySet):
     for kw in ("SIMPLE", "BITPIX", "EXTEND", "NAXIS", "NAXIS1", "NAXIS2",
