@@ -128,8 +128,10 @@ class LsstSimMapper(Mapper):
 
     def _extractAmpId(self, dataId):
         m = re.match(r'(\d)(\d)', dataId['channel'])
+        # Note that indices are swapped in the camera geometry vs. official
+        # channel specification.
         return (self._extractDetectorName(dataId),
-                int(m.group(1)), int(m.group(2)))
+                int(m.group(2)), int(m.group(1)))
 
     def _setDetector(self, item, dataId):
         ampId = self._extractAmpId(dataId)
