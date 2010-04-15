@@ -28,7 +28,6 @@ for f in scanner.getFields():
         cmd += f + " float"
     else:
         cmd += f + " text"
-    first = False
 cmd += ", width int, height int, filter text"
 cmd += ")"
  

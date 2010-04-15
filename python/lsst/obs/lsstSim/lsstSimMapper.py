@@ -43,7 +43,6 @@ class LsstSimMapper(Mapper):
             registryPath = "registry.sqlite3"
             if not os.path.exists(registryPath):
                 pass
-                # raise pexExcept.LsstException, "Registry not found"
         if registryPath is not None:
             self.registry = butlerUtils.SqliteRegistry(registryPath)
 
@@ -56,14 +55,14 @@ class LsstSimMapper(Mapper):
             if not os.path.exists(calibRegistryPath):
                 calibRegistryPath = None
         if calibRegistryPath is None:
-            calibRegistryPath = os.path.join(self.root, "calibRegistry.sqlite3")
+            calibRegistryPath = os.path.join(self.calibRoot,
+                    "calibRegistry.sqlite3")
             if not os.path.exists(calibRegistryPath):
                 calibRegistryPath = None
         if calibRegistryPath is None:
             calibRegistryPath = "calibRegistry.sqlite3"
             if not os.path.exists(calibRegistryPath):
                 pass
-                # raise pexExcept.LsstException, "Calibration registry not found"
         if calibRegistryPath is not None:
             self.calibRegistry = butlerUtils.SqliteRegistry(calibRegistryPath)
 
@@ -188,7 +187,7 @@ class LsstSimMapper(Mapper):
         return self.registry.getCollection(key, format, dataId)
 
     def std_raw(self, item, dataId):
-        exposure = afwImage.makeExposure(
+        exposure = afwImage.ExposureU(
                 afwImage.makeMaskedImage(item.getImage()))
         exposure.setMetadata(item.getMetadata())
         return self._standardizeExposure(exposure, dataId)
