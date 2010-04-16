@@ -9,7 +9,7 @@ import lsst.afw.image.utils as imageUtils
 import lsst.pex.policy as pexPolicy
 
 class LsstSimMapper(Mapper):
-    def __init__(self, policy=None, root=".", calibRoot=None):
+    def __init__(self, policy=None, root=".", calibRoot=None, **kw):
         Mapper.__init__(self)
 
         self.policy = policy
@@ -30,53 +30,26 @@ class LsstSimMapper(Mapper):
         if self.calibRoot is None:
             self.calibRoot = self.root
 
-        registryPath = None
-        if self.policy.exists('registryPath'):
-            registryPath = self.policy.getString('registryPath')
-            if not os.path.exists(registryPath):
-                registryPath = None
-        if registryPath is None:
-            registryPath = os.path.join(self.root, "registry.sqlite3")
-            if not os.path.exists(registryPath):
-                registryPath = None
-        if registryPath is None:
-            registryPath = "registry.sqlite3"
-            if not os.path.exists(registryPath):
-                pass
-        if registryPath is not None:
-            self.registry = butlerUtils.SqliteRegistry(registryPath)
-
-        # self.keys = self.registry.getFields()
-        self.keys = ["visit", "raft", "sensor", "channel", "snap"]
-
-        calibRegistryPath = None
-        if self.policy.exists('calibRegistryPath'):
-            calibRegistryPath = self.policy.getString('calibRegistryPath')
-            if not os.path.exists(calibRegistryPath):
-                calibRegistryPath = None
-        if calibRegistryPath is None:
-            calibRegistryPath = os.path.join(self.calibRoot,
-                    "calibRegistry.sqlite3")
-            if not os.path.exists(calibRegistryPath):
-                calibRegistryPath = None
-        if calibRegistryPath is None:
-            calibRegistryPath = "calibRegistry.sqlite3"
-            if not os.path.exists(calibRegistryPath):
-                pass
-        if calibRegistryPath is not None:
-            self.calibRegistry = butlerUtils.SqliteRegistry(calibRegistryPath)
-
-        # for k in self.calibRegistry.getFields():
-        #     if k not in self.keys:
-        #         self.keys.append(k)
-        self.keys.append("filter")
-
         for datasetType in ["raw", "bias", "dark", "flat", "fringe",
-            "postIsr", "postIsrCcd", "satDefect", "visitImage", "sci",
+            "postISR", "postISRCCD", "satDefect", "visitim", "calexp",
             "src", "obj"]:
             key = datasetType + "Template"
             if self.policy.exists(key):
                 setattr(self, key, self.policy.getString(key))
+
+        self._setupRegistry(kw)
+        self._setupCalibRegistry(kw)
+
+        if self.registry:
+            self.keys = self.registry.getFields()
+        else:
+            self.keys = ["visit", "raft", "sensor", "channel", "snap"]
+        if self.calibRegistry:
+            for k in self.calibRegistry.getFields():
+                if k not in self.keys:
+                    self.keys.append(k)
+        else:
+            self.keys.append("filter")
 
         self.cameraPolicyLocation = os.path.join(
                 defaultFile.getRepositoryPath(),
@@ -99,9 +72,55 @@ class LsstSimMapper(Mapper):
 #
 ###############################################################################
 
+    def _setupRegistry(self, kw):
+        registryPath = None
+        if self.policy.exists('registryPath'):
+            registryPath = self.policy.getString('registryPath')
+            if not os.path.exists(registryPath):
+                registryPath = None
+        if registryPath is None:
+            registryPath = os.path.join(self.root, "registry.sqlite3")
+            if not os.path.exists(registryPath):
+                registryPath = None
+        if registryPath is None:
+            registryPath = "registry.sqlite3"
+        if os.path.exists(registryPath):
+            self.registry = butlerUtils.SqliteRegistry(registryPath)
+        else:
+            # Try a FsRegistry(self.root) for raw and all intermediates
+            self.registry = None
+
+    def _setupCalibRegistry(self, kw):
+        calibRegistryPath = None
+        if self.policy.exists('calibRegistryPath'):
+            calibRegistryPath = self.policy.getString('calibRegistryPath')
+            if not os.path.exists(calibRegistryPath):
+                calibRegistryPath = None
+        if calibRegistryPath is None:
+            calibRegistryPath = os.path.join(self.calibRoot,
+                    "calibRegistry.sqlite3")
+            if not os.path.exists(calibRegistryPath):
+                calibRegistryPath = None
+        if calibRegistryPath is None:
+            calibRegistryPath = "calibRegistry.sqlite3"
+        if os.path.exists(calibRegistryPath):
+            self.calibRegistry = butlerUtils.SqliteRegistry(calibRegistryPath)
+        else:
+            # Try a FsRegistry(self.calibRoot) for all calibration types
+            self.calibRegistry = None
+
     def _mapIdToActual(self, dataId):
-        # TODO map mapped fields in actualId to actual fields
-        return dict(dataId)
+        # TODO map mapped fields in dataId to actual fields
+        actualId = dict(dataId)
+        if actualId.has_key("detector"):
+            for m in re.finditer(r'([RSC]):(\d),(\d)', actualId['detector']):
+                if m.group(1) == 'R':
+                    actualId['raft'] = m.group(0)
+                elif m.group(1) == 'S':
+                    actualId['sensor'] = m.group(0)
+                elif m.group(1) == 'C':
+                    actualId['channel'] = m.group(0)
+        return actualId
 
     def _mapActualToPath(self, actualId):
         pathId = dict(actualId)
@@ -109,15 +128,9 @@ class LsstSimMapper(Mapper):
             pathId['raft'] = re.sub(r'R:(\d),(\d)', r'\1\2', pathId['raft'])
         if pathId.has_key("sensor"):
             pathId['sensor'] = re.sub(r'S:(\d),(\d)', r'\1\2', pathId['sensor'])
-        if pathId.has_key("detector"):
-            for m in re.finditer(r'([RSC]):(\d),(\d)', pathId['detector']):
-                id = m.groups(1) + m.groups(2)
-                if m.groups(0) == 'R':
-                    pathId['raft'] = id
-                elif m.groups(0) == 'S':
-                    pathId['sensor'] = id
-                elif m.groups(0) == 'C':
-                    pathId['channel'] = id
+        if pathId.has_key("channel"):
+            pathId['channel'] = re.sub(r'C:(\d),(\d)', r'\1\2',
+                    pathId['channel'])
         if pathId.has_key("snap"):
             pathId['exposure'] = pathId['snap']
         return pathId
@@ -126,7 +139,7 @@ class LsstSimMapper(Mapper):
         return "%(raft)s %(sensor)s" % dataId
 
     def _extractAmpId(self, dataId):
-        m = re.match(r'(\d)(\d)', dataId['channel'])
+        m = re.match(r'C:(\d),(\d)', dataId['channel'])
         # Note that indices are swapped in the camera geometry vs. official
         # channel specification.
         return (self._extractDetectorName(dataId),
@@ -258,50 +271,50 @@ class LsstSimMapper(Mapper):
 
 ###############################################################################
 
-    def map_postIsr(self, dataId):
+    def map_postISR(self, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
-        path = os.path.join(self.root, self.postIsrTemplate % pathId)
+        path = os.path.join(self.root, self.postISRTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)
 
-    def std_postIsr(self, item, dataId):
+    def std_postISR(self, item, dataId):
         return self._standardizeExposure(item, dataId)
 
 ###############################################################################
 
-    def map_postIsrCcd(self, dataId):
+    def map_postISRCCD(self, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
-        path = os.path.join(self.root, self.postIsrCcdTemplate % pathId)
+        path = os.path.join(self.root, self.postISRCCDTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)
 
-    def std_postIsrCcd(self, item, dataId):
+    def std_postISRCCD(self, item, dataId):
         return self._standardizeExposure(item, dataId)
 
 ###############################################################################
 
-    def map_visitImage(self, dataId):
+    def map_visitim(self, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
-        path = os.path.join(self.root, self.visitImageTemplate % pathId)
+        path = os.path.join(self.root, self.visitimTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)
 
-    def std_visitImage(self, item, dataId):
+    def std_visitim(self, item, dataId):
         return self._standardizeExposure(item, dataId)
 
 ###############################################################################
 
-    def map_sci(self, dataId):
+    def map_calexp(self, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
-        path = os.path.join(self.root, self.sciTemplate % pathId)
+        path = os.path.join(self.root, self.calexpTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)
 
-    def std_sci(self, item, dataId):
+    def std_calexp(self, item, dataId):
         return self._standardizeExposure(item, dataId)
 
 ###############################################################################
