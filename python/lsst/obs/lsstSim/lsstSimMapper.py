@@ -145,10 +145,16 @@ class LsstSimMapper(Mapper):
         return (self._extractDetectorName(dataId),
                 int(m.group(2)), int(m.group(1)))
 
-    def _setDetector(self, item, dataId):
+    def _setAmpDetector(self, item, dataId):
         ampId = self._extractAmpId(dataId)
         detector = cameraGeomUtils.findAmp(
                 self.camera, afwCameraGeom.Id(ampId[0]), ampId[1], ampId[2])
+        item.setDetector(detector)
+
+    def _setCcdDetector(self, item, dataId):
+        ccdId = self._extractDetectorName(dataId)
+        detector = cameraGeomUtils.findCcd(
+                self.camera, afwCameraGeom.Id(ccdId))
         item.setDetector(detector)
 
     def _setFilter(self, item):
@@ -156,18 +162,13 @@ class LsstSimMapper(Mapper):
         filter = afwImage.Filter(filterName)
         item.setFilter(filter)
 
-    def _setWcs(self, item):
-        md = item.getMetadata()
-        item.setWcs(afwImage.makeWcs(md))
-        wcsMetadata = item.getWcs().getFitsMetadata()
-        for kw in wcsMetadata.paramNames():
-            md.remove(kw)
-
-    def _standardizeExposure(self, item, dataId):
+    def _standardizeExposure(self, item, dataId, isAmp=False):
         stripFits(item.getMetadata())
-        self._setDetector(item, dataId)
+        if isAmp:
+            self._setAmpDetector(item, dataId)
+        else:
+            self._setCcdDetector(item, dataId)
         self._setFilter(item)
-        self._setWcs(item)
         return item
 
     def _standardizeCalib(self, item, dataId, filterNeeded):
@@ -202,8 +203,13 @@ class LsstSimMapper(Mapper):
     def std_raw(self, item, dataId):
         exposure = afwImage.ExposureU(
                 afwImage.makeMaskedImage(item.getImage()))
-        exposure.setMetadata(item.getMetadata())
-        return self._standardizeExposure(exposure, dataId)
+        md = item.getMetadata()
+        exposure.setMetadata(md)
+        exposure.setWcs(afwImage.makeWcs(md))
+        wcsMetadata = item.getWcs().getFitsMetadata()
+        for kw in wcsMetadata.paramNames():
+            md.remove(kw)
+        return self._standardizeExposure(exposure, dataId, True)
 
 ###############################################################################
 
@@ -279,7 +285,7 @@ class LsstSimMapper(Mapper):
                 "FitsStorage", path, dataId)
 
     def std_postISR(self, item, dataId):
-        return self._standardizeExposure(item, dataId)
+        return self._standardizeExposure(item, dataId, True)
 
 ###############################################################################
 
