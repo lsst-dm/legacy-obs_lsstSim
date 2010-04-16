@@ -173,7 +173,7 @@ class LsstSimMapper(Mapper):
 
     def _standardizeCalib(self, item, dataId, filterNeeded):
         stripFits(item.getMetadata())
-        self._setDetector(item, dataId)
+        self._setAmpDetector(item, dataId)
         if filterNeeded:
             self._setFilter(item)
         return item
