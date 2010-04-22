@@ -135,7 +135,7 @@ class LsstSimMapper(Mapper):
         return pathId
 
     def _extractDetectorName(self, dataId):
-        return "R%(raft)s S%(sensor)s" % dataId
+        return "R:%(raft)s S:%(sensor)s" % dataId
 
     def _extractAmpId(self, dataId):
         m = re.match(r'(\d),(\d)', dataId['channel'])
