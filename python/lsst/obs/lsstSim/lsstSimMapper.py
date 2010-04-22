@@ -87,7 +87,7 @@ class LsstSimMapper(Mapper):
         if os.path.exists(registryPath):
             self.registry = butlerUtils.SqliteRegistry(registryPath)
         else:
-            # Try a FsRegistry(self.root) for raw and all intermediates
+            # TODO Try a FsRegistry(self.root) for raw and all intermediates
             self.registry = None
 
     def _setupCalibRegistry(self, kw):
@@ -106,11 +106,10 @@ class LsstSimMapper(Mapper):
         if os.path.exists(calibRegistryPath):
             self.calibRegistry = butlerUtils.SqliteRegistry(calibRegistryPath)
         else:
-            # Try a FsRegistry(self.calibRoot) for all calibration types
+            # TODO Try a FsRegistry(self.calibRoot) for all calibration types
             self.calibRegistry = None
 
     def _mapIdToActual(self, dataId):
-        # TODO map mapped fields in dataId to actual fields
         actualId = dict(dataId)
         if actualId.has_key("detector"):
             for m in re.finditer(r'([RSC]):(\d),(\d)', actualId['detector']):
@@ -125,21 +124,21 @@ class LsstSimMapper(Mapper):
     def _mapActualToPath(self, actualId):
         pathId = dict(actualId)
         if pathId.has_key("raft"):
-            pathId['raft'] = re.sub(r'R:(\d),(\d)', r'\1\2', pathId['raft'])
+            pathId['raft'] = re.sub(r'(\d),(\d)', r'\1\2', pathId['raft'])
         if pathId.has_key("sensor"):
-            pathId['sensor'] = re.sub(r'S:(\d),(\d)', r'\1\2', pathId['sensor'])
+            pathId['sensor'] = re.sub(r'(\d),(\d)', r'\1\2', pathId['sensor'])
         if pathId.has_key("channel"):
-            pathId['channel'] = re.sub(r'C:(\d),(\d)', r'\1\2',
+            pathId['channel'] = re.sub(r'(\d),(\d)', r'\1\2',
                     pathId['channel'])
         if pathId.has_key("snap"):
             pathId['exposure'] = pathId['snap']
         return pathId
 
     def _extractDetectorName(self, dataId):
-        return "%(raft)s %(sensor)s" % dataId
+        return "R%(raft)s S%(sensor)s" % dataId
 
     def _extractAmpId(self, dataId):
-        m = re.match(r'C:(\d),(\d)', dataId['channel'])
+        m = re.match(r'(\d),(\d)', dataId['channel'])
         # Note that indices are swapped in the camera geometry vs. official
         # channel specification.
         return (self._extractDetectorName(dataId),
