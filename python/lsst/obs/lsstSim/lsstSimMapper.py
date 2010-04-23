@@ -1,5 +1,7 @@
 import os
 import re
+import time
+import lsst.daf.base as dafBase
 from lsst.daf.persistence import Mapper, ButlerLocation
 import lsst.daf.butlerUtils as butlerUtils
 import lsst.afw.image as afwImage
@@ -162,7 +164,21 @@ class LsstSimMapper(Mapper):
         item.setFilter(filter)
 
     def _standardizeExposure(self, item, dataId, isAmp=False):
-        stripFits(item.getMetadata())
+        md = item.getMetadata()
+        stripFits(md)
+
+        # Recompute EQUINOX and WCS based on actual observation date
+        mjd = md.get("MJD-OBS")
+        obsdate = dafBase.DateTime(mjd, dafBase.DateTime.MJD,
+                dafBase.DateTime.TAI)
+        gmt = time.gmtime(obsdate.nsecs(dafBase.DateTime.UTC) / 1.0e9)
+        year = gmt[0]
+        doy = gmt[7]
+        equinox = year + (doy / 365.0)
+        wcsMetadata = item.getWcs().getFitsMetadata()
+        wcsMetadata.set("EQUINOX", equinox)
+        item.setWcs(afwImage.makeWcs(wcsMetadata))
+
         if isAmp:
             self._setAmpDetector(item, dataId)
         else:
