@@ -51,11 +51,23 @@ definitions: {
         maxOccurs: 1
 	default: "visitim/v%(visit)d-fr/R%(raft)s-S%(sensor)s.fits"
     }
+    psfTemplate: {
+        type: string
+        description: "The Python substitution template for the measured PSF pathnames."
+        maxOccurs: 1
+	default: "psf/v%(visit)d-fr/R%(raft)s-S%(sensor)s.boost"
+    }
     calexpTemplate: {
         type: string
         description: "The Python substitution template for the calibrated science exposure pathnames."
         maxOccurs: 1
 	default: "calexp/v%(visit)d-fr/R%(raft)s-S%(sensor)s.fits"
+    }
+    srcTemplate: {
+        type: string
+        description: "The Python substitution template for the source vector pathnames."
+        maxOccurs: 1
+	default: "src/v%(visit)d-fr/R%(raft)s-S%(sensor)s.boost"
     }
 
     root: {

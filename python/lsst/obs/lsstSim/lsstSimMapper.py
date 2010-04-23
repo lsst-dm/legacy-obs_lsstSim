@@ -32,7 +32,7 @@ class LsstSimMapper(Mapper):
 
         for datasetType in ["raw", "bias", "dark", "flat", "fringe",
             "postISR", "postISRCCD", "satDefect", "visitim", "calexp",
-            "src", "obj"]:
+            "psf", "src", "obj"]:
             key = datasetType + "Template"
             if self.policy.exists(key):
                 setattr(self, key, self.policy.getString(key))
@@ -312,6 +312,15 @@ class LsstSimMapper(Mapper):
 
 ###############################################################################
 
+    def map_psf(self, dataId):
+        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
+        path = os.path.join(self.root, self.psfTemplate % pathId)
+        return ButlerLocation(
+                "lsst.meas.algorithms.PSF", "PSF",
+                "BoostStorage", path, dataId)
+
+###############################################################################
+
     def map_calexp(self, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
         path = os.path.join(self.root, self.calexpTemplate % pathId)
@@ -321,6 +330,18 @@ class LsstSimMapper(Mapper):
 
     def std_calexp(self, item, dataId):
         return self._standardizeExposure(item, dataId)
+
+###############################################################################
+
+    def map_src(self, dataId):
+        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
+        path = os.path.join(self.root, self.srcTemplate % pathId)
+        ampExposureId = dataId['visit'] << 12
+        # TODO add in ccd and amp bits
+        return ButlerLocation(
+                "lsst.afw.detection.PersistableSourceVector",
+                "PersistableSourceVector",
+                "BoostStorage", path, {"ampExposureId": ampExposureId})
 
 ###############################################################################
 
