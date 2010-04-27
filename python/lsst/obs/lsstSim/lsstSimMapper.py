@@ -56,7 +56,7 @@ class LsstSimMapper(Mapper):
         self.cameraPolicyLocation = os.path.join(
                 defaultFile.getRepositoryPath(),
                 self.policy.getString('cameraDescription'))
-        cameraPolicy = pexPolicy.Policy.createPolicy(self.cameraPolicyLocation)
+        cameraPolicy = cameraGeomUtils.getGeomPolicy(self.cameraPolicyLocation)
         self.camera = cameraGeomUtils.makeCamera(cameraPolicy)
 
         filterPolicy = pexPolicy.Policy.createPolicy(
@@ -201,7 +201,8 @@ class LsstSimMapper(Mapper):
                 "PafStorage", self.cameraPolicyLocation, dataId)
 
     def std_camera(self, item, dataId):
-        return cameraGeomUtils.makeCamera(item)
+        pol = cameraGeomUtils.getGeomPolicy(item)
+        return cameraGeomUtils.makeCamera(pol)
 
 ###############################################################################
 
