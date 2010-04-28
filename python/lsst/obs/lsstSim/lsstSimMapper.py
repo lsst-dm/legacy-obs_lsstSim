@@ -2,7 +2,7 @@ import os
 import re
 import time
 import lsst.daf.base as dafBase
-from lsst.daf.persistence import Mapper, ButlerLocation
+from lsst.daf.persistence import Mapper, ButlerLocation, LogicalLocation
 import lsst.daf.butlerUtils as butlerUtils
 import lsst.afw.image as afwImage
 import lsst.afw.cameraGeom as afwCameraGeom
@@ -31,6 +31,10 @@ class LsstSimMapper(Mapper):
             self.calibRoot = self.policy.getString('calibRoot')
         if self.calibRoot is None:
             self.calibRoot = self.root
+
+        # Do any location map substitutions
+        self.root = LogicalLocation(self.root).locString()
+        self.calibRoot = LogicalLocation(self.calibRoot).locString()
 
         for datasetType in ["raw", "bias", "dark", "flat", "fringe",
             "postISR", "postISRCCD", "satDefect", "visitim", "calexp",
