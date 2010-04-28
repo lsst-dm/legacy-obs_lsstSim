@@ -262,7 +262,7 @@ class LsstSimMapper(Mapper):
     def map_flat(self, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
         # TODO get this from the metadata registry
-        pathId['filter'] = 'r'
+        # pathId['filter'] = 'r'
         path = os.path.join(self.calibRoot, self.flatTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.ExposureF", "ExposureF",
@@ -279,7 +279,7 @@ class LsstSimMapper(Mapper):
     def map_fringe(self, dataId):
         pathId = self._mapActualToPath(self._mapIdToActual(dataId))
         # TODO get this from the metadata registry
-        pathId['filter'] = 'r'
+        # pathId['filter'] = 'r'
         path = os.path.join(self.calibRoot, self.fringeTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.ExposureF", "ExposureF",
