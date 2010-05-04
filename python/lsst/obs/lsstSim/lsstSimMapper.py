@@ -40,6 +40,13 @@ class LsstSimMapper(Mapper):
         self.root = LogicalLocation(self.root).locString()
         self.calibRoot = LogicalLocation(self.calibRoot).locString()
 
+        if not os.path.exists(self.root):
+            self.log.log(pexLog.Log.WARN,
+                    "Root directory not found: %s" % (root,))
+        if not os.path.exists(self.calibRoot):
+            self.log.log(pexLog.Log.WARN,
+                    "Calibration root directory not found: %s" % (calibRoot,))
+
         for datasetType in ["raw", "bias", "dark", "flat", "fringe",
             "postISR", "satPixelSet", "postISRCCD", "visitim",
             "psf", "calexp", "src", "obj"]:
@@ -72,7 +79,6 @@ class LsstSimMapper(Mapper):
                     self.policy.getString('filterDescription')))
         imageUtils.defineFiltersFromPolicy(filterPolicy, reset=True)
 
-
     def getKeys(self):
         return self.keys
 
@@ -97,7 +103,7 @@ class LsstSimMapper(Mapper):
             if not os.path.exists(registryPath):
                 registryPath = None
         if registryPath is not None:
-            self.log.log(pexLog.INFO,
+            self.log.log(pexLog.Log.INFO,
                     "Registry loaded from %s" % (registryPath,))
             self.registry = butlerUtils.Registry.create(registryPath)
         else:
@@ -136,11 +142,27 @@ class LsstSimMapper(Mapper):
         if dataId.has_key('filter'):
             return dataId
         actualId = dict(dataId)
+        if not dataId.has_key('visit'):
+            raise KeyError, \
+                    "Data id missing visit key, cannot look up filter\n" + \
+                    str(dataId)
         rows = self.registry.executeQuery(("filter",), ("raw",),
                 {'visit': "?"}, None, (dataId['visit'],))
         assert len(rows) == 1
         actualId['filter'] = str(rows[0][0])
         return actualId
+
+    def _mapActualToPath(self, actualId):
+        pathId = dict(actualId)
+        if pathId.has_key("raft"):
+            pathId['raft'] = re.sub(r'(\d),(\d)', r'\1\2', pathId['raft'])
+        if pathId.has_key("sensor"):
+            pathId['sensor'] = re.sub(r'(\d),(\d)', r'\1\2', pathId['sensor'])
+        if pathId.has_key("channel"):
+            pathId['channel'] = re.sub(r'(\d),(\d)', r'\1\2', pathId['channel'])
+        if pathId.has_key("snap"):
+            pathId['exposure'] = pathId['snap']
+        return pathId
 
     def _extractDetectorName(self, dataId):
         return "R:%(raft)s S:%(sensor)s" % dataId
@@ -260,7 +282,7 @@ class LsstSimMapper(Mapper):
 ###############################################################################
 
     def map_raw(self, dataId):
-        pathId = self._mapActualToPath(self._needField(dataId))
+        pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.rawTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.DecoratedImageU", "DecoratedImageU",
@@ -328,7 +350,7 @@ class LsstSimMapper(Mapper):
 ###############################################################################
 
     def map_fringe(self, dataId):
-        pathId = self._mapActualToPath(self._needFilter((dataId))
+        pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.calibRoot, self.fringeTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.ExposureF", "ExposureF",
