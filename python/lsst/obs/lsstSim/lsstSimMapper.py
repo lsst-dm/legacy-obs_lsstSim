@@ -8,19 +8,23 @@ import lsst.afw.image as afwImage
 import lsst.afw.cameraGeom as afwCameraGeom
 import lsst.afw.cameraGeom.utils as cameraGeomUtils
 import lsst.afw.image.utils as imageUtils
+import lsst.pex.logging as pexLog
 import lsst.pex.policy as pexPolicy
 
 class LsstSimMapper(Mapper):
-    def __init__(self, policy=None, root=".", calibRoot=None, **kw):
+    def __init__(self, policy=None, root=".", registry=None, calibRoot=None):
         Mapper.__init__(self)
+
+        self.log = pexLog.Log(pexLog.getDefaultLog(), "CfhtMapper")
 
         self.policy = policy
         if self.policy is None:
             self.policy = pexPolicy.Policy()
         defaultFile = pexPolicy.DefaultPolicyFile("obs_lsstSim",
                 "LsstSimMapperDictionary.paf", "policy")
+        self.repositoryPath = defaultFile.getRepositoryPath()
         defaultPolicy = pexPolicy.Policy.createPolicy(defaultFile,
-                defaultFile.getRepositoryPath())
+                self.repositoryPath)
         self.policy.mergeDefaults(defaultPolicy)
 
         self.root = root
@@ -37,34 +41,34 @@ class LsstSimMapper(Mapper):
         self.calibRoot = LogicalLocation(self.calibRoot).locString()
 
         for datasetType in ["raw", "bias", "dark", "flat", "fringe",
-            "postISR", "postISRCCD", "satDefect", "visitim", "calexp",
-            "psf", "src", "obj"]:
+            "postISR", "satPixelSet", "postISRCCD", "visitim",
+            "psf", "calexp", "src", "obj"]:
             key = datasetType + "Template"
             if self.policy.exists(key):
                 setattr(self, key, self.policy.getString(key))
 
-        self._setupRegistry(kw)
-        self._setupCalibRegistry(kw)
+        self._setupRegistry(registry)
 
-        if self.registry:
-            self.keys = self.registry.getFields()
-        else:
-            self.keys = ["visit", "raft", "sensor", "channel", "snap"]
-        if self.calibRegistry:
-            for k in self.calibRegistry.getFields():
-                if k not in self.keys:
-                    self.keys.append(k)
-        else:
-            self.keys.append("filter")
+        self.keys = ["visit", "snap", "raft", "sensor", "channel", "skyTile"]
+        self.keys.append("filter")
 
-        self.cameraPolicyLocation = os.path.join(
-                defaultFile.getRepositoryPath(),
+        self.cameraPolicyLocation = os.path.join(self.repositoryPath,
                 self.policy.getString('cameraDescription'))
-        cameraPolicy = cameraGeomUtils.getGeomPolicy(self.cameraPolicyLocation)
-        self.camera = cameraGeomUtils.makeCamera(cameraPolicy)
+        self.cameraPolicy = cameraGeomUtils.getGeomPolicy(
+                self.cameraPolicyLocation)
+
+        self.defectRegistry = None
+        if self.policy.exists('defectPath'):
+            self.defectPath = os.path.join(
+                    self.repositoryPath, self.policy.getString('defectPath'))
+            defectRegistryLocation = os.path.join(
+                    self.defectPath, "defectRegistry.sqlite3")
+            self.defectRegistry = \
+                    butlerUtils.Registry.create(defectRegistryLocation)
+        self.cameras = {}
 
         filterPolicy = pexPolicy.Policy.createPolicy(
-                os.path.join(defaultFile.getRepositoryPath(),
+                os.path.join(self.repositoryPath,
                     self.policy.getString('filterDescription')))
         imageUtils.defineFiltersFromPolicy(filterPolicy, reset=True)
 
@@ -78,9 +82,9 @@ class LsstSimMapper(Mapper):
 #
 ###############################################################################
 
-    def _setupRegistry(self, kw):
-        registryPath = None
-        if self.policy.exists('registryPath'):
+    def _setupRegistry(self, registry):
+        registryPath = registry
+        if registryPath is None and self.policy.exists('registryPath'):
             registryPath = self.policy.getString('registryPath')
             if not os.path.exists(registryPath):
                 registryPath = None
@@ -90,13 +94,17 @@ class LsstSimMapper(Mapper):
                 registryPath = None
         if registryPath is None:
             registryPath = "registry.sqlite3"
-        if os.path.exists(registryPath):
-            self.registry = butlerUtils.SqliteRegistry(registryPath)
+            if not os.path.exists(registryPath):
+                registryPath = None
+        if registryPath is not None:
+            self.log.log(pexLog.INFO,
+                    "Registry loaded from %s" % (registryPath,))
+            self.registry = butlerUtils.Registry.create(registryPath)
         else:
-            # TODO Try a FsRegistry(self.root) for raw and all intermediates
+            # TODO Try a FsRegistry(self.root) for raw (and all outputs?)
             self.registry = None
 
-    def _setupCalibRegistry(self, kw):
+    def _setupCalibRegistry(self):
         calibRegistryPath = None
         if self.policy.exists('calibRegistryPath'):
             calibRegistryPath = self.policy.getString('calibRegistryPath')
@@ -109,36 +117,30 @@ class LsstSimMapper(Mapper):
                 calibRegistryPath = None
         if calibRegistryPath is None:
             calibRegistryPath = "calibRegistry.sqlite3"
-        if os.path.exists(calibRegistryPath):
+            if not os.path.exists(calibRegistryPath):
+                calibRegistryPath = None
+        if calibRegistryPath is not None:
+            self.log.log(pexLog.INFO,
+                    "Calibration registry loaded from %s" %
+                    (calibRegistryPath,))
             self.calibRegistry = butlerUtils.SqliteRegistry(calibRegistryPath)
+
+            # for k in self.calibRegistry.getFields():
+            #     if k not in self.keys:
+            #         self.keys.append(k)
         else:
             # TODO Try a FsRegistry(self.calibRoot) for all calibration types
             self.calibRegistry = None
 
-    def _mapIdToActual(self, dataId):
+    def _needFilter(self, dataId):
+        if dataId.has_key('filter'):
+            return dataId
         actualId = dict(dataId)
-        if actualId.has_key("detector"):
-            for m in re.finditer(r'([RSC]):(\d),(\d)', actualId['detector']):
-                if m.group(1) == 'R':
-                    actualId['raft'] = m.group(0)
-                elif m.group(1) == 'S':
-                    actualId['sensor'] = m.group(0)
-                elif m.group(1) == 'C':
-                    actualId['channel'] = m.group(0)
+        rows = self.registry.executeQuery(("filter",), ("raw",),
+                {'visit': "?"}, None, (dataId['visit'],))
+        assert len(rows) == 1
+        actualId['filter'] = str(rows[0][0])
         return actualId
-
-    def _mapActualToPath(self, actualId):
-        pathId = dict(actualId)
-        if pathId.has_key("raft"):
-            pathId['raft'] = re.sub(r'(\d),(\d)', r'\1\2', pathId['raft'])
-        if pathId.has_key("sensor"):
-            pathId['sensor'] = re.sub(r'(\d),(\d)', r'\1\2', pathId['sensor'])
-        if pathId.has_key("channel"):
-            pathId['channel'] = re.sub(r'(\d),(\d)', r'\1\2',
-                    pathId['channel'])
-        if pathId.has_key("snap"):
-            pathId['exposure'] = pathId['snap']
-        return pathId
 
     def _extractDetectorName(self, dataId):
         return "R:%(raft)s S:%(sensor)s" % dataId
@@ -152,18 +154,27 @@ class LsstSimMapper(Mapper):
 
     def _setAmpDetector(self, item, dataId):
         ampId = self._extractAmpId(dataId)
+        camera = self._cameraWithDefects(dataId)
         detector = cameraGeomUtils.findAmp(
-                self.camera, afwCameraGeom.Id(ampId[0]), ampId[1], ampId[2])
+                camera, afwCameraGeom.Id(ampId[0]), ampId[1], ampId[2])
         item.setDetector(detector)
 
     def _setCcdDetector(self, item, dataId):
         ccdId = self._extractDetectorName(dataId)
-        detector = cameraGeomUtils.findCcd(
-                self.camera, afwCameraGeom.Id(ccdId))
+        camera = self._cameraWithDefects(dataId)
+        detector = cameraGeomUtils.findCcd(camera, afwCameraGeom.Id(ccdId))
         item.setDetector(detector)
 
-    def _setFilter(self, item):
-        filterName = item.getMetadata().get("FILTER").strip()
+    def _setFilter(self, item, dataId):
+        md = item.getMetadata()
+        filterName = None
+        if md.exists("FILTER"):
+            filterName = item.getMetadata().get("FILTER").strip()
+        if filterName is None:
+            rows = self.registry.executeQuery(("filter",), ("raw",),
+                    {'visit': "?"}, None, (dataId['visit'],))
+            assert len(rows) == 1
+            filterName = str(rows[0][0])
         filter = afwImage.Filter(filterName)
         item.setFilter(filter)
 
@@ -187,15 +198,50 @@ class LsstSimMapper(Mapper):
             self._setAmpDetector(item, dataId)
         else:
             self._setCcdDetector(item, dataId)
-        self._setFilter(item)
+        self._setFilter(item, dataId)
         return item
 
     def _standardizeCalib(self, item, dataId, filterNeeded):
         stripFits(item.getMetadata())
         self._setAmpDetector(item, dataId)
         if filterNeeded:
-            self._setFilter(item)
+            self._setFilter(item, dataId)
         return item
+
+    def _defectLookup(self, dataId):
+        if self.defectRegistry is None:
+            return None
+
+        rows = self.registry.executeQuery(("taiObs",), ("raw",),
+                {"visit": "?"}, None, (dataId['visit'],))
+        if len(rows) == 0:
+            return None
+        assert len(rows) == 1
+        taiObs = rows[0][0]
+
+        rows = self.defectRegistry.executeQuery(("path",), ("defect",), None,
+                ("DATETIME(?)", "DATETIME(validStart)", "DATETIME(validEnd)"),
+                (taiObs,))
+        if len(rows) == 0:
+            return None
+        assert len(rows) == 1
+        return os.path.join(self.defectPath, str(rows[0][0]))
+
+    def _cameraWithDefects(self, dataId):
+        defectPolicy = self._defectLookup(dataId)
+        if defectPolicy is None:
+            if not self.cameras.has_key(""):
+                self.cameras[""] = \
+                        cameraGeomUtils.makeCamera(self.cameraPolicy)
+            return self.cameras[""]
+        if not self.cameras.has_key(defectPolicy):
+            cameraPolicy = pexPolicy.Policy(self.cameraPolicy, True)
+            cameraPolicy.set("Defects",
+                    pexPolicy.Policy.createPolicy(defectPolicy).get("Defects"))
+            self.cameras[defectPolicy] = \
+                    cameraGeomUtils.makeCamera(cameraPolicy)
+        return self.cameras[defectPolicy]
+
 
 ###############################################################################
 
@@ -206,22 +252,31 @@ class LsstSimMapper(Mapper):
 
     def std_camera(self, item, dataId):
         pol = cameraGeomUtils.getGeomPolicy(item)
+        defectPol = self._defectLookup(dataId)
+        if defectPol is not None:
+            pol.set("Defects", defectPol)
         return cameraGeomUtils.makeCamera(pol)
 
 ###############################################################################
 
     def map_raw(self, dataId):
-        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
+        pathId = self._mapActualToPath(self._needField(dataId))
         path = os.path.join(self.root, self.rawTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.DecoratedImageU", "DecoratedImageU",
                 "FitsStorage", path, dataId)
 
     def query_raw(self, key, format, dataId):
-        return self.registry.getCollection(key, format, dataId)
+        where = {}
+        values = []
+        for k, v in dataId.iteritems():
+            where[k] = '?'
+            values.append(v)
+        return self.registry.executeQuery(format, ("raw", "raw_skyTile"),
+                where, None, values)
 
     def std_raw(self, item, dataId):
-        exposure = afwImage.ExposureU(
+        exposure = afwImage.makeExposure(
                 afwImage.makeMaskedImage(item.getImage()))
         md = item.getMetadata()
         exposure.setMetadata(md)
@@ -234,7 +289,7 @@ class LsstSimMapper(Mapper):
 ###############################################################################
 
     def map_bias(self, dataId):
-        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
+        pathId = self._mapActualToPath(dataId)
         path = os.path.join(self.calibRoot, self.biasTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.ExposureF", "ExposureF",
@@ -249,14 +304,11 @@ class LsstSimMapper(Mapper):
 ###############################################################################
 
     def map_dark(self, dataId):
-        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
+        pathId = self._mapActualToPath(dataId)
         path = os.path.join(self.calibRoot, self.darkTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)
-
-    def query_dark(self, key, format, dataId):
-        return self.calibRegistry.queryMetadata("dark", key, format, dataId)
 
     def std_dark(self, item, dataId):
         return self._standardizeCalib(item, dataId, False)
@@ -264,16 +316,11 @@ class LsstSimMapper(Mapper):
 ###############################################################################
 
     def map_flat(self, dataId):
-        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
-        # TODO get this from the metadata registry
-        # pathId['filter'] = 'r'
+        pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.calibRoot, self.flatTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)
-
-    def query_flat(self, key, format, dataId):
-        return self.calibRegistry.queryMetadata("flat", key, format, dataId)
 
     def std_flat(self, item, dataId):
         return self._standardizeCalib(item, dataId, True)
@@ -281,16 +328,11 @@ class LsstSimMapper(Mapper):
 ###############################################################################
 
     def map_fringe(self, dataId):
-        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
-        # TODO get this from the metadata registry
-        # pathId['filter'] = 'r'
+        pathId = self._mapActualToPath(self._needFilter((dataId))
         path = os.path.join(self.calibRoot, self.fringeTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)
-
-    def query_fringe(self, key, format, dataId):
-        return self.calibRegistry.queryMetadata("fringe", key, format, dataId)
 
     def std_fringe(self, item, dataId):
         return self._standardizeCalib(item, dataId, True)
@@ -298,7 +340,7 @@ class LsstSimMapper(Mapper):
 ###############################################################################
 
     def map_postISR(self, dataId):
-        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
+        pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.postISRTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.ExposureF", "ExposureF",
@@ -309,8 +351,15 @@ class LsstSimMapper(Mapper):
 
 ###############################################################################
 
+    def map_satPixelSet(self, dataId):
+        pathId = self._mapActualToPath(_needFilter(dataId))
+        path = os.path.join(self.root, self.satPixelSetTemplate % pathId)
+        return ButlerLocation(None, None, "PickleStorage", path, None)
+
+###############################################################################
+
     def map_postISRCCD(self, dataId):
-        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
+        pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.postISRCCDTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.ExposureF", "ExposureF",
@@ -322,7 +371,7 @@ class LsstSimMapper(Mapper):
 ###############################################################################
 
     def map_visitim(self, dataId):
-        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
+        pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.visitimTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.ExposureF", "ExposureF",
@@ -334,7 +383,7 @@ class LsstSimMapper(Mapper):
 ###############################################################################
 
     def map_psf(self, dataId):
-        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
+        pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.psfTemplate % pathId)
         return ButlerLocation(
                 "lsst.meas.algorithms.PSF", "PSF",
@@ -343,7 +392,7 @@ class LsstSimMapper(Mapper):
 ###############################################################################
 
     def map_calexp(self, dataId):
-        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
+        pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.calexpTemplate % pathId)
         return ButlerLocation(
                 "lsst.afw.image.ExposureF", "ExposureF",
@@ -355,10 +404,12 @@ class LsstSimMapper(Mapper):
 ###############################################################################
 
     def map_src(self, dataId):
-        pathId = self._mapActualToPath(self._mapIdToActual(dataId))
+        pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.srcTemplate % pathId)
-        ampExposureId = dataId['visit'] << 12
-        # TODO add in ccd and amp bits
+        r1, r2 = dataId['raft'].split(',')
+        s1, s2 = dataId['sensor'].split(',')
+        ampExposureId = (dataId['visit'] << 9) + \
+                (int(r1) * 5 + int(r2)) * 10 + (int(s1) * 3 + int(s2))
         return ButlerLocation(
                 "lsst.afw.detection.PersistableSourceVector",
                 "PersistableSourceVector",
