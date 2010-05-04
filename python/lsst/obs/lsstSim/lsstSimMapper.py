@@ -15,7 +15,7 @@ class LsstSimMapper(Mapper):
     def __init__(self, policy=None, root=".", registry=None, calibRoot=None):
         Mapper.__init__(self)
 
-        self.log = pexLog.Log(pexLog.getDefaultLog(), "CfhtMapper")
+        self.log = pexLog.Log(pexLog.getDefaultLog(), "LsstSimMapper")
 
         self.policy = policy
         if self.policy is None:
@@ -352,7 +352,7 @@ class LsstSimMapper(Mapper):
     def map_satPixelSet(self, dataId):
         pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.satPixelSetTemplate % pathId)
-        return ButlerLocation(None, None, "PickleStorage", path, None)
+        return ButlerLocation(None, None, "PickleStorage", path, {})
 
 ###############################################################################
 
@@ -407,7 +407,7 @@ class LsstSimMapper(Mapper):
         r1, r2 = dataId['raft'].split(',')
         s1, s2 = dataId['sensor'].split(',')
         ampExposureId = (dataId['visit'] << 9) + \
-                (int(r1) * 5 + int(r2)) * 10 + (int(s1) * 3 + int(s2))
+                (long(r1) * 5 + long(r2)) * 10 + (long(s1) * 3 + long(s2))
         return ButlerLocation(
                 "lsst.afw.detection.PersistableSourceVector",
                 "PersistableSourceVector",
