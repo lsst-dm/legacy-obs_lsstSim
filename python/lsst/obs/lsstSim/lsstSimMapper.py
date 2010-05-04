@@ -350,7 +350,7 @@ class LsstSimMapper(Mapper):
 ###############################################################################
 
     def map_satPixelSet(self, dataId):
-        pathId = self._mapActualToPath(_needFilter(dataId))
+        pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.satPixelSetTemplate % pathId)
         return ButlerLocation(None, None, "PickleStorage", path, None)
 
