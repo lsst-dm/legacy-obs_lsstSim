@@ -55,7 +55,6 @@ class LsstSimMapper(Mapper):
                 setattr(self, key, self.policy.getString(key))
 
         self._setupRegistry(registry)
-
         self.keys = ["visit", "snap", "raft", "sensor", "channel", "skyTile"]
         self.keys.append("filter")
 
@@ -110,34 +109,6 @@ class LsstSimMapper(Mapper):
             # TODO Try a FsRegistry(self.root) for raw (and all outputs?)
             self.registry = None
 
-    def _setupCalibRegistry(self):
-        calibRegistryPath = None
-        if self.policy.exists('calibRegistryPath'):
-            calibRegistryPath = self.policy.getString('calibRegistryPath')
-            if not os.path.exists(calibRegistryPath):
-                calibRegistryPath = None
-        if calibRegistryPath is None:
-            calibRegistryPath = os.path.join(self.calibRoot,
-                    "calibRegistry.sqlite3")
-            if not os.path.exists(calibRegistryPath):
-                calibRegistryPath = None
-        if calibRegistryPath is None:
-            calibRegistryPath = "calibRegistry.sqlite3"
-            if not os.path.exists(calibRegistryPath):
-                calibRegistryPath = None
-        if calibRegistryPath is not None:
-            self.log.log(pexLog.INFO,
-                    "Calibration registry loaded from %s" %
-                    (calibRegistryPath,))
-            self.calibRegistry = butlerUtils.SqliteRegistry(calibRegistryPath)
-
-            # for k in self.calibRegistry.getFields():
-            #     if k not in self.keys:
-            #         self.keys.append(k)
-        else:
-            # TODO Try a FsRegistry(self.calibRoot) for all calibration types
-            self.calibRegistry = None
-
     def _needFilter(self, dataId):
         if dataId.has_key('filter'):
             return dataId
@@ -146,9 +117,14 @@ class LsstSimMapper(Mapper):
             raise KeyError, \
                     "Data id missing visit key, cannot look up filter\n" + \
                     str(dataId)
+        if not hasattr(self, 'registry') or self.registry is None:
+            raise RuntimeError, "No registry available to find filter for visit"
         rows = self.registry.executeQuery(("filter",), ("raw",),
                 {'visit': "?"}, None, (dataId['visit'],))
-        assert len(rows) == 1
+        if len(rows) != 1:
+            raise RuntimeError, \
+                    "Unable to find unique filter for visit %d: %s" % \
+                    (dataId['visit'], str(rows))
         actualId['filter'] = str(rows[0][0])
         return actualId
 
@@ -195,7 +171,10 @@ class LsstSimMapper(Mapper):
         if filterName is None:
             rows = self.registry.executeQuery(("filter",), ("raw",),
                     {'visit': "?"}, None, (dataId['visit'],))
-            assert len(rows) == 1
+            if len(rows) != 1:
+                raise RuntimeError, \
+                        "Unable to find unique filter for visit %d: %s" % \
+                        (dataId['visit'], str(rows))
             filterName = str(rows[0][0])
         filter = afwImage.Filter(filterName)
         item.setFilter(filter)
@@ -316,9 +295,6 @@ class LsstSimMapper(Mapper):
         return ButlerLocation(
                 "lsst.afw.image.ExposureF", "ExposureF",
                 "FitsStorage", path, dataId)
-
-    def query_bias(self, key, format, dataId):
-        return self.calibRegistry.queryMetadata("bias", key, format, dataId)
 
     def std_bias(self, item, dataId):
         return self._standardizeCalib(item, dataId, False)
