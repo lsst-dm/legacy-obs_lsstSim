@@ -115,7 +115,7 @@ class LsstSimMapper(Mapper):
     def _needFilter(self, dataId):
         if dataId.has_key('filter'):
             return dataId
-        actualId = dict(dataId)
+        actualId = dataId.copy()
         if not dataId.has_key('visit'):
             raise KeyError, \
                     "Data id missing visit key, cannot look up filter\n" + \
@@ -131,16 +131,30 @@ class LsstSimMapper(Mapper):
         actualId['filter'] = str(rows[0][0])
         return actualId
 
+    def _transformId(self, dataId):
+        actualId = dataId.copy()
+        if actualId.has_key("sensorName"):
+            m = re.search(r'R:(\d),(\d) S:(\d),(\d)', actualId['sensorName'])
+            actualId['raft'] = m.group(1) + "," + m.group(2)
+            actualId['sensor'] = m.group(3) + "," + m.group(4)
+        if actualId.has_key("channelName"):
+            m = re.search(r'ID(\d+)', actualId['channelName'])
+            channelNumber = int(m.group(1))
+            channelX = channelNumber % 8
+            channelY = channelNumber // 8
+            actualId['channel'] = str(channelY) + "," + str(channelX)
+        if actualId.has_key("exposure"):
+            actualId['snap'] = actualId['exposure']
+        return actualId
+
     def _mapActualToPath(self, actualId):
-        pathId = dict(actualId)
+        pathId = actualId.copy()
         if pathId.has_key("raft"):
             pathId['raft'] = re.sub(r'(\d),(\d)', r'\1\2', pathId['raft'])
         if pathId.has_key("sensor"):
             pathId['sensor'] = re.sub(r'(\d),(\d)', r'\1\2', pathId['sensor'])
         if pathId.has_key("channel"):
             pathId['channel'] = re.sub(r'(\d),(\d)', r'\1\2', pathId['channel'])
-        if pathId.has_key("snap"):
-            pathId['exposure'] = pathId['snap']
         return pathId
 
     def _extractDetectorName(self, dataId):
@@ -250,11 +264,13 @@ class LsstSimMapper(Mapper):
 ###############################################################################
 
     def map_camera(self, dataId):
+        dataId = self._transformId(dataId)
         return ButlerLocation(
                 "lsst.afw.cameraGeom.Camera", "Camera",
                 "PafStorage", self.cameraPolicyLocation, dataId)
 
     def std_camera(self, item, dataId):
+        dataId = self._transformId(dataId)
         pol = cameraGeomUtils.getGeomPolicy(item)
         defectPol = self._defectLookup(dataId)
         if defectPol is not None:
@@ -264,6 +280,7 @@ class LsstSimMapper(Mapper):
 ###############################################################################
 
     def map_raw(self, dataId):
+        dataId = self._transformId(dataId)
         pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.rawTemplate % pathId)
         return ButlerLocation(
@@ -271,6 +288,7 @@ class LsstSimMapper(Mapper):
                 "FitsStorage", path, dataId)
 
     def query_raw(self, key, format, dataId):
+        dataId = self._transformId(dataId)
         where = {}
         values = []
         for k, v in dataId.iteritems():
@@ -280,6 +298,7 @@ class LsstSimMapper(Mapper):
                 where, None, values)
 
     def std_raw(self, item, dataId):
+        dataId = self._transformId(dataId)
         exposure = afwImage.makeExposure(
                 afwImage.makeMaskedImage(item.getImage()))
         md = item.getMetadata()
@@ -293,6 +312,7 @@ class LsstSimMapper(Mapper):
 ###############################################################################
 
     def map_bias(self, dataId):
+        dataId = self._transformId(dataId)
         pathId = self._mapActualToPath(dataId)
         path = os.path.join(self.calibRoot, self.biasTemplate % pathId)
         return ButlerLocation(
@@ -305,6 +325,7 @@ class LsstSimMapper(Mapper):
 ###############################################################################
 
     def map_dark(self, dataId):
+        dataId = self._transformId(dataId)
         pathId = self._mapActualToPath(dataId)
         path = os.path.join(self.calibRoot, self.darkTemplate % pathId)
         return ButlerLocation(
@@ -312,11 +333,13 @@ class LsstSimMapper(Mapper):
                 "FitsStorage", path, dataId)
 
     def std_dark(self, item, dataId):
+        dataId = self._transformId(dataId)
         return self._standardizeCalib(item, dataId, False)
 
 ###############################################################################
 
     def map_flat(self, dataId):
+        dataId = self._transformId(dataId)
         pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.calibRoot, self.flatTemplate % pathId)
         return ButlerLocation(
@@ -324,11 +347,13 @@ class LsstSimMapper(Mapper):
                 "FitsStorage", path, dataId)
 
     def std_flat(self, item, dataId):
+        dataId = self._transformId(dataId)
         return self._standardizeCalib(item, dataId, True)
 
 ###############################################################################
 
     def map_fringe(self, dataId):
+        dataId = self._transformId(dataId)
         pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.calibRoot, self.fringeTemplate % pathId)
         return ButlerLocation(
@@ -336,11 +361,13 @@ class LsstSimMapper(Mapper):
                 "FitsStorage", path, dataId)
 
     def std_fringe(self, item, dataId):
+        dataId = self._transformId(dataId)
         return self._standardizeCalib(item, dataId, True)
 
 ###############################################################################
 
     def map_postISR(self, dataId):
+        dataId = self._transformId(dataId)
         pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.postISRTemplate % pathId)
         return ButlerLocation(
@@ -348,11 +375,13 @@ class LsstSimMapper(Mapper):
                 "FitsStorage", path, dataId)
 
     def std_postISR(self, item, dataId):
+        dataId = self._transformId(dataId)
         return self._standardizeExposure(item, dataId, True)
 
 ###############################################################################
 
     def map_satPixelSet(self, dataId):
+        dataId = self._transformId(dataId)
         pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.satPixelSetTemplate % pathId)
         return ButlerLocation(None, None, "PickleStorage", path, {})
@@ -360,6 +389,7 @@ class LsstSimMapper(Mapper):
 ###############################################################################
 
     def map_postISRCCD(self, dataId):
+        dataId = self._transformId(dataId)
         pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.postISRCCDTemplate % pathId)
         return ButlerLocation(
@@ -367,11 +397,13 @@ class LsstSimMapper(Mapper):
                 "FitsStorage", path, dataId)
 
     def std_postISRCCD(self, item, dataId):
+        dataId = self._transformId(dataId)
         return self._standardizeExposure(item, dataId)
 
 ###############################################################################
 
     def map_visitim(self, dataId):
+        dataId = self._transformId(dataId)
         pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.visitimTemplate % pathId)
         return ButlerLocation(
@@ -379,11 +411,13 @@ class LsstSimMapper(Mapper):
                 "FitsStorage", path, dataId)
 
     def std_visitim(self, item, dataId):
+        dataId = self._transformId(dataId)
         return self._standardizeExposure(item, dataId)
 
 ###############################################################################
 
     def map_psf(self, dataId):
+        dataId = self._transformId(dataId)
         pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.psfTemplate % pathId)
         return ButlerLocation(
@@ -393,6 +427,7 @@ class LsstSimMapper(Mapper):
 ###############################################################################
 
     def map_calexp(self, dataId):
+        dataId = self._transformId(dataId)
         pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.calexpTemplate % pathId)
         return ButlerLocation(
@@ -400,15 +435,17 @@ class LsstSimMapper(Mapper):
                 "FitsStorage", path, dataId)
 
     def std_calexp(self, item, dataId):
+        dataId = self._transformId(dataId)
         return self._standardizeExposure(item, dataId)
 
 ###############################################################################
 
     def map_src(self, dataId):
+        dataId = self._transformId(dataId)
         pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.srcTemplate % pathId)
-        r1, r2 = dataId['raft'].split(',')
-        s1, s2 = dataId['sensor'].split(',')
+        r1, r2 = pathId['raft']
+        s1, s2 = pathId['sensor']
         ampExposureId = (dataId['visit'] << 9) + \
                 (long(r1) * 5 + long(r2)) * 10 + (long(s1) * 3 + long(s2))
         filterId = self.filterIdMap[pathId['filter']]
