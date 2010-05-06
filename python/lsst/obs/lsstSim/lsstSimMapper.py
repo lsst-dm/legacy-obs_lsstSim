@@ -78,6 +78,9 @@ class LsstSimMapper(Mapper):
                     self.policy.getString('filterDescription')))
         imageUtils.defineFiltersFromPolicy(filterPolicy, reset=True)
 
+        self.filterIdMap = {
+                'u': 0, 'g': 1, 'r': 2, 'i': 3, 'z': 4, 'y': 5, 'i2': 5}
+
     def getKeys(self):
         return self.keys
 
@@ -408,10 +411,12 @@ class LsstSimMapper(Mapper):
         s1, s2 = dataId['sensor'].split(',')
         ampExposureId = (dataId['visit'] << 9) + \
                 (long(r1) * 5 + long(r2)) * 10 + (long(s1) * 3 + long(s2))
+        filterId = self.filterIdMap[pathId['filter']]
         return ButlerLocation(
                 "lsst.afw.detection.PersistableSourceVector",
                 "PersistableSourceVector",
-                "BoostStorage", path, {"ampExposureId": ampExposureId})
+                "BoostStorage", path,
+                {"ampExposureId": ampExposureId, "filterId": filterId})
 
 ###############################################################################
 
