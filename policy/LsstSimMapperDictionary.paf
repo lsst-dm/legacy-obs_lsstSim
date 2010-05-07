@@ -39,12 +39,6 @@ definitions: {
         maxOccurs: 1
 	default: "postISR/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s/C%(channel)s.fits"
     }
-    satPixelSetTemplate: {
-        type: string
-        description: "The Python substitution template for the saturated pixel set pathnames."
-        maxOccurs: 1
-        default: "postISR/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s/C%(channel)s.satPixelSet"
-    }
     postISRCCDTemplate: {
         type: string
         description: "The Python substitution template for the post-ISR CCD image pathnames."
@@ -75,6 +69,49 @@ definitions: {
         maxOccurs: 1
 	default: "src/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
     }
+    sourceHistTemplate: {
+        type: string
+        description: "The Python substitution template for the source histogram pathnames."
+        maxOccurs: 1
+	default: "results/st%(skyTile)d/sourceHist.fits"
+    }
+    badSourceHistTemplate: {
+        type: string
+        description: "The Python substitution template for the bad source histogram pathnames."
+        maxOccurs: 1
+	default: "results/st%(skyTile)d/badSourceHist.fits"
+    }
+    sourceTemplate: {
+        type: string
+        description: "The Python substitution template for the final source vector pathnames."
+        maxOccurs: 1
+	default: "results/st%(skyTile)d/source.boost"
+    }
+    badSourceTemplate: {
+        type: string
+        description: "The Python substitution template for the bad source vector pathnames."
+        maxOccurs: 1
+	default: "results/st%(skyTile)d/badSource.boost"
+    }
+    invalidSourceTemplate: {
+        type: string
+        description: "The Python substitution template for the invalid source vector pathnames."
+        maxOccurs: 1
+	default: "results/st%(skyTile)d/invalidSource.boost"
+    }
+    object: {
+        type: string
+        description: "The Python substitution template for the source cluster pathnames."
+        maxOccurs: 1
+	default: "results/st%(skyTile)d/object.boost"
+    }
+    badObjectTemplate: {
+        type: string
+        description: "The Python substitution template for the bad source cluster pathnames."
+        maxOccurs: 1
+	default: "results/st%(skyTile)d/badObject.boost"
+    }
+
 
     root: {
         type: string
