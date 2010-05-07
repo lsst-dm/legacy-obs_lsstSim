@@ -106,7 +106,7 @@ definitions: {
         type: string
         description: "The pathname to the directory containing the defect policies and registry.  Relative to the repository containing this dictionary."
         maxOccurs: 1
-        default: "../description"
+        default: "../description/defects"
     }
     filterDescription: {
         type: string
