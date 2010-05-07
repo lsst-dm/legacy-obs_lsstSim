@@ -248,6 +248,9 @@ class LsstSimMapper(Mapper):
     def _addDefects(self, dataId, amp=None, ccd=None):
         if ccd is None:
             ccd = afwCameraGeom.cast_Ccd(amp.getParent())
+        if len(ccd.getDefects()) > 0:
+            # Assume we have loaded them properly already
+            return
         defectFits = self._defectLookup(dataId, ccd.getId().getSerial())
         if defectFits is not None:
             defectDict = cameraGeomUtils.makeDefectsFromFits(defectFits)
