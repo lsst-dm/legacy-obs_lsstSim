@@ -453,7 +453,7 @@ class LsstSimMapper(Mapper):
 
     def map_sourceHist(self, dataId):
         dataId = self._transformId(dataId)
-        path = os.path.join(self.root, self.sourceHistTemplate % pathId)
+        path = os.path.join(self.root, self.sourceHistTemplate % dataId)
         return ButlerLocation(
                 "lsst.afw.image.DecoratedImageU",
                 "DecoratedImageU",
@@ -461,7 +461,7 @@ class LsstSimMapper(Mapper):
 
     def map_badSourceHist(self, dataId):
         dataId = self._transformId(dataId)
-        path = os.path.join(self.root, self.badSourceHistTemplate % pathId)
+        path = os.path.join(self.root, self.badSourceHistTemplate % dataId)
         return ButlerLocation(
                 "lsst.afw.image.DecoratedImageU",
                 "DecoratedImageU",
@@ -469,7 +469,7 @@ class LsstSimMapper(Mapper):
 
     def map_source(self, dataId):
         dataId = self._transformId(dataId)
-        path = os.path.join(self.root, self.sourceTemplate % pathId)
+        path = os.path.join(self.root, self.sourceTemplate % dataId)
         return ButlerLocation(
                 "lsst.afw.detection.PersistableSourceVector",
                 "PersistableSourceVector",
@@ -477,7 +477,7 @@ class LsstSimMapper(Mapper):
 
     def map_badSource(self, dataId):
         dataId = self._transformId(dataId)
-        path = os.path.join(self.root, self.badSourceTemplate % pathId)
+        path = os.path.join(self.root, self.badSourceTemplate % dataId)
         return ButlerLocation(
                 "lsst.afw.detection.PersistableSourceVector",
                 "PersistableSourceVector",
@@ -485,7 +485,7 @@ class LsstSimMapper(Mapper):
 
     def map_invalidSource(self, dataId):
         dataId = self._transformId(dataId)
-        path = os.path.join(self.root, self.invalidSourceHistTemplate % pathId)
+        path = os.path.join(self.root, self.invalidSourceHistTemplate % dataId)
         return ButlerLocation(
                 "lsst.afw.detection.PersistableSourceVector",
                 "PersistableSourceVector",
@@ -493,7 +493,7 @@ class LsstSimMapper(Mapper):
 
     def map_object(self, dataId):
         dataId = self._transformId(dataId)
-        path = os.path.join(self.root, self.objectTemplate % pathId)
+        path = os.path.join(self.root, self.objectTemplate % dataId)
         return ButlerLocation(
                 "lsst.ap.cluster.PersistableSourceClusterVector",
                 "PersistableSourceClusterVector",
@@ -501,7 +501,7 @@ class LsstSimMapper(Mapper):
 
     def map_badObject(self, dataId):
         dataId = self._transformId(dataId)
-        path = os.path.join(self.root, self.badObjectTemplate % pathId)
+        path = os.path.join(self.root, self.badObjectTemplate % dataId)
         return ButlerLocation(
                 "lsst.ap.cluster.PersistableSourceClusterVector",
                 "PersistableSourceClusterVector",
