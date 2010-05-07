@@ -1,7 +1,7 @@
 setupRequired(pex_logging >= 3.4.1)
 setupRequired(pex_policy >= 3.5)
 setupRequired(daf_persistence >= 3.3.12)
-setupRequired(afw >= 3.3.23)
+setupRequired(afw >= 3.4.1)
 setupRequired(daf_butlerUtils >= 3.0.2)
 setupRequired(skypix >= 3.0.3)
 
