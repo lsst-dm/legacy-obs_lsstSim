@@ -128,7 +128,7 @@ class LsstSimMapper(Mapper):
             raise RuntimeError, \
                     "Unable to find unique filter for visit %d: %s" % \
                     (dataId['visit'], str(rows))
-        actualId['filter'] = str(rows[0][0])
+        actualId['filter'] = rows[0][0]
         return actualId
 
     def _transformId(self, dataId):
@@ -192,7 +192,7 @@ class LsstSimMapper(Mapper):
                 raise RuntimeError, \
                         "Unable to find unique filter for visit %d: %s" % \
                         (dataId['visit'], str(rows))
-            filterName = str(rows[0][0])
+            filterName = rows[0][0]
         filter = afwImage.Filter(filterName)
         item.setFilter(filter)
 
@@ -244,7 +244,7 @@ class LsstSimMapper(Mapper):
         if len(rows) == 0:
             return None
         assert len(rows) == 1
-        return os.path.join(self.defectPath, str(rows[0][0]))
+        return os.path.join(self.defectPath, rows[0][0])
 
     def _addDefects(self, dataId, amp=None, ccd=None):
         if ccd is None:
