@@ -485,7 +485,7 @@ class LsstSimMapper(Mapper):
 
     def map_invalidSource(self, dataId):
         dataId = self._transformId(dataId)
-        path = os.path.join(self.root, self.invalidSourceHistTemplate % dataId)
+        path = os.path.join(self.root, self.invalidSourceTemplate % dataId)
         return ButlerLocation(
                 "lsst.afw.detection.PersistableSourceVector",
                 "PersistableSourceVector",
