@@ -215,96 +215,112 @@ CcdDiskLayout: {
         serial: 0
         flipLR: false
         flipTB: false
+        nQuarter: 0
         hdu: 0
     }
     Amp: {
         serial: 1
         flipLR: false
         flipTB: false
+        nQuarter: 0
         hdu: 0
     }
     Amp: {
         serial: 2
         flipLR: false
         flipTB: false
+        nQuarter: 0
         hdu: 0
     }
     Amp: {
         serial: 3
         flipLR: false
         flipTB: false
+        nQuarter: 0
         hdu: 0
     }
     Amp: {
         serial: 4
         flipLR: false
         flipTB: false
+        nQuarter: 0
         hdu: 0
     }
     Amp: {
         serial: 5
         flipLR: false
         flipTB: false
+        nQuarter: 0
         hdu: 0
     }
     Amp: {
         serial: 6
         flipLR: false
         flipTB: false
+        nQuarter: 0
         hdu: 0
     }
     Amp: {
         serial: 7
         flipLR: false
         flipTB: false
+        nQuarter: 0
         hdu: 0
     }
     Amp: {
         serial: 8
         flipLR: false
         flipTB: true
+        nQuarter: 0
         hdu: 0
     }
     Amp: {
         serial: 9
         flipLR: false
         flipTB: true
+        nQuarter: 0
         hdu: 0
     }
     Amp: {
         serial: 10
         flipLR: false
         flipTB: true
+        nQuarter: 0
         hdu: 0
     }
     Amp: {
         serial: 11
         flipLR: false
         flipTB: true
+        nQuarter: 0
         hdu: 0
     }
     Amp: {
         serial: 12
         flipLR: false
         flipTB: true
+        nQuarter: 0
         hdu: 0
     }
     Amp: {
         serial: 13
         flipLR: false
         flipTB: true
+        nQuarter: 0
         hdu: 0
     }
     Amp: {
         serial: 14
         flipLR: false
         flipTB: true
+        nQuarter: 0
         hdu: 0
     }
     Amp: {
         serial: 15
         flipLR: false
         flipTB: true
+        nQuarter: 0
         hdu: 0
     }
 }
