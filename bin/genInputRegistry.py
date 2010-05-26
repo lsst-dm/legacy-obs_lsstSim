@@ -1,7 +1,7 @@
 import glob
 import os
 import re
-import sqlite3
+import sqlite as sqlite3
 import sys
 import lsst.daf.base as dafBase
 import lsst.afw.image as afwImage

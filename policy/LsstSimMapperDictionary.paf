@@ -51,6 +51,12 @@ definitions: {
         maxOccurs: 1
 	default: "visitim/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
     }
+    icSrcTemplate: {
+        type: string
+        description: "The Python substitution template for the image characterization source pathnames."
+        maxOccurs: 1
+	default: "icSrc/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
+    }
     psfTemplate: {
         type: string
         description: "The Python substitution template for the measured PSF pathnames."

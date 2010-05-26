@@ -196,6 +196,21 @@ class LsstSimMapper(Mapper):
         filter = afwImage.Filter(filterName)
         item.setFilter(filter)
 
+    def _setTimes(self, item, dataId):
+        md = item.getMetadata()
+        calib = item.getCalib()
+        if md.exists("EXPTIME"):
+            expTime = md.get("EXPTIME")
+            calib.setExptime(expTime)
+            md.remove("EXPTIME")
+        else:
+            expTime = calib.getExptime()
+        if md.exists("MJD-OBS"):
+            obsStart = dafBase.DateTime(md.get("MJD-OBS"),
+                    dafBase.DateTime.MJD, dafBase.DateTime.UTC)
+            obsMidpoint = obsStart.nsecs() + long(expTime * 1000000000L / 2)
+            calib.setMidTime(dafBase.DateTime(obsMidpoint))
+
     def _standardizeExposure(self, item, dataId, isAmp=False):
         md = item.getMetadata()
         stripFits(md)
@@ -217,6 +232,7 @@ class LsstSimMapper(Mapper):
         else:
             self._setCcdDetector(item, dataId)
         self._setFilter(item, dataId)
+        self._setTimes(item, dataId)
         return item
 
     def _standardizeCalib(self, item, dataId, filterNeeded):
@@ -407,6 +423,23 @@ class LsstSimMapper(Mapper):
     def std_visitim(self, item, dataId):
         dataId = self._transformId(dataId)
         return self._standardizeExposure(item, dataId)
+
+###############################################################################
+
+    def map_icSrc(self, dataId):
+        dataId = self._transformId(dataId)
+        pathId = self._mapActualToPath(self._needFilter(dataId))
+        path = os.path.join(self.root, self.icSrcTemplate % pathId)
+        r1, r2 = pathId['raft']
+        s1, s2 = pathId['sensor']
+        ampExposureId = (dataId['visit'] << 9) + \
+                (long(r1) * 5 + long(r2)) * 10 + (long(s1) * 3 + long(s2))
+        filterId = self.filterIdMap[pathId['filter']]
+        return ButlerLocation(
+                "lsst.afw.detection.PersistableSourceVector",
+                "PersistableSourceVector",
+                "BoostStorage", path,
+                {"ampExposureId": ampExposureId, "filterId": filterId})
 
 ###############################################################################
 
