@@ -48,7 +48,8 @@ class LsstSimMapper(Mapper):
                     "Calibration root directory not found: %s" % (calibRoot,))
 
         for datasetType in ["raw", "bias", "dark", "flat", "fringe",
-            "postISR", "postISRCCD", "visitim", "psf", "calexp", "src",
+            "postISR", "postISRCCD",
+            "icSrc", "visitim", "psf", "calexp", "src",
             "sourceHist", "badSourceHist", "source", "badSource",
             "invalidSource", "object", "badObject"]:
             key = datasetType + "Template"
