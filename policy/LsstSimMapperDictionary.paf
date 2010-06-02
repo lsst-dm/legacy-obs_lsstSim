@@ -45,6 +45,18 @@ definitions: {
         maxOccurs: 1
 	default: "postISRCCD/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s.fits"
     }
+    sdqaAmpTemplate: {
+        type: string
+        description: "The Python substitution template for the amp-level SDQA ratings pathnames."
+        maxOccurs: 1
+        default: "sdqaAmp/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s/C%(channel)s.boost"
+    }
+    sdqaCcdTemplate: {
+        type: string
+        description: "The Python substitution template for the CCD-level SDQA ratings pathnames."
+        maxOccurs: 1
+        default: "sdqaCcd/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s.boost"
+    }
     visitimTemplate: {
         type: string
         description: "The Python substitution template for the CR-removed visit image pathnames."

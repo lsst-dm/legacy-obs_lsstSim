@@ -48,7 +48,7 @@ class LsstSimMapper(Mapper):
                     "Calibration root directory not found: %s" % (calibRoot,))
 
         for datasetType in ["raw", "bias", "dark", "flat", "fringe",
-            "postISR", "postISRCCD",
+            "postISR", "postISRCCD", "sdqaAmp", "sdqaCcd",
             "icSrc", "visitim", "psf", "calexp", "src",
             "sourceHist", "badSourceHist", "source", "badSource",
             "invalidSource", "object", "badObject"]:
@@ -410,6 +410,42 @@ class LsstSimMapper(Mapper):
     def std_postISRCCD(self, item, dataId):
         dataId = self._transformId(dataId)
         return self._standardizeExposure(item, dataId)
+
+###############################################################################
+
+    def map_sdqaAmp(self, dataId):
+        dataId = self._transformId(dataId)
+        pathId = self._needFilter(dataId)
+        path = os.path.join(self.root, self.sdqaAmpTemplate % pathId)
+        r1, r2 = pathId['raft']
+        s1, s2 = pathId['sensor']
+        c1, c2 = pathId['channel']
+        ampExposureId = (dataId['visit'] << 13) + \
+                (long(r1) * 5 + long(r2)) * 160 + \
+                (long(s1) * 3 + long(s2)) * 16 + \
+                (long(c1) * 8 + long(c2))
+        return ButlerLocation(
+                "lsst.sdqa.PersistableSdqaRatingVector",
+                "PersistableSdqaRatingVector",
+                "BoostStorage", path,
+                {"ampExposureId": ampExposureId})
+
+###############################################################################
+
+    def map_sdqaCcd(self, dataId):
+        dataId = self._transformId(dataId)
+        pathId = self._needFilter(dataId)
+        path = os.path.join(self.root, self.sdqaCcdTemplate % pathId)
+        r1, r2 = pathId['raft']
+        s1, s2 = pathId['sensor']
+        ccdExposureId = (dataId['visit'] << 9) + \
+                (long(r1) * 5 + long(r2)) * 10 + \
+                (long(s1) * 3 + long(s2))
+        return ButlerLocation(
+                "lsst.sdqa.PersistableSdqaRatingVector",
+                "PersistableSdqaRatingVector",
+                "BoostStorage", path,
+                {"ccdExposureId": ccdExposureId})
 
 ###############################################################################
 
