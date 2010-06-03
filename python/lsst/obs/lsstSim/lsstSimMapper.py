@@ -138,14 +138,28 @@ class LsstSimMapper(Mapper):
             m = re.search(r'R:(\d),(\d) S:(\d),(\d)', actualId['sensorName'])
             actualId['raft'] = m.group(1) + "," + m.group(2)
             actualId['sensor'] = m.group(3) + "," + m.group(4)
+        if actualId.has_key("ccdName"):
+            m = re.search(r'R:(\d),(\d) S:(\d),(\d)', actualId['ccdName'])
+            actualId['raft'] = m.group(1) + "," + m.group(2)
+            actualId['sensor'] = m.group(3) + "," + m.group(4)
         if actualId.has_key("channelName"):
             m = re.search(r'ID(\d+)', actualId['channelName'])
             channelNumber = int(m.group(1))
             channelX = channelNumber % 8
             channelY = channelNumber // 8
             actualId['channel'] = str(channelY) + "," + str(channelX)
+        if actualId.has_key("ampName"):
+            m = re.search(r'ID(\d+)', actualId['ampName'])
+            channelNumber = int(m.group(1))
+            channelX = channelNumber % 8
+            channelY = channelNumber // 8
+            actualId['channel'] = str(channelY) + "," + str(channelX)
         if actualId.has_key("exposure"):
             actualId['snap'] = actualId['exposure']
+        if actualId.has_key("ccd"):
+            actualId['sensor'] = actualId['ccd']
+        if actualId.has_key("amp"):
+            actualId['channel'] = actualId['amp']
         return actualId
 
     def _mapActualToPath(self, actualId):
