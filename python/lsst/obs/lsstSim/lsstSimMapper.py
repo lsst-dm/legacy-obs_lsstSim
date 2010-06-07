@@ -429,7 +429,7 @@ class LsstSimMapper(Mapper):
 
     def map_sdqaAmp(self, dataId):
         dataId = self._transformId(dataId)
-        pathId = self._needFilter(dataId)
+        pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.sdqaAmpTemplate % pathId)
         r1, r2 = pathId['raft']
         s1, s2 = pathId['sensor']
@@ -448,7 +448,7 @@ class LsstSimMapper(Mapper):
 
     def map_sdqaCcd(self, dataId):
         dataId = self._transformId(dataId)
-        pathId = self._needFilter(dataId)
+        pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.sdqaCcdTemplate % pathId)
         r1, r2 = pathId['raft']
         s1, s2 = pathId['sensor']
