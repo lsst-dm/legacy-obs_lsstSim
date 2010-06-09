@@ -20,8 +20,7 @@ class MetadataTestCase(unittest.TestCase):
 
     def testTiles(self):
         """Test sky tiles"""
-        tiles = self.butler.queryMetadata("raw", "skyTile", ("skyTile",))
-        tiles = [x[0] for x in tiles]
+        tiles = self.butler.queryMetadata("raw", "skyTile")
         tiles.sort()
         self.assertEqual(tiles, [
             92247, 92248, 92249, 92250, 92251, 92252, 92258, 92259, 92260,
@@ -40,25 +39,24 @@ class MetadataTestCase(unittest.TestCase):
         ccds = self.butler.queryMetadata("raw", "sensor",
                 ("visit", "raft", "sensor"), skyTile=92247)
         ccds.sort()
-        self.assertEqual(ccds, [(85471048, u'1,4', u'1,2')])
+        self.assertEqual(ccds, [(85471048, '1,4', '1,2')])
 
         ccds = self.butler.queryMetadata("raw", "sensor",
                 ("visit", "raft", "sensor"), dataId={'skyTile': 92250})
         ccds.sort()
         self.assertEqual(ccds, [
-            (85470982, u'3,4', u'0,1'), (85470982, u'3,4', u'0,2'),
-            (85470982, u'3,4', u'1,0'), (85470982, u'3,4', u'1,1'),
-            (85470982, u'3,4', u'1,2'), (85470982, u'3,4', u'2,0'),
-            (85470982, u'3,4', u'2,1'), (85470982, u'3,4', u'2,2'),
-            (85471048, u'3,4', u'0,1'), (85471048, u'3,4', u'0,2'),
-            (85471048, u'3,4', u'1,1'), (85471048, u'3,4', u'1,2'),
-            (85471048, u'3,4', u'2,0'), (85471048, u'3,4', u'2,1'),
-            (85471048, u'3,4', u'2,2') ])
+            (85470982, '3,4', '0,1'), (85470982, '3,4', '0,2'),
+            (85470982, '3,4', '1,0'), (85470982, '3,4', '1,1'),
+            (85470982, '3,4', '1,2'), (85470982, '3,4', '2,0'),
+            (85470982, '3,4', '2,1'), (85470982, '3,4', '2,2'),
+            (85471048, '3,4', '0,1'), (85471048, '3,4', '0,2'),
+            (85471048, '3,4', '1,1'), (85471048, '3,4', '1,2'),
+            (85471048, '3,4', '2,0'), (85471048, '3,4', '2,1'),
+            (85471048, '3,4', '2,2') ])
 
     def testVisits(self):
         """Test visits"""
         visits = self.butler.queryMetadata("raw", "visit", ("visit",), {})
-        visits = [x[0] for x in visits]
         visits.sort()
         self.assertEqual(visits, [85470982, 85471048, 85656362, 85801502])
 
@@ -66,7 +64,7 @@ class MetadataTestCase(unittest.TestCase):
         """Test filters"""
         filter = self.butler.queryMetadata("raw", "visit", ("filter",),
                 visit=85470982)
-        self.assertEqual(filter, [(u'y',)])
+        self.assertEqual(filter, ['y'])
 
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
