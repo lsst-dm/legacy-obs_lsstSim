@@ -442,7 +442,7 @@ class LsstSimMapper(Mapper):
                 "lsst.sdqa.PersistableSdqaRatingVector",
                 "PersistableSdqaRatingVector",
                 "BoostStorage", path,
-                {"ampExposureId": ampExposureId})
+                {"ampExposureId": ampExposureId, "sdqaRatingScope": "AMP"})
 
 ###############################################################################
 
@@ -459,7 +459,7 @@ class LsstSimMapper(Mapper):
                 "lsst.sdqa.PersistableSdqaRatingVector",
                 "PersistableSdqaRatingVector",
                 "BoostStorage", path,
-                {"ccdExposureId": ccdExposureId})
+                {"ccdExposureId": ccdExposureId, "sdqaRatingScope": "CCD"})
 
 ###############################################################################
 
