@@ -226,22 +226,62 @@ class LsstSimMapper(Mapper):
             obsMidpoint = obsStart.nsecs() + long(expTime * 1000000000L / 2)
             calib.setMidTime(dafBase.DateTime(obsMidpoint))
 
+    def _mapExposure(self, dataId, exposureType,
+            isCalib=False, needFilter=True):
+        dataId = self._transformId(dataId)
+        if needFilter:
+            pathId = self._mapActualToPath(self._needFilter(dataId))
+        else:
+            pathId = self._mapActualToPath(dataId)
+        if isCalib:
+            root = self.calibRoot
+        else:
+            root = self.root
+        path = os.path.join(root,
+                getattr(self, exposureType + "Template") % pathId)
+        return ButlerLocation(
+                "lsst.afw.image.ExposureF", "ExposureF",
+                "FitsStorage", path, dataId)
+
+    def _mapSubimage(self, dataId, exposureType, isCalib=False,
+            needFilter=True):
+        if not dataId.has_key("bbox"):
+            return self._mapExposure(dataId, exposureType, isCalib, needFilter)
+
+        bbox = dataId['bbox']
+        del dataId['bbox']
+        loc = self._mapExposure(dataId, exposureType, isCalib, needFilter)
+
+        if isinstance(bbox, afwImage.BBox):
+            llcX = bbox.getLLC().getX()
+            llcY = bbox.getLLC().getY()
+            width = bbox.getWidth()
+            height = bbox.getHeight()
+        else:
+            llcX = bbox[0][0]
+            llcY = bbox[0][1]
+            width = bbox[1]
+            height = bbox[2]
+        ad = loc.getAdditionalData()
+        ad.set("llcX", llcX)
+        ad.set("llcY", llcY)
+        ad.set("width", width)
+        ad.set("height", height)
+        return loc
+
+    def _mapWcs(self, dataId, exposureType, needFilter=True):
+        dataId = self._transformId(dataId)
+        if needFilter:
+            pathId = self._mapActualToPath(self._needFilter(dataId))
+        else:
+            pathId = self._mapActualToPath(dataId)
+        path = os.path.join(self.root,
+                getattr(self, exposureType + "Template") % pathId)
+        return ButlerLocation(
+                "lsst.afw.image.Wcs", "Wcs", "FitsStorage", path, dataId)
+
     def _standardizeExposure(self, item, dataId, isAmp=False):
-        md = item.getMetadata()
-        stripFits(md)
-
-        # Recompute EQUINOX and WCS based on actual observation date
-        mjd = md.get("MJD-OBS")
-        obsdate = dafBase.DateTime(mjd, dafBase.DateTime.MJD,
-                dafBase.DateTime.TAI)
-        gmt = time.gmtime(obsdate.nsecs(dafBase.DateTime.UTC) / 1.0e9)
-        year = gmt[0]
-        doy = gmt[7]
-        equinox = year + (doy / 365.0)
-        wcsMetadata = item.getWcs().getFitsMetadata()
-        wcsMetadata.set("EQUINOX", equinox)
-        item.setWcs(afwImage.makeWcs(wcsMetadata))
-
+        dataId = self._transformId(dataId)
         if isAmp:
             self._setAmpDetector(item, dataId)
         else:
@@ -251,7 +291,7 @@ class LsstSimMapper(Mapper):
         return item
 
     def _standardizeCalib(self, item, dataId, filterNeeded):
-        stripFits(item.getMetadata())
+        dataId = self._transformId(dataId)
         self._setAmpDetector(item, dataId)
         if filterNeeded:
             self._setFilter(item, dataId)
@@ -320,6 +360,12 @@ class LsstSimMapper(Mapper):
                 "lsst.afw.image.DecoratedImageU", "DecoratedImageU",
                 "FitsStorage", path, dataId)
 
+    def map_raw_wcs(self, dataId):
+        loc = self.map_raw(dataId)
+        loc.pythonType = "lsst.afw.image.Wcs"
+        loc.cppType = "Wcs"
+        return loc
+
     def query_raw(self, key, format, dataId):
         dataId = self._transformId(dataId)
         where = {}
@@ -331,149 +377,31 @@ class LsstSimMapper(Mapper):
                 where, None, values)
 
     def std_raw(self, item, dataId):
-        dataId = self._transformId(dataId)
         exposure = afwImage.makeExposure(
                 afwImage.makeMaskedImage(item.getImage()))
         md = item.getMetadata()
+        stripFits(md)
+
+        # Recompute EQUINOX and WCS based on actual observation date
+        mjd = md.get("MJD-OBS")
+        obsdate = dafBase.DateTime(mjd, dafBase.DateTime.MJD,
+                dafBase.DateTime.TAI)
+        gmt = time.gmtime(obsdate.nsecs(dafBase.DateTime.UTC) / 1.0e9)
+        year = gmt[0]
+        doy = gmt[7]
+        equinox = year + (doy / 365.0)
+        md.set("EQUINOX", equinox)
+
         exposure.setMetadata(md)
         exposure.setWcs(afwImage.makeWcs(md))
         wcsMetadata = exposure.getWcs().getFitsMetadata()
         for kw in wcsMetadata.paramNames():
             md.remove(kw)
+
         return self._standardizeExposure(exposure, dataId, True)
 
-###############################################################################
-
-    def map_bias(self, dataId):
-        dataId = self._transformId(dataId)
-        pathId = self._mapActualToPath(dataId)
-        path = os.path.join(self.calibRoot, self.biasTemplate % pathId)
-        return ButlerLocation(
-                "lsst.afw.image.ExposureF", "ExposureF",
-                "FitsStorage", path, dataId)
-
-    def std_bias(self, item, dataId):
-        return self._standardizeCalib(item, dataId, False)
-
-###############################################################################
-
-    def map_dark(self, dataId):
-        dataId = self._transformId(dataId)
-        pathId = self._mapActualToPath(dataId)
-        path = os.path.join(self.calibRoot, self.darkTemplate % pathId)
-        return ButlerLocation(
-                "lsst.afw.image.ExposureF", "ExposureF",
-                "FitsStorage", path, dataId)
-
-    def std_dark(self, item, dataId):
-        dataId = self._transformId(dataId)
-        return self._standardizeCalib(item, dataId, False)
-
-###############################################################################
-
-    def map_flat(self, dataId):
-        dataId = self._transformId(dataId)
-        pathId = self._mapActualToPath(self._needFilter(dataId))
-        path = os.path.join(self.calibRoot, self.flatTemplate % pathId)
-        return ButlerLocation(
-                "lsst.afw.image.ExposureF", "ExposureF",
-                "FitsStorage", path, dataId)
-
-    def std_flat(self, item, dataId):
-        dataId = self._transformId(dataId)
-        return self._standardizeCalib(item, dataId, True)
-
-###############################################################################
-
-    def map_fringe(self, dataId):
-        dataId = self._transformId(dataId)
-        pathId = self._mapActualToPath(self._needFilter(dataId))
-        path = os.path.join(self.calibRoot, self.fringeTemplate % pathId)
-        return ButlerLocation(
-                "lsst.afw.image.ExposureF", "ExposureF",
-                "FitsStorage", path, dataId)
-
-    def std_fringe(self, item, dataId):
-        dataId = self._transformId(dataId)
-        return self._standardizeCalib(item, dataId, True)
-
-###############################################################################
-
-    def map_postISR(self, dataId):
-        dataId = self._transformId(dataId)
-        pathId = self._mapActualToPath(self._needFilter(dataId))
-        path = os.path.join(self.root, self.postISRTemplate % pathId)
-        return ButlerLocation(
-                "lsst.afw.image.ExposureF", "ExposureF",
-                "FitsStorage", path, dataId)
-
-    def std_postISR(self, item, dataId):
-        dataId = self._transformId(dataId)
-        return self._standardizeExposure(item, dataId, True)
-
-###############################################################################
-
-    def map_postISRCCD(self, dataId):
-        dataId = self._transformId(dataId)
-        pathId = self._mapActualToPath(self._needFilter(dataId))
-        path = os.path.join(self.root, self.postISRCCDTemplate % pathId)
-        return ButlerLocation(
-                "lsst.afw.image.ExposureF", "ExposureF",
-                "FitsStorage", path, dataId)
-
-    def std_postISRCCD(self, item, dataId):
-        dataId = self._transformId(dataId)
-        return self._standardizeExposure(item, dataId)
-
-###############################################################################
-
-    def map_sdqaAmp(self, dataId):
-        dataId = self._transformId(dataId)
-        pathId = self._mapActualToPath(self._needFilter(dataId))
-        path = os.path.join(self.root, self.sdqaAmpTemplate % pathId)
-        r1, r2 = pathId['raft']
-        s1, s2 = pathId['sensor']
-        c1, c2 = pathId['channel']
-        ampExposureId = (dataId['visit'] << 13) + \
-                (long(r1) * 5 + long(r2)) * 160 + \
-                (long(s1) * 3 + long(s2)) * 16 + \
-                (long(c1) * 8 + long(c2))
-        return ButlerLocation(
-                "lsst.sdqa.PersistableSdqaRatingVector",
-                "PersistableSdqaRatingVector",
-                "BoostStorage", path,
-                {"ampExposureId": ampExposureId})
-
-###############################################################################
-
-    def map_sdqaCcd(self, dataId):
-        dataId = self._transformId(dataId)
-        pathId = self._mapActualToPath(self._needFilter(dataId))
-        path = os.path.join(self.root, self.sdqaCcdTemplate % pathId)
-        r1, r2 = pathId['raft']
-        s1, s2 = pathId['sensor']
-        ccdExposureId = (dataId['visit'] << 9) + \
-                (long(r1) * 5 + long(r2)) * 10 + \
-                (long(s1) * 3 + long(s2))
-        return ButlerLocation(
-                "lsst.sdqa.PersistableSdqaRatingVector",
-                "PersistableSdqaRatingVector",
-                "BoostStorage", path,
-                {"ccdExposureId": ccdExposureId})
-
-###############################################################################
-
-    def map_visitim(self, dataId):
-        dataId = self._transformId(dataId)
-        pathId = self._mapActualToPath(self._needFilter(dataId))
-        path = os.path.join(self.root, self.visitimTemplate % pathId)
-        return ButlerLocation(
-                "lsst.afw.image.ExposureF", "ExposureF",
-                "FitsStorage", path, dataId)
-
-    def std_visitim(self, item, dataId):
-        dataId = self._transformId(dataId)
-        return self._standardizeExposure(item, dataId)
+    def std_raw_sub(self, item, dataId):
+        return self.std_raw(item, dataId)
 
 ###############################################################################
 
@@ -501,20 +429,6 @@ class LsstSimMapper(Mapper):
         return ButlerLocation(
                 "lsst.meas.algorithms.PSF", "PSF",
                 "BoostStorage", path, dataId)
-
-###############################################################################
-
-    def map_calexp(self, dataId):
-        dataId = self._transformId(dataId)
-        pathId = self._mapActualToPath(self._needFilter(dataId))
-        path = os.path.join(self.root, self.calexpTemplate % pathId)
-        return ButlerLocation(
-                "lsst.afw.image.ExposureF", "ExposureF",
-                "FitsStorage", path, dataId)
-
-    def std_calexp(self, item, dataId):
-        dataId = self._transformId(dataId)
-        return self._standardizeExposure(item, dataId)
 
 ###############################################################################
 
@@ -590,6 +504,37 @@ class LsstSimMapper(Mapper):
                 "lsst.ap.cluster.PersistableSourceClusterVector",
                 "PersistableSourceClusterVector",
                 "BoostStorage", path, {"skyTileId": dataId['skyTile']})
+
+###############################################################################
+
+for calibType in ("bias", "dark", "flat", "fringe"):
+    needFilter = calibType in ("flat", "fringe")
+    setattr(LsstSimMapper, "map_" + calibType,
+            lambda self, dataId: self._mapExposure(dataId, calibType, True,
+                needFilter))
+    setattr(LsstSimMapper, "map_" + calibType + "_sub",
+            lambda self, dataId: self._mapSubimage(dataId, calibType, True,
+                needFilter))
+    setattr(LsstSimMapper, "std_" + calibType,
+            lambda self, item, dataId: self._standardizeCalib(item, dataId,
+                needFilter))
+    setattr(LsstSimMapper, "std_" + calibType + "_sub",
+            lambda self, item, dataId: self._standardizeCalib(item, dataId,
+                needFilter))
+
+for exposureType in ("postISR", "postISRCCD", "visitim", "calexp"):
+    setattr(LsstSimMapper, "map_" + exposureType,
+            lambda self, dataId: self._mapExposure(dataId, exposureType))
+    setattr(LsstSimMapper, "map_" + exposureType + "_wcs",
+            lambda self, dataId: self._mapWcs(dataId, exposureType))
+    setattr(LsstSimMapper, "map_" + exposureType + "_sub",
+            lambda self, dataId: self._mapSubimage(dataId, exposureType))
+    setattr(LsstSimMapper, "std_" + exposureType,
+            lambda self, item, dataId: self._standardizeExposure(item, dataId,
+                calibType == "postISR"))
+    setattr(LsstSimMapper, "std_" + exposureType + "_sub",
+            lambda self, item, dataId: self._standardizeExposure(item, dataId,
+                calibType == "postISR"))
 
 ###############################################################################
 
