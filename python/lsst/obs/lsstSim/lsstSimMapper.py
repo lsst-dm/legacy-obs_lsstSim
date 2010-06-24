@@ -230,17 +230,20 @@ class LsstSimMapper(Mapper):
         md = item.getMetadata()
         stripFits(md)
 
-        # Recompute EQUINOX and WCS based on actual observation date
-        mjd = md.get("MJD-OBS")
-        obsdate = dafBase.DateTime(mjd, dafBase.DateTime.MJD,
-                dafBase.DateTime.TAI)
-        gmt = time.gmtime(obsdate.nsecs(dafBase.DateTime.UTC) / 1.0e9)
-        year = gmt[0]
-        doy = gmt[7]
-        equinox = year + (doy / 365.0)
-        wcsMetadata = item.getWcs().getFitsMetadata()
-        wcsMetadata.set("EQUINOX", equinox)
-        item.setWcs(afwImage.makeWcs(wcsMetadata))
+        if md.exists("VERSION") and md.getInt("VERSION") < 40000:
+        # Precess WCS based on actual observation date
+            wcs = exposure.getWcs()
+            epoch = dafBase.DateTime(md.get("MJD-OBS"), dafBase.DateTime.MJD,
+                    dafBase.DateTime.TAI).get(dafBase.DateTime.EPOCH)
+            origin = wcs.getSkyOrigin()
+            refCoord = afwCoord.Fk5Coord(origin[0], origin[1], epoch)
+            newRefCoord = refcoord.precess(2000.)
+            crval = afwGeom.PointD(
+                    newRefCoord.getRa(afwCoord.DEGREES),
+                    newRefCoord.getDec(afwCoord.DEGREES))
+            newWcs = afwImage.Wcs(crval, wcs.getPixelOrigin(),
+                    wcs.getCDMatrix())
+            item.setWcs(newWcs)
 
         if isAmp:
             self._setAmpDetector(item, dataId)
