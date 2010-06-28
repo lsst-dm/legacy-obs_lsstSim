@@ -250,7 +250,7 @@ class LsstSimMapper(Mapper):
                     dafBase.DateTime.TAI).get(dafBase.DateTime.EPOCH)
             origin = wcs.getSkyOrigin()
             refCoord = afwCoord.Fk5Coord(origin[0], origin[1], epoch)
-            newRefCoord = refcoord.precess(2000.)
+            newRefCoord = refCoord.precess(2000.)
             crval = afwGeom.PointD(
                     newRefCoord.getRa(afwCoord.DEGREES),
                     newRefCoord.getDec(afwCoord.DEGREES))
