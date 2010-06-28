@@ -6,6 +6,7 @@ from lsst.daf.persistence import Mapper, ButlerLocation, LogicalLocation
 import lsst.daf.butlerUtils as butlerUtils
 import lsst.afw.image as afwImage
 import lsst.afw.coord as afwCoord
+import lsst.afw.geom as afwGeom
 import lsst.afw.cameraGeom as afwCameraGeom
 import lsst.afw.cameraGeom.utils as cameraGeomUtils
 import lsst.afw.image.utils as imageUtils
