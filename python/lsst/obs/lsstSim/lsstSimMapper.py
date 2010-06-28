@@ -241,24 +241,7 @@ class LsstSimMapper(Mapper):
             calib.setMidTime(dafBase.DateTime(obsMidpoint))
 
     def _standardizeExposure(self, item, dataId, isAmp=False):
-        md = item.getMetadata()
-        stripFits(md)
-
-        if md.exists("VERSION") and md.getInt("VERSION") < 40000:
-        # Precess WCS based on actual observation date
-            wcs = item.getWcs()
-            epoch = dafBase.DateTime(md.get("MJD-OBS"), dafBase.DateTime.MJD,
-                    dafBase.DateTime.TAI).get(dafBase.DateTime.EPOCH)
-            origin = wcs.getSkyOrigin()
-            refCoord = afwCoord.Fk5Coord(origin[0], origin[1], epoch)
-            newRefCoord = refCoord.precess(2000.)
-            crval = afwGeom.PointD()
-            crval.setX(newRefCoord.getRa(afwCoord.DEGREES))
-            crval.setY(newRefCoord.getDec(afwCoord.DEGREES))
-            newWcs = afwImage.Wcs(crval, wcs.getPixelOrigin(),
-                    wcs.getCDMatrix())
-            item.setWcs(newWcs)
-
+        stripFits(item.getMetadata())
         if isAmp:
             self._setAmpDetector(item, dataId)
         else:
@@ -353,8 +336,23 @@ class LsstSimMapper(Mapper):
                 afwImage.makeMaskedImage(item.getImage()))
         md = item.getMetadata()
         exposure.setMetadata(md)
-        exposure.setWcs(afwImage.makeWcs(md))
-        wcsMetadata = exposure.getWcs().getFitsMetadata()
+        wcs = afwImage.makeWcs(md)
+
+        if md.exists("VERSION") and md.getInt("VERSION") < 40000:
+        # Precess WCS based on actual observation date
+            epoch = dafBase.DateTime(md.get("MJD-OBS"), dafBase.DateTime.MJD,
+                    dafBase.DateTime.UTC).get(dafBase.DateTime.EPOCH)
+            origin = wcs.getSkyOrigin()
+            refCoord = afwCoord.Fk5Coord(origin[0], origin[1], epoch)
+            newRefCoord = refCoord.precess(2000.)
+            crval = afwGeom.PointD()
+            crval.setX(newRefCoord.getRa(afwCoord.DEGREES))
+            crval.setY(newRefCoord.getDec(afwCoord.DEGREES))
+            wcs = afwImage.Wcs(crval, wcs.getPixelOrigin(),
+                    wcs.getCDMatrix())
+
+        exposure.setWcs(wcs)
+        wcsMetadata = wcs.getFitsMetadata()
         for kw in wcsMetadata.paramNames():
             md.remove(kw)
         return self._standardizeExposure(exposure, dataId, True)
