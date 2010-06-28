@@ -244,7 +244,7 @@ class LsstSimMapper(Mapper):
 
         if md.exists("VERSION") and md.getInt("VERSION") < 40000:
         # Precess WCS based on actual observation date
-            wcs = exposure.getWcs()
+            wcs = item.getWcs()
             epoch = dafBase.DateTime(md.get("MJD-OBS"), dafBase.DateTime.MJD,
                     dafBase.DateTime.TAI).get(dafBase.DateTime.EPOCH)
             origin = wcs.getSkyOrigin()
