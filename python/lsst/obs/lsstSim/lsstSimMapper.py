@@ -252,9 +252,9 @@ class LsstSimMapper(Mapper):
             origin = wcs.getSkyOrigin()
             refCoord = afwCoord.Fk5Coord(origin[0], origin[1], epoch)
             newRefCoord = refCoord.precess(2000.)
-            crval = afwGeom.PointD(
-                    newRefCoord.getRa(afwCoord.DEGREES),
-                    newRefCoord.getDec(afwCoord.DEGREES))
+            crval = afwGeom.PointD()
+            crval.setX(newRefCoord.getRa(afwCoord.DEGREES))
+            crval.setY(newRefCoord.getDec(afwCoord.DEGREES))
             newWcs = afwImage.Wcs(crval, wcs.getPixelOrigin(),
                     wcs.getCDMatrix())
             item.setWcs(newWcs)
