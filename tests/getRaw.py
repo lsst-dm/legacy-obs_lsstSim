@@ -5,6 +5,7 @@ import lsst.utils.tests as utilsTests
 
 import lsst.daf.persistence as dafPersist
 from lsst.obs.lsstSim import LsstSimMapper
+import lsst.afw.coord as afwCoord
 
 class GetRawTestCase(unittest.TestCase):
     """Testing butler raw image retrieval"""
@@ -28,6 +29,11 @@ class GetRawTestCase(unittest.TestCase):
         self.assertEqual(raw.getDetector().getId().getName(), "ID8")
         self.assertEqual(raw.getDetector().getParent().getId().getName(),
                 "R:0,3 S:0,1")
+        origin = raw.getWcs().getSkyOrigin()
+        self.assertAlmostEqual(
+                origin.getLongitude(afwCoord.DEGREES), 0.005865, 6)
+        self.assertAlmostEqual(
+                origin.getLatitude(afwCoord.DEGREES), -2.305262, 6)
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
