@@ -343,7 +343,9 @@ class LsstSimMapper(Mapper):
             epoch = dafBase.DateTime(md.get("MJD-OBS"), dafBase.DateTime.MJD,
                     dafBase.DateTime.UTC).get(dafBase.DateTime.EPOCH)
             origin = wcs.getSkyOrigin()
-            refCoord = afwCoord.Fk5Coord(origin[0], origin[1], epoch)
+            refCoord = afwCoord.Fk5Coord(
+                    origin.getLongitude(afwCoord.DEGREES),
+                    origin.getLatitude(afwCoord.DEGREES), epoch)
             newRefCoord = refCoord.precess(2000.)
             crval = afwGeom.PointD()
             crval.setX(newRefCoord.getRa(afwCoord.DEGREES))
