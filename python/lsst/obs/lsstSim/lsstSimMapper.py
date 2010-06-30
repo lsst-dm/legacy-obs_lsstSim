@@ -5,6 +5,8 @@ import lsst.daf.base as dafBase
 from lsst.daf.persistence import Mapper, ButlerLocation, LogicalLocation
 import lsst.daf.butlerUtils as butlerUtils
 import lsst.afw.image as afwImage
+import lsst.afw.coord as afwCoord
+import lsst.afw.geom as afwGeom
 import lsst.afw.cameraGeom as afwCameraGeom
 import lsst.afw.cameraGeom.utils as cameraGeomUtils
 import lsst.afw.image.utils as imageUtils
@@ -95,15 +97,25 @@ class LsstSimMapper(Mapper):
         registryPath = registry
         if registryPath is None and self.policy.exists('registryPath'):
             registryPath = self.policy.getString('registryPath')
+            registryPath = LogicalLocation(registryPath).locString()
             if not os.path.exists(registryPath):
+                self.log.log(pexLog.Log.WARN,
+                        "Unable to locate registry at registryPath: %s" %
+                        (registryPath,))
                 registryPath = None
         if registryPath is None:
             registryPath = os.path.join(self.root, "registry.sqlite3")
             if not os.path.exists(registryPath):
+                self.log.log(pexLog.Log.WARN,
+                        "Unable to locate registry in root: %s" %
+                        (registryPath,))
                 registryPath = None
         if registryPath is None:
             registryPath = "registry.sqlite3"
             if not os.path.exists(registryPath):
+                self.log.log(pexLog.Log.WARN,
+                        "Unable to locate registry in current dir: %s" %
+                        (registryPath,))
                 registryPath = None
         if registryPath is not None:
             self.log.log(pexLog.Log.INFO,
@@ -111,6 +123,8 @@ class LsstSimMapper(Mapper):
             self.registry = butlerUtils.Registry.create(registryPath)
         else:
             # TODO Try a FsRegistry(self.root) for raw (and all outputs?)
+            self.log.log(pexLog.Log.WARN,
+                    "No registry loaded; proceeding without one")
             self.registry = None
 
     def _needFilter(self, dataId):
@@ -222,7 +236,7 @@ class LsstSimMapper(Mapper):
             expTime = calib.getExptime()
         if md.exists("MJD-OBS"):
             obsStart = dafBase.DateTime(md.get("MJD-OBS"),
-                    dafBase.DateTime.MJD, dafBase.DateTime.UTC)
+                    dafBase.DateTime.MJD, dafBase.DateTime.TAI)
             obsMidpoint = obsStart.nsecs() + long(expTime * 1000000000L / 2)
             calib.setMidTime(dafBase.DateTime(obsMidpoint))
 
@@ -382,19 +396,26 @@ class LsstSimMapper(Mapper):
         md = item.getMetadata()
         stripFits(md)
 
-        # Recompute EQUINOX and WCS based on actual observation date
-        mjd = md.get("MJD-OBS")
-        obsdate = dafBase.DateTime(mjd, dafBase.DateTime.MJD,
-                dafBase.DateTime.TAI)
-        gmt = time.gmtime(obsdate.nsecs(dafBase.DateTime.UTC) / 1.0e9)
-        year = gmt[0]
-        doy = gmt[7]
-        equinox = year + (doy / 365.0)
-        md.set("EQUINOX", equinox)
-
         exposure.setMetadata(md)
-        exposure.setWcs(afwImage.makeWcs(md))
-        wcsMetadata = exposure.getWcs().getFitsMetadata()
+        wcs = afwImage.makeWcs(md)
+
+        if md.exists("VERSION") and md.getInt("VERSION") < 40000:
+        # Precess WCS based on actual observation date
+            epoch = dafBase.DateTime(md.get("MJD-OBS"), dafBase.DateTime.MJD,
+                    dafBase.DateTime.TAI).get(dafBase.DateTime.EPOCH)
+            origin = wcs.getSkyOrigin()
+            refCoord = afwCoord.Fk5Coord(
+                    origin.getLongitude(afwCoord.DEGREES),
+                    origin.getLatitude(afwCoord.DEGREES), epoch)
+            newRefCoord = refCoord.precess(2000.)
+            crval = afwGeom.PointD()
+            crval.setX(newRefCoord.getRa(afwCoord.DEGREES))
+            crval.setY(newRefCoord.getDec(afwCoord.DEGREES))
+            wcs = afwImage.Wcs(crval, wcs.getPixelOrigin(),
+                    wcs.getCDMatrix())
+
+        exposure.setWcs(wcs)
+        wcsMetadata = wcs.getFitsMetadata()
         for kw in wcsMetadata.paramNames():
             md.remove(kw)
 
@@ -402,6 +423,42 @@ class LsstSimMapper(Mapper):
 
     def std_raw_sub(self, item, dataId):
         return self.std_raw(item, dataId)
+
+###############################################################################
+
+    def map_sdqaAmp(self, dataId):
+        dataId = self._transformId(dataId)
+        pathId = self._mapActualToPath(self._needFilter(dataId))
+        path = os.path.join(self.root, self.sdqaAmpTemplate % pathId)
+        r1, r2 = pathId['raft']
+        s1, s2 = pathId['sensor']
+        c1, c2 = pathId['channel']
+        ampExposureId = (dataId['visit'] << 13) + \
+                (long(r1) * 5 + long(r2)) * 160 + \
+                (long(s1) * 3 + long(s2)) * 16 + \
+                (long(c1) * 8 + long(c2))
+        return ButlerLocation(
+                "lsst.sdqa.PersistableSdqaRatingVector",
+                "PersistableSdqaRatingVector",
+                "BoostStorage", path,
+                {"ampExposureId": ampExposureId, "sdqaRatingScope": "AMP"})
+
+###############################################################################
+
+    def map_sdqaCcd(self, dataId):
+        dataId = self._transformId(dataId)
+        pathId = self._mapActualToPath(self._needFilter(dataId))
+        path = os.path.join(self.root, self.sdqaCcdTemplate % pathId)
+        r1, r2 = pathId['raft']
+        s1, s2 = pathId['sensor']
+        ccdExposureId = (dataId['visit'] << 9) + \
+                (long(r1) * 5 + long(r2)) * 10 + \
+                (long(s1) * 3 + long(s2))
+        return ButlerLocation(
+                "lsst.sdqa.PersistableSdqaRatingVector",
+                "PersistableSdqaRatingVector",
+                "BoostStorage", path,
+                {"ccdExposureId": ccdExposureId, "sdqaRatingScope": "CCD"})
 
 ###############################################################################
 
