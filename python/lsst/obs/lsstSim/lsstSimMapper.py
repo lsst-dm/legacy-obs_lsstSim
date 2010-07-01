@@ -137,7 +137,7 @@ class LsstSimMapper(Mapper):
                     str(dataId)
         if not hasattr(self, 'registry') or self.registry is None:
             raise RuntimeError, "No registry available to find filter for visit"
-        rows = self.registry.executeQuery(("filter",), ("raw",),
+        rows = self.registry.executeQuery(("filter",), ("raw_visit",),
                 {'visit': "?"}, None, (dataId['visit'],))
         if len(rows) != 1:
             raise RuntimeError, \
@@ -215,7 +215,7 @@ class LsstSimMapper(Mapper):
         if md.exists("FILTER"):
             filterName = item.getMetadata().get("FILTER").strip()
         if filterName is None:
-            rows = self.registry.executeQuery(("filter",), ("raw",),
+            rows = self.registry.executeQuery(("filter",), ("raw_visit",),
                     {'visit': "?"}, None, (dataId['visit'],))
             if len(rows) != 1:
                 raise RuntimeError, \
@@ -261,7 +261,7 @@ class LsstSimMapper(Mapper):
         if self.defectRegistry is None:
             return None
 
-        rows = self.registry.executeQuery(("taiObs",), ("raw",),
+        rows = self.registry.executeQuery(("taiObs",), ("raw_visit",),
                 {"visit": "?"}, None, (dataId['visit'],))
         if len(rows) == 0:
             return None
