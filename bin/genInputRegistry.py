@@ -20,6 +20,8 @@ conn.execute(cmd)
 cmd = "create table raw_skyTile (id integer, skyTile integer)"
 # cmd += ", unique(id, skyTile), foreign key(id) references raw(id))"
 conn.execute(cmd)
+conn.execute("""create table raw_visit (visit int, filter text,
+        taiObs text, expTime double, unique(visit))""")
 conn.commit()
 
 qsp = skypix.createQuadSpherePixelization()
@@ -63,4 +65,7 @@ for snapdir in glob.glob(os.path.join(root, "raw", "v*-f*", "E00[01]")):
                     (id, skyTileId))
 
     conn.commit()
+
+conn.execute("""insert into raw_visit
+        select distinct visit, filter, taiObs, expTime from raw""")
 conn.close()
