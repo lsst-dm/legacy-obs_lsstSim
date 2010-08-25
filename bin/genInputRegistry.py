@@ -90,4 +90,5 @@ for snapdir in glob.glob(os.path.join(root, "raw", "v*-f*", "E00[01]")):
 
 conn.execute("""insert into raw_visit
         select distinct visit, filter, taiObs, expTime from raw""")
+conn.commit()
 conn.close()
