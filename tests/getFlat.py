@@ -26,6 +26,7 @@
 import unittest
 import lsst.utils.tests as utilsTests
 
+from lsst.pex.policy import Policy
 import lsst.daf.persistence as dafPersist
 from lsst.obs.lsstSim import LsstSimMapper
 
@@ -33,8 +34,9 @@ class GetFlatTestCase(unittest.TestCase):
     """Testing butler flat image retrieval"""
 
     def setUp(self):
+        policy = Policy.createPolicy("./policy/LsstSimMapper.paf")
         self.bf = dafPersist.ButlerFactory(
-                mapper=LsstSimMapper(root="./tests/data"))
+                mapper=LsstSimMapper(policy=policy,root="./tests/data"))
         self.butler = self.bf.create()
 
     def tearDown(self):
