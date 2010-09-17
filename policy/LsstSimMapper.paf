@@ -7,10 +7,11 @@ filterDescription:	"description/LsstFilters.paf"
 calibRegistry:		false
 
 rawTemplate:		"raw/v%(visit)d-f%(filter)s/E%(snap)03d/R%(raft)s/S%(sensor)s/imsim_%(visit)d_R%(raft)s_S%(sensor)s_C%(channel)s_E%(snap)03d.fits.gz"
-biasTemplate:		"bias/v0/R%(raft)s/S%(sensor)s/imsim_0_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
-darkTemplate:		"dark/v1/R%(raft)s/S%(sensor)s/imsim_1_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
-flatTemplate:		"flat/v2-f%(filter)s/R%(raft)s/S%(sensor)s/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
-fringeTemplate:		"fringe/v2-f%(filter)s/R%(raft)s/S%(sensor)s/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
+
+bias.template:		"bias/v0/R%(raft)s/S%(sensor)s/imsim_0_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
+dark.template:		"dark/v1/R%(raft)s/S%(sensor)s/imsim_1_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
+flat.template:		"flat/v2-f%(filter)s/R%(raft)s/S%(sensor)s/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
+fringe.template:	"fringe/v2-f%(filter)s/R%(raft)s/S%(sensor)s/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
 postISRTemplate:	"postISR/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s/C%(channel)s.fits"
 postISRCCDTemplate:	"postISRCCD/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s.fits"
 sdqaAmpTemplate:	"sdqaAmp/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s/C%(channel)s.boost"

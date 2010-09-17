@@ -77,7 +77,7 @@ class LsstSimMapper(CameraMapper):
             actualId['channel'] = actualId['amp']
         return actualId
 
-    def _mapActualToPath(self, actualId):
+    def _mapActualToPath(self, template, actualId):
         pathId = actualId.copy()
         if pathId.has_key("raft"):
             pathId['raft'] = re.sub(r'(\d),(\d)', r'\1\2', pathId['raft'])
@@ -85,7 +85,7 @@ class LsstSimMapper(CameraMapper):
             pathId['sensor'] = re.sub(r'(\d),(\d)', r'\1\2', pathId['sensor'])
         if pathId.has_key("channel"):
             pathId['channel'] = re.sub(r'(\d),(\d)', r'\1\2', pathId['channel'])
-        return pathId
+        return template % pathId
 
     def _extractDetectorName(self, dataId):
         return "R:%(raft)s S:%(sensor)s" % dataId
