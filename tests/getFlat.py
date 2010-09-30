@@ -34,9 +34,7 @@ class GetFlatTestCase(unittest.TestCase):
     """Testing butler flat image retrieval"""
 
     def setUp(self):
-        policy = Policy.createPolicy("./policy/LsstSimMapper.paf")
-        self.bf = dafPersist.ButlerFactory(
-                mapper=LsstSimMapper(policy=policy,root="./tests/data"))
+        self.bf = dafPersist.ButlerFactory(mapper=LsstSimMapper(root="./tests/data"))
         self.butler = self.bf.create()
 
     def tearDown(self):

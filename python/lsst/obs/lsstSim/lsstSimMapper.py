@@ -24,7 +24,7 @@ import os
 import re
 import time
 import lsst.daf.base as dafBase
-from lsst.daf.persistence import Mapper, ButlerLocation, LogicalLocation
+import lsst.daf.persistence as dafPersist
 import lsst.daf.butlerUtils as butlerUtils
 import lsst.afw.image as afwImage
 import lsst.afw.coord as afwCoord
@@ -37,12 +37,12 @@ import lsst.pex.policy as pexPolicy
 
 from lsst.obs.camera import CameraMapper
 
-class LsstSimMapper(CameraMapper):
-    def __init__(self, policy=None, root=".", registry=None, calibRoot=None):
-        CameraMapper.__init__(self, policy=policy, root=root, registry=registry, calibRoot=calibRoot)
+class LsstSimMapper(dafPersist.Mapper):
+    def __init__(self, root=".", registry=None, calibRoot=None):
+        dafPersist.Mapper.__init__(self, policy="LsstSimMapper.paf", module="obs_lsstSim",
+								   policyDir="policy", root=root, registry=registry, calibRoot=calibRoot)
 
-        self.keys = ["visit", "snap", "raft", "sensor", "channel", "skyTile"]
-        self.keys.append("filter")
+        self.keys = ["visit", "snap", "raft", "sensor", "channel", "skyTile", "filter"]
 
         self.filterIdMap = {
                 'u': 0, 'g': 1, 'r': 2, 'i': 3, 'z': 4, 'y': 5, 'i2': 5}
@@ -97,7 +97,7 @@ class LsstSimMapper(CameraMapper):
         return (self._extractDetectorName(dataId),
                 int(m.group(2)), int(m.group(1)))
 
-    def std_raw(self, item, dataId):
+    def standardize_raw(self, mapping, item, dataId):
         dataId = self._transformId(dataId)
         exposure = afwImage.makeExposure(
                 afwImage.makeMaskedImage(item.getImage()))
@@ -124,4 +124,4 @@ class LsstSimMapper(CameraMapper):
         wcsMetadata = wcs.getFitsMetadata()
         for kw in wcsMetadata.paramNames():
             md.remove(kw)
-        return self._standardizeExposure(exposure, dataId, True)
+        return self._standardize(mapping, exposure, dataId)
