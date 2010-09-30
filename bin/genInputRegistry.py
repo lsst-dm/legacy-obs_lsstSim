@@ -88,7 +88,8 @@ for snapdir in glob.glob(os.path.join(root, "raw", "v*-f*", "E00[01]")):
 
     conn.commit()
 
-conn.execute("""insert into raw_visit
-        select distinct visit, filter, taiObs, expTime from raw""")
+conn.execute("""INSERT INTO raw_visit
+        SELECT DISTINCT visit, filter, taiObs, expTime FROM raw
+        WHERE snap = 0""")
 conn.commit()
 conn.close()
