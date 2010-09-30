@@ -360,7 +360,7 @@ class LsstSimMapper(Mapper):
         exposure.setMetadata(md)
         wcs = afwImage.makeWcs(md)
 
-        if md.exists("VERSION") and md.getInt("VERSION") < 40000:
+        if md.exists("VERSION") and md.getInt("VERSION") < 16952:
         # Precess WCS based on actual observation date
             epoch = dafBase.DateTime(md.get("MJD-OBS"), dafBase.DateTime.MJD,
                     dafBase.DateTime.TAI).get(dafBase.DateTime.EPOCH)
