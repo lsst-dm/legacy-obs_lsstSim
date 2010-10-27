@@ -68,24 +68,28 @@ def process(dirList, inputRegistry, outputRegistry="registry.sqlite3"):
 
     qsp = skypix.createQuadSpherePixelization()
 
-    for dir in dirList:
-        if os.path.exists(os.path.join(dir, "raw")):
-            for visitDir in glob.glob(os.path.join(dir, "raw", "v*-f*",)):
-                processVisit(visitDir, conn, done, qsp)
-        else:
-            processVisit(dir, conn, done, qsp)
-
-    conn.execute("""INSERT INTO raw_visit
-            SELECT DISTINCT visit, filter, taiObs, expTime FROM raw
-            WHERE snap = 0""")
-    conn.commit()
-    conn.close()
+    try:
+        for dir in dirList:
+            if os.path.exists(os.path.join(dir, "raw")):
+                for visitDir in glob.glob(os.path.join(dir, "raw", "v*-f*",)):
+                    processVisit(visitDir, conn, done, qsp)
+            else:
+                processVisit(dir, conn, done, qsp)
+    finally:
+        print >>sys.stderr, "Cleaning up..."
+        conn.execute("DELETE FROM raw_visit")
+        conn.commit()
+        conn.execute("""INSERT INTO raw_visit
+                SELECT DISTINCT visit, filter, taiObs, expTime FROM raw
+                WHERE snap = 0""")
+        conn.commit()
+        conn.close()
 
 def processVisit(visitDir, conn, done, qsp):
-    print visitDir, "... started"
+    print >>sys.stderr, visitDir, "... started"
     for raftDir in glob.glob(os.path.join(visitDir, "E00[01]", "R[0-4][0-4]")):
         processRaft(raftDir, conn, done, qsp)
-    print visitDir, "... completed"
+    print >>sys.stderr, visitDir, "... completed"
 
 def processRaft(raftDir, conn, done, qsp):
     nProcessed = 0
@@ -136,8 +140,9 @@ def processRaft(raftDir, conn, done, qsp):
 
         nProcessed += 1
 
-    print raftDir, "... %d processed, %d skipped, %d unrecognized" % (
-            nProcessed, nSkipped, nUnrecognized)
+    print >>sys.stderr, raftDir, \
+            "... %d processed, %d skipped, %d unrecognized" % \
+            (nProcessed, nSkipped, nUnrecognized)
 
 if __name__ == "__main__":
     parser = OptionParser(usage="""%prog [options] DIR ...
