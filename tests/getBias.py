@@ -26,6 +26,7 @@
 import unittest
 import lsst.utils.tests as utilsTests
 
+from lsst.pex.policy import Policy
 import lsst.daf.persistence as dafPersist
 from lsst.obs.lsstSim import LsstSimMapper
 
@@ -33,8 +34,7 @@ class GetBiasTestCase(unittest.TestCase):
     """Testing butler bias image retrieval"""
 
     def setUp(self):
-        self.bf = dafPersist.ButlerFactory(
-                mapper=LsstSimMapper(root="./tests/data"))
+        self.bf = dafPersist.ButlerFactory(mapper=LsstSimMapper(root="./tests/data"))
         self.butler = self.bf.create()
 
     def tearDown(self):
