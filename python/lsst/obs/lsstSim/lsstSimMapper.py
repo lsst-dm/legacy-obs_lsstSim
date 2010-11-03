@@ -383,6 +383,16 @@ class LsstSimMapper(Mapper):
 
 ###############################################################################
 
+    def map_eimage(self, dataId):
+        dataId = self._transformId(dataId)
+        pathId = self._mapActualToPath(dataId)
+        path = os.path.join(self.root, self.eimageTemplate % pathId)
+        return ButlerLocation(
+                "lsst.afw.image.DecoratedImageF", "DecoratedImageF",
+                "FitsStorage", path, dataId)
+
+###############################################################################
+
     def map_bias(self, dataId):
         dataId = self._transformId(dataId)
         pathId = self._mapActualToPath(dataId)
@@ -627,6 +637,16 @@ class LsstSimMapper(Mapper):
                 "lsst.ap.cluster.PersistableSourceClusterVector",
                 "PersistableSourceClusterVector",
                 "BoostStorage", path, {"skyTileId": dataId['skyTile']})
+
+###############################################################################
+
+for exposureType in ("raw", "eimage", "bias", "dark", "flat", "fringe",
+        "postISR", "postISRCCD", "visitim", "calexp"):
+    setattr(LsstSimMapper, "map_" + exposureType + "_md",
+            getattr(LsstSimMapper, "map_" + exposureType))
+    setattr(LsstSimMapper, "bypass_" + exposureType + "_md",
+            lambda self, datasetType, pythonType, location, dataId: \
+                    afwImage.readMetadata(location.getLocations()[0]))
 
 ###############################################################################
 
