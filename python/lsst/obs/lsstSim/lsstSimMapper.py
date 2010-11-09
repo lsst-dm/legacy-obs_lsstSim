@@ -73,9 +73,9 @@ class LsstSimMapper(Mapper):
 
         for datasetType in ["raw", "bias", "dark", "flat", "fringe",
             "postISR", "postISRCCD", "sdqaAmp", "sdqaCcd",
-            "icSrc", "visitim", "psf", "calexp", "src",
+            "icSrc", "visitim", "psf", "calexp", "matchList", "src",
             "sourceHist", "badSourceHist", "source", "badSource",
-            "invalidSource", "object", "badObject"]:
+            "invalidSource", "object", "badObject" ]:
             key = datasetType + "Template"
             if self.policy.exists(key):
                 setattr(self, key, self.policy.getString(key))
@@ -333,6 +333,18 @@ class LsstSimMapper(Mapper):
         return cameraGeomUtils.makeCamera(pol)
 
 ###############################################################################
+
+    def map_matchList(self, dataId):
+        dataId = self._transformId(dataId)
+        pathId = self._mapActualToPath(self._needFilter(dataId))
+        path = os.path.join(self.root, self.matchListTemplate % pathId)
+        return ButlerLocation(
+                "lsst.afw.detection.PersistableSourceMatchVector",
+                "PersistableSourceMatchVector",
+                "FitsStorage", path, dataId)
+
+###############################################################################
+
 
     def map_raw(self, dataId):
         dataId = self._transformId(dataId)

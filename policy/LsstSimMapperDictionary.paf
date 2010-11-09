@@ -87,6 +87,12 @@ definitions: {
         maxOccurs: 1
 	default: "calexp/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
     }
+    matchListTemplate: {
+        type: string
+        description: "The Python substitution template for the image characterization source match list pathnames."
+        maxOccurs: 1
+	default: "matchList/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
+    }
     srcTemplate: {
         type: string
         description: "The Python substitution template for the source vector pathnames."
