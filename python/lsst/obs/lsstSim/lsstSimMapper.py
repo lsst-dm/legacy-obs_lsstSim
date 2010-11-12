@@ -73,7 +73,7 @@ class LsstSimMapper(Mapper):
 
         for datasetType in ["raw", "bias", "dark", "flat", "fringe",
             "postISR", "postISRCCD", "sdqaAmp", "sdqaCcd",
-            "icSrc", "visitim", "psf", "calexp", "src",
+            "icSrc", "icMatch", "visitim", "psf", "apCorr", "calexp", "src",
             "sourceHist", "badSourceHist", "source", "badSource",
             "invalidSource", "object", "badObject"]:
             key = datasetType + "Template"
@@ -543,11 +543,31 @@ class LsstSimMapper(Mapper):
 
 ###############################################################################
 
+    def map_icMatch(self, dataId):
+        dataId = self._transformId(dataId)
+        pathId = self._mapActualToPath(self._needFilter(dataId))
+        path = os.path.join(self.root, self.icMatchTemplate % pathId)
+        return ButlerLocation(
+                "lsst.afw.detection.PersistableSourceMatchVector",
+                "PersistableSourceMatchVector", "FitsStorage", path, dataId)
+
+###############################################################################
+
     def map_psf(self, dataId):
         dataId = self._transformId(dataId)
         pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.psfTemplate % pathId)
         return ButlerLocation("lsst.afw.detection.Psf", "Psf", "BoostStorage", path, dataId)
+
+###############################################################################
+
+    def map_apCorr(self, dataId):
+        dataId = self._transformId(dataId)
+        pathId = self._mapActualToPath(self._needFilter(dataId))
+        path = os.path.join(self.root, self.apCorrTemplate % pathId)
+        return ButlerLocation(
+                "lsst.meas.algorithms.ApertureCorrection.ApertureCorrection",
+                "ApertureCorrection", "PickleStorage", path, dataId)
 
 ###############################################################################
 

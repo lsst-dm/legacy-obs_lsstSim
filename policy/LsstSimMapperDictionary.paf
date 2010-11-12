@@ -75,11 +75,23 @@ definitions: {
         maxOccurs: 1
 	default: "icSrc/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
     }
+    icMatchTemplate: {
+        type: string
+        description: "The Python substitution template for the image characterization match pair pathnames."
+        maxOccurs: 1
+	default: "icMatch/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
+    }
     psfTemplate: {
         type: string
         description: "The Python substitution template for the measured PSF pathnames."
         maxOccurs: 1
 	default: "psf/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
+    }
+    apCorrTemplate: {
+        type: string
+        description: "The Python substitution template for the aperture correction pathnames."
+        maxOccurs: 1
+	default: "apCorr/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.pickle"
     }
     calexpTemplate: {
         type: string
