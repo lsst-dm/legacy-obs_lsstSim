@@ -35,6 +35,10 @@ import lsst.afw.image.utils as imageUtils
 import lsst.pex.logging as pexLog
 import lsst.pex.policy as pexPolicy
 
+# Solely to get boost serialization registrations for Measurement subclasses
+import lsst.meas.algorithms as measAlgo
+import lsst.meas.multifit as measMultifit
+
 class LsstSimMapper(Mapper):
     def __init__(self, policy=None, root=".", registry=None, calibRoot=None):
         Mapper.__init__(self)
