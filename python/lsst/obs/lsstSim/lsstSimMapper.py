@@ -330,8 +330,6 @@ class LsstSimMapper(Mapper):
         return ButlerLocation(None, 'none', None, [], dataId)
 
     def bypass_sourceIdStart(self, datasetType, pythonType, location, dataId):
-        print 'bypass_sourceIdStart'
-        print 'dataId', dataId
         # as per map_icSrc
         dataId = self._transformId(dataId)
         pathId = self._mapActualToPath(self._needFilter(dataId))
