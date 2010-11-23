@@ -325,6 +325,22 @@ class LsstSimMapper(Mapper):
 
 ###############################################################################
 
+    # cheat!
+    def map_sourceIdStart(self, dataId):
+        return ButlerLocation(None, 'none', None, [], dataId)
+
+    def bypass_sourceIdStart(self, datasetType, pythonType, location, dataId):
+        print 'bypass_sourceIdStart'
+        print 'dataId', dataId
+        # as per map_icSrc
+        dataId = self._transformId(dataId)
+        pathId = self._mapActualToPath(self._needFilter(dataId))
+        ampExposureId = self.getAmpExposureId(dataId, pathId)
+        # as per SourceFormatter::generateSourceId
+        return (ampExposureId << 16, (1<<16)-1)
+
+###############################################################################
+
     def map_camera(self, dataId):
         dataId = self._transformId(dataId)
         return ButlerLocation(
@@ -530,14 +546,17 @@ class LsstSimMapper(Mapper):
 
 ###############################################################################
 
+    def getAmpExposureId(self, dataId, pathId):
+        r1, r2 = pathId['raft']
+        s1, s2 = pathId['sensor']
+        return ((dataId['visit'] << 9) +
+                (long(r1) * 5 + long(r2)) * 10 + (long(s1) * 3 + long(s2)))
+
     def map_icSrc(self, dataId):
         dataId = self._transformId(dataId)
         pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.icSrcTemplate % pathId)
-        r1, r2 = pathId['raft']
-        s1, s2 = pathId['sensor']
-        ampExposureId = (dataId['visit'] << 9) + \
-                (long(r1) * 5 + long(r2)) * 10 + (long(s1) * 3 + long(s2))
+        ampExposureId = self.getAmpExposureId(dataId, pathId)
         filterId = self.filterIdMap[pathId['filter']]
         return ButlerLocation(
                 "lsst.afw.detection.PersistableSourceVector",
