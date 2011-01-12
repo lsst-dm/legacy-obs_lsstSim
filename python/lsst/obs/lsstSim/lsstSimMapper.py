@@ -322,6 +322,52 @@ class LsstSimMapper(Mapper):
                         (str(ccd.getId()), defectFits)
             ccd.setDefects(ccdDefects)
 
+    def _computeAmpExposureId(self, visit, snap, raft, sensor, channel):
+        """Compute the 64-bit (long) identifier for an amp exposure.
+
+        @param visit (int)
+        @param raft (str) "xy" e.g. "20"
+        @param sensor (str) "xy" e.g. "11"
+        @param channel (str) "yx" e.g. "05"
+        """
+        r1, r2 = raft
+        s1, s2 = sensor
+        c1, c2 = channel
+        return (visit << 13) + (snap << 12) + \
+                (long(r1) * 5 + long(r2)) * 160 + \
+                (long(s1) * 3 + long(s2)) * 16 + \
+                (long(c1) * 8 + long(c2))
+
+    def _computeCcdExposureId(self, visit, raft, sensor):
+        """Compute the 64-bit (long) identifier for a CCD exposure.
+
+        @param visit (int)
+        @param raft (str) "xy" e.g. "20"
+        @param sensor (str) "xy" e.g. "11"
+        """
+
+        r1, r2 = raft
+        s1, s2 = sensor
+        return (visit << 9) + \
+                (long(r1) * 5 + long(r2)) * 10 + \
+                (long(s1) * 3 + long(s2))
+
+    def _setAmpExposureId(self, propertyList, dataId):
+        dataId = self._transformId(dataId)
+        pathId = self._mapActualToPath(dataId)
+        propertyList.set("Computed_ampExposureId",
+                self._computeAmpExposureId(
+                    dataId['visit'], dataId['snap'],
+                    pathId['raft'], pathId['sensor'], pathId['channel']))
+        return propertyList
+
+    def _setCcdExposureId(self, propertyList, dataId):
+        dataId = self._transformId(dataId)
+        pathId = self._mapActualToPath(dataId)
+        propertyList.set("Computed_ccdExposureId",
+                self._computeCcdExposureId(
+                    dataId['visit'], pathId['raft'], pathId['sensor']))
+        return propertyList
 
 ###############################################################################
 
@@ -484,13 +530,9 @@ class LsstSimMapper(Mapper):
         dataId = self._transformId(dataId)
         pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.sdqaAmpTemplate % pathId)
-        r1, r2 = pathId['raft']
-        s1, s2 = pathId['sensor']
-        c1, c2 = pathId['channel']
-        ampExposureId = (dataId['visit'] << 13) + \
-                (long(r1) * 5 + long(r2)) * 160 + \
-                (long(s1) * 3 + long(s2)) * 16 + \
-                (long(c1) * 8 + long(c2))
+        ampExposureId = self._computeAmpExposureId(
+                dataId['visit'], dataId['snap'],
+                pathId['raft'], pathId['sensor'], pathId['channel'])
         return ButlerLocation(
                 "lsst.sdqa.PersistableSdqaRatingVector",
                 "PersistableSdqaRatingVector",
@@ -503,11 +545,8 @@ class LsstSimMapper(Mapper):
         dataId = self._transformId(dataId)
         pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.sdqaCcdTemplate % pathId)
-        r1, r2 = pathId['raft']
-        s1, s2 = pathId['sensor']
-        ccdExposureId = (dataId['visit'] << 9) + \
-                (long(r1) * 5 + long(r2)) * 10 + \
-                (long(s1) * 3 + long(s2))
+        ccdExposureId = self._computeCcdExposureId(
+                dataId['visit'], pathId['raft'], pathId['sensor'])
         return ButlerLocation(
                 "lsst.sdqa.PersistableSdqaRatingVector",
                 "PersistableSdqaRatingVector",
@@ -534,10 +573,10 @@ class LsstSimMapper(Mapper):
         dataId = self._transformId(dataId)
         pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.icSrcTemplate % pathId)
-        r1, r2 = pathId['raft']
-        s1, s2 = pathId['sensor']
-        ampExposureId = (dataId['visit'] << 9) + \
-                (long(r1) * 5 + long(r2)) * 10 + (long(s1) * 3 + long(s2))
+        # Note that sources are identified by what is called an ampExposureId,
+        # but in this case all we have is a CCD.
+        ampExposureId = self._computeCcdExposureId(
+                dataId['visit'], pathId['raft'], pathId['sensor'])
         filterId = self.filterIdMap[pathId['filter']]
         return ButlerLocation(
                 "lsst.afw.detection.PersistableSourceVector",
@@ -593,10 +632,10 @@ class LsstSimMapper(Mapper):
         dataId = self._transformId(dataId)
         pathId = self._mapActualToPath(self._needFilter(dataId))
         path = os.path.join(self.root, self.srcTemplate % pathId)
-        r1, r2 = pathId['raft']
-        s1, s2 = pathId['sensor']
-        ampExposureId = (dataId['visit'] << 9) + \
-                (long(r1) * 5 + long(r2)) * 10 + (long(s1) * 3 + long(s2))
+        # Note that sources are identified by what is called an ampExposureId,
+        # but in this case all we have is a CCD.
+        ampExposureId = self._computeCcdExposureId(
+                dataId['visit'], pathId['raft'], pathId['sensor'])
         filterId = self.filterIdMap[pathId['filter']]
         return ButlerLocation(
                 "lsst.afw.detection.PersistableSourceVector",
@@ -664,13 +703,28 @@ class LsstSimMapper(Mapper):
 
 ###############################################################################
 
-for exposureType in ("raw", "eimage", "bias", "dark", "flat", "fringe",
-        "postISR", "postISRCCD", "visitim", "calexp"):
+for exposureType in ("bias", "dark", "flat", "fringe"):
     setattr(LsstSimMapper, "map_" + exposureType + "_md",
             getattr(LsstSimMapper, "map_" + exposureType))
     setattr(LsstSimMapper, "bypass_" + exposureType + "_md",
             lambda self, datasetType, pythonType, location, dataId: \
                     afwImage.readMetadata(location.getLocations()[0]))
+for exposureType in ("raw", "postISR"):
+    setattr(LsstSimMapper, "map_" + exposureType + "_md",
+            getattr(LsstSimMapper, "map_" + exposureType))
+    setattr(LsstSimMapper, "bypass_" + exposureType + "_md",
+            lambda self, datasetType, pythonType, location, dataId: \
+                    self._setAmpExposureId(
+                        afwImage.readMetadata(location.getLocations()[0]),
+                        dataId))
+for exposureType in ("eimage", "postISRCCD", "visitim", "calexp"):
+    setattr(LsstSimMapper, "map_" + exposureType + "_md",
+            getattr(LsstSimMapper, "map_" + exposureType))
+    setattr(LsstSimMapper, "bypass_" + exposureType + "_md",
+            lambda self, datasetType, pythonType, location, dataId: \
+                    self._setCcdExposureId(
+                        afwImage.readMetadata(location.getLocations()[0]),
+                        dataId))
 
 ###############################################################################
 
