@@ -24,7 +24,7 @@ import os
 import re
 import time
 import lsst.daf.base as dafBase
-import lsst.daf.persistence as dafPersist
+from lsst.daf.persistence import Mapper, ButlerLocation, LogicalLocation
 import lsst.daf.butlerUtils as butlerUtils
 import lsst.afw.image as afwImage
 import lsst.afw.coord as afwCoord
@@ -35,24 +35,14 @@ import lsst.afw.image.utils as imageUtils
 import lsst.pex.logging as pexLog
 import lsst.pex.policy as pexPolicy
 
-class LsstSimMapper(butlerUtils.CameraMapper):
-    def __init__(self, policy=None, root=".", registry=None, calibRoot=None):
-        defaultPolicyFile = pexPolicy.DefaultPolicyFile("obs_lsstSim",
-                "LsstSimMapper.paf", "policy")
-        defaultPolicy = pexPolicy.Policy.createPolicy(defaultPolicyFile,
-                defaultPolicyFile.getRepository())
-        if policy is None:
-            policy = pexPolicy.Policy()
-        policy.mergeDefaults(defaultPolicy)
+from lsst.daf.butlerUtils import CameraMapper
 
-        butlerUtils.Mapper.__init__(self, policy,
-                defaultPolicyFile.getRepository(),
-                root=root, registry=registry, calibRoot=calibRoot)
 
-        self.keys = ["visit", "snap", "raft", "sensor", "channel", "skyTile", "filter"]
-
-        self.filterIdMap = {
-                'u': 0, 'g': 1, 'r': 2, 'i': 3, 'z': 4, 'y': 5, 'i2': 5}
+class LsstSimMapper(CameraMapper):
+    def __init__(self, **kwargs):
+        policyFile = pexPolicy.DefaultPolicyFile("obs_lsstSim", "LsstSimMapper.paf", "policy")
+        policy = pexPolicy.Policy(policyFile)
+        super(LsstSimMapper, self).__init__(policy, policyFile.getRepositoryPath(), **kwargs)
 
     def _transformId(self, dataId):
         actualId = dataId.copy()
@@ -82,17 +72,15 @@ class LsstSimMapper(butlerUtils.CameraMapper):
             actualId['sensor'] = actualId['ccd']
         if actualId.has_key("amp"):
             actualId['channel'] = actualId['amp']
-        return actualId
 
-    def _mapActualToPath(self, template, actualId):
-        pathId = actualId.copy()
-        if pathId.has_key("raft"):
-            pathId['raft'] = re.sub(r'(\d),(\d)', r'\1\2', pathId['raft'])
-        if pathId.has_key("sensor"):
-            pathId['sensor'] = re.sub(r'(\d),(\d)', r'\1\2', pathId['sensor'])
-        if pathId.has_key("channel"):
-            pathId['channel'] = re.sub(r'(\d),(\d)', r'\1\2', pathId['channel'])
-        return template % pathId
+        if actualId.has_key("raft"):
+            actualId['raft'] = re.sub(r'(\d),(\d)', r'\1\2', actualId['raft'])
+        if actualId.has_key("sensor"):
+            actualId['sensor'] = re.sub(r'(\d),(\d)', r'\1\2', actualId['sensor'])
+        if actualId.has_key("channel"):
+            actualId['channel'] = re.sub(r'(\d),(\d)', r'\1\2', actualId['channel'])
+
+        return actualId
 
     def _extractDetectorName(self, dataId):
         return "R:%(raft)s S:%(sensor)s" % dataId
@@ -104,18 +92,64 @@ class LsstSimMapper(butlerUtils.CameraMapper):
         return (self._extractDetectorName(dataId),
                 int(m.group(2)), int(m.group(1)))
 
-    def std_raw(self, item, dataId):
-        dataId = self._transformId(dataId)
-        exposure = afwImage.makeExposure(
-                afwImage.makeMaskedImage(item.getImage()))
-        md = item.getMetadata()
-        exposure.setMetadata(md)
-        wcs = afwImage.makeWcs(md)
+    def _computeAmpExposureId(self, dataId):
+        #visit, snap, raft, sensor, channel):
+        """Compute the 64-bit (long) identifier for an amp exposure.
 
+        @param dataId (dict) Data identifier with visit, snap, raft, sensor, channel
+        """
+
+        pathId = self._transformId(dataId)
+        visit = pathId['visit']
+        snap = pathId['snap']
+        raft = pathId['raft'] # "xy" e.g. "20"
+        sensor = pathId['sensor'] # "xy" e.g. "11"
+        channel = pathId['channel'] # "yx" e.g. "05" (NB: yx, not xy, in original comment)
+
+        r1, r2 = raft
+        s1, s2 = sensor
+        c1, c2 = channel
+        return (visit << 13) + (snap << 12) + \
+                (long(r1) * 5 + long(r2)) * 160 + \
+                (long(s1) * 3 + long(s2)) * 16 + \
+                (long(c1) * 8 + long(c2))
+
+    def _computeCcdExposureId(self, dataId):
+        """Compute the 64-bit (long) identifier for a CCD exposure.
+
+        @param dataId (dict) Data identifier with visit, raft, sensor
+        """
+
+        pathId = self._transformId(dataId)
+        visit = pathId['visit']
+        raft = pathId['raft'] # "xy" e.g. "20"
+        sensor = pathId['sensor'] # "xy" e.g. "11"
+
+        r1, r2 = raft
+        s1, s2 = sensor
+        return (visit << 9) + \
+                (long(r1) * 5 + long(r2)) * 10 + \
+                (long(s1) * 3 + long(s2))
+
+    def _setAmpExposureId(self, propertyList, dataId):
+        propertyList.set("Computed_ampExposureId", self._computeAmpExposureId(dataId))
+        return propertyList
+
+    def _setCcdExposureId(self, propertyList, dataId):
+        propertyList.set("Computed_ccdExposureId", self._computeCcdExposureId(dataId))
+        return propertyList
+
+###############################################################################
+
+    def std_raw(self, item, dataId):
+        exposure = super(LsstSimMapper, self).std_raw(item, dataId)
+
+        md = exposure.getMetadata()
         if md.exists("VERSION") and md.getInt("VERSION") < 16952:
         # Precess WCS based on actual observation date
             epoch = dafBase.DateTime(md.get("MJD-OBS"), dafBase.DateTime.MJD,
                     dafBase.DateTime.TAI).get(dafBase.DateTime.EPOCH)
+            wcs = exposure.getWcs()
             origin = wcs.getSkyOrigin()
             refCoord = afwCoord.Fk5Coord(
                     origin.getLongitude(afwCoord.DEGREES),
@@ -126,129 +160,42 @@ class LsstSimMapper(butlerUtils.CameraMapper):
             crval.setY(newRefCoord.getDec(afwCoord.DEGREES))
             wcs = afwImage.Wcs(crval, wcs.getPixelOrigin(),
                     wcs.getCDMatrix())
-
-        exposure.setWcs(wcs)
-        wcsMetadata = wcs.getFitsMetadata()
-        for kw in wcsMetadata.paramNames():
-            md.remove(kw)
-        return self._standardize(self.getMapping("raw"), exposure, dataId)
+            exposure.setWcs(wcs)
+        
+        return self._standardizeExposure(self.exposures['raw'], exposure, dataId)
 
 ###############################################################################
 
-    def map_sdqaAmp(self, dataId):
-        dataId = self._transformId(dataId)
-        pathId = self._mapActualToPath(self._needFilter(dataId))
-        path = os.path.join(self.root, self.sdqaAmpTemplate % pathId)
-        r1, r2 = pathId['raft']
-        s1, s2 = pathId['sensor']
-        c1, c2 = pathId['channel']
-        ampExposureId = (dataId['visit'] << 13) + \
-                (long(r1) * 5 + long(r2)) * 160 + \
-                (long(s1) * 3 + long(s2)) * 16 + \
-                (long(c1) * 8 + long(c2))
-        return ButlerLocation(
-                "lsst.sdqa.PersistableSdqaRatingVector",
-                "PersistableSdqaRatingVector",
-                "BoostStorage", path,
-                {"ampExposureId": ampExposureId, "sdqaRatingScope": "AMP"})
+    def add_sdqaAmp(self, dataId):
+        ampExposureId = self._computeAmpExposureId(dataId)
+        return {"ampExposureId": ampExposureId, "sdqaRatingScope": "AMP"}
 
-###############################################################################
+    def add_sdqaCcd(self, dataId):
+        ccdExposureId = self._computeCcdExposureId(dataId)
+        return {"ccdExposureId": ccdExposureId, "sdqaRatingScope": "CCD"}
 
-    def map_sdqaCcd(self, dataId):
-        dataId = self._transformId(dataId)
-        pathId = self._mapActualToPath(self._needFilter(dataId))
-        path = os.path.join(self.root, self.sdqaCcdTemplate % pathId)
-        r1, r2 = pathId['raft']
-        s1, s2 = pathId['sensor']
-        ccdExposureId = (dataId['visit'] << 9) + \
-                (long(r1) * 5 + long(r2)) * 10 + \
-                (long(s1) * 3 + long(s2))
-        return ButlerLocation(
-                "lsst.sdqa.PersistableSdqaRatingVector",
-                "PersistableSdqaRatingVector",
-                "BoostStorage", path,
-                {"ccdExposureId": ccdExposureId, "sdqaRatingScope": "CCD"})
-
-###############################################################################
-
-    def map_icSrc(self, dataId):
-        dataId = self._transformId(dataId)
-        pathId = self._mapActualToPath(self._needFilter(dataId))
-        path = os.path.join(self.root, self.icSrcTemplate % pathId)
-        r1, r2 = pathId['raft']
-        s1, s2 = pathId['sensor']
-        ampExposureId = (dataId['visit'] << 9) + \
-                (long(r1) * 5 + long(r2)) * 10 + (long(s1) * 3 + long(s2))
+    def _addSources(self, dataId):
+        """Generic 'add' function to add ampExposureId and filterId"""
+        # Note that sources are identified by what is called an ampExposureId,
+        # but in this case all we have is a CCD.
+        ampExposureId = self._computeCcdExposureId(dataId)
         filterId = self.filterIdMap[pathId['filter']]
-        return ButlerLocation(
-                "lsst.afw.detection.PersistableSourceVector",
-                "PersistableSourceVector",
-                "BoostStorage", path,
-                {"ampExposureId": ampExposureId, "filterId": filterId})
+        return {"ampExposureId": ampExposureId, "filterId": filterId}
+
+    def _addSkytile(self, dataId):
+        """Generic 'add' function to add skyTileId"""
+        return {"skyTileId": dataId['skyTile']}
+
+for dsType in ("icSrc", "src"):
+    setattr(LsstSimMapper, "add_" + dsType, LsstSimMapper._addSources)
+for dsType in ("source", "badSource", "invalidSource", "object", "badObject"):
+    setattr(LsstSimMapper, "add_" + dsType, LsstSimMapper._addSkytile)
 
 ###############################################################################
 
-    def map_psf(self, dataId):
-        dataId = self._transformId(dataId)
-        pathId = self._mapActualToPath(self._needFilter(dataId))
-        path = os.path.join(self.root, self.psfTemplate % pathId)
-        return ButlerLocation("lsst.afw.detection.Psf", "Psf", "BoostStorage", path, dataId)
-
-###############################################################################
-
-    def map_src(self, dataId):
-        dataId = self._transformId(dataId)
-        pathId = self._mapActualToPath(self._needFilter(dataId))
-        path = os.path.join(self.root, self.srcTemplate % pathId)
-        r1, r2 = pathId['raft']
-        s1, s2 = pathId['sensor']
-        ampExposureId = (dataId['visit'] << 9) + \
-                (long(r1) * 5 + long(r2)) * 10 + (long(s1) * 3 + long(s2))
-        filterId = self.filterIdMap[pathId['filter']]
-        return ButlerLocation(
-                "lsst.afw.detection.PersistableSourceVector",
-                "PersistableSourceVector",
-                "BoostStorage", path,
-                {"ampExposureId": ampExposureId, "filterId": filterId})
-
-###############################################################################
-
-    def map_source(self, dataId):
-        dataId = self._transformId(dataId)
-        path = os.path.join(self.root, self.sourceTemplate % dataId)
-        return ButlerLocation(
-                "lsst.afw.detection.PersistableSourceVector",
-                "PersistableSourceVector",
-                "BoostStorage", path, {"skyTileId": dataId['skyTile']})
-
-    def map_badSource(self, dataId):
-        dataId = self._transformId(dataId)
-        path = os.path.join(self.root, self.badSourceTemplate % dataId)
-        return ButlerLocation(
-                "lsst.afw.detection.PersistableSourceVector",
-                "PersistableSourceVector",
-                "BoostStorage", path, {"skyTileId": dataId['skyTile']})
-
-    def map_invalidSource(self, dataId):
-        dataId = self._transformId(dataId)
-        path = os.path.join(self.root, self.invalidSourceTemplate % dataId)
-        return ButlerLocation(
-                "lsst.afw.detection.PersistableSourceVector",
-                "PersistableSourceVector",
-                "BoostStorage", path, {"skyTileId": dataId['skyTile']})
-
-    def map_object(self, dataId):
-        dataId = self._transformId(dataId)
-        path = os.path.join(self.root, self.objectTemplate % dataId)
-        return ButlerLocation(
-                "lsst.ap.cluster.PersistableSourceClusterVector",
-                "PersistableSourceClusterVector",
-                "BoostStorage", path, {"skyTileId": dataId['skyTile']})
-
-    def map_badObject(self, dataId):
-        dataId = self._transformId(dataId)
-        path = os.path.join(self.root, self.badObjectTemplate % dataId)
-        return ButlerLocation(
-                "lsst.ap.cluster.PersistableSourceClusterVector",
-                "PersistableSourceClusterVector",
-                "BoostStorage", path, {"skyTileId": dataId['skyTile']})
+for dsType in ("raw", "postISR"):
+    setattr(LsstSimMapper, "std_" + dsType + "_md",
+            lambda self, item, dataId: self._setAmpExposureId(item))
+for dsType in ("eimage", "postISRCCD", "visitim", "calexp"):
+    setattr(LsstSimMapper, "std_" + dsType + "_md",
+            lambda self, item, dataId: self._setCcdExposureId(item))
