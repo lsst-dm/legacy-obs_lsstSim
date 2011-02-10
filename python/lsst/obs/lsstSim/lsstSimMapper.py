@@ -20,19 +20,12 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-import os
 import re
-import time
+
 import lsst.daf.base as dafBase
-from lsst.daf.persistence import Mapper, ButlerLocation, LogicalLocation
-import lsst.daf.butlerUtils as butlerUtils
 import lsst.afw.image as afwImage
 import lsst.afw.coord as afwCoord
 import lsst.afw.geom as afwGeom
-import lsst.afw.cameraGeom as afwCameraGeom
-import lsst.afw.cameraGeom.utils as cameraGeomUtils
-import lsst.afw.image.utils as imageUtils
-import lsst.pex.logging as pexLog
 import lsst.pex.policy as pexPolicy
 
 from lsst.daf.butlerUtils import CameraMapper
