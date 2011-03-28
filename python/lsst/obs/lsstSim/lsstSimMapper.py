@@ -37,6 +37,10 @@ class LsstSimMapper(CameraMapper):
         policy = pexPolicy.Policy(policyFile)
         super(LsstSimMapper, self).__init__(policy, policyFile.getRepositoryPath(), **kwargs)
 
+        self.filterIdMap = {
+                'u': 0, 'g': 1, 'r': 2, 'i': 3, 'z': 4, 'y': 5, 'i2': 5}
+        
+        
     def _transformId(self, dataId):
         actualId = dataId.copy()
         if actualId.has_key("sensorName"):
@@ -172,6 +176,7 @@ class LsstSimMapper(CameraMapper):
         # Note that sources are identified by what is called an ampExposureId,
         # but in this case all we have is a CCD.
         ampExposureId = self._computeCcdExposureId(dataId)
+        pathId = self._transformId(dataId)
         filterId = self.filterIdMap[pathId['filter']]
         return {"ampExposureId": ampExposureId, "filterId": filterId}
 
