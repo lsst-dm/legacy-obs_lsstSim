@@ -30,17 +30,18 @@ import lsst.pex.policy as pexPolicy
 
 from lsst.daf.butlerUtils import CameraMapper
 
+# Solely to get boost serialization registrations for Measurement subclasses
+import lsst.meas.algorithms as measAlgo
+import lsst.meas.multifit as measMultifit
 
 class LsstSimMapper(CameraMapper):
     def __init__(self, **kwargs):
         policyFile = pexPolicy.DefaultPolicyFile("obs_lsstSim", "LsstSimMapper.paf", "policy")
         policy = pexPolicy.Policy(policyFile)
         super(LsstSimMapper, self).__init__(policy, policyFile.getRepositoryPath(), **kwargs)
-
         self.filterIdMap = {
                 'u': 0, 'g': 1, 'r': 2, 'i': 3, 'z': 4, 'y': 5, 'i2': 5}
-        
-        
+
     def _transformId(self, dataId):
         actualId = dataId.copy()
         if actualId.has_key("sensorName"):
