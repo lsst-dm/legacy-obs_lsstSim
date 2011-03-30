@@ -1,0 +1,219 @@
+#<?cfg paf policy ?>
+
+camera:        "../description/Full_STA_geom.paf"
+defects:    "../description/defects"
+filters:    "../description/LsstFilters.paf"
+
+needCalibRegistry: false
+
+exposures: {
+    raw: {
+        template:    "raw/v%(visit)d-f%(filter)s/E%(snap)03d/R%(raft)s/S%(sensor)s/imsim_%(visit)d_R%(raft)s_S%(sensor)s_C%(channel)s_E%(snap)03d.fits.gz"
+        python:     "lsst.afw.image.DecoratedImageU"
+        persistable:         "DecoratedImageU"
+        storage:     "FitsStorage"
+        level:        "Amp"
+        tables:        raw
+        tables:        raw_visit
+        tables:        raw_skyTile
+    }
+    postISR: {
+        template:    "postISR/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s/C%(channel)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
+        level:        "Amp"
+        tables:        raw
+        tables:        raw_visit
+        tables:        raw_skyTile
+    }
+    postISRCCD: {
+        template:    "postISRCCD/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
+        level:        "Ccd"
+        tables:        raw
+        tables:        raw_visit
+        tables:        raw_skyTile
+    }
+    visitim: {
+        template:      "visitim/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
+        level:        "Ccd"
+        tables:        raw
+        tables:        raw_visit
+        tables:        raw_skyTile
+    }
+    calexp: {
+        template:      "calexp/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
+        level:        "Ccd"
+        tables:        raw
+        tables:        raw_visit
+        tables:        raw_skyTile
+    }
+}
+
+calibrations: {
+    bias: {
+        template:    "bias/v0/R%(raft)s/S%(sensor)s/imsim_0_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
+        level:        "Amp"
+    }
+    dark: {
+        template:    "dark/v1/R%(raft)s/S%(sensor)s/imsim_1_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
+        level:        "Amp"
+    }
+    flat: {
+        template:    "flat/v2-f%(filter)s/R%(raft)s/S%(sensor)s/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
+        level:        "Amp"
+        reference:    "raw"
+        reference:    "raw_visit"
+        columns:      "filter"
+    }
+    fringe: {
+        template:    "fringe/v2-f%(filter)s/R%(raft)s/S%(sensor)s/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
+        level:        "Amp"
+        reference:    "raw"
+        reference:    "raw_visit"
+        columns:      "filter"
+    }
+}
+
+datasets: {
+    icSrc: {
+        template:      "icSrc/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
+        python:        "lsst.afw.detection.PersistableSourceVector"
+        persistable:        "PersistableSourceVector"
+        storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_visit
+        tables:        raw_skyTile
+    }
+    icMatch: {
+        template:      "icMatch/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
+        python:        "lsst.afw.detection.PersistableSourceMatchVector"
+        persistable:        "PersistableSourceMatchVector"
+        storage:    "FitsStorage"
+        tables:        raw
+        tables:        raw_visit
+        tables:        raw_skyTile
+    }
+    psf: {
+        template:      "psf/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
+        python:        "lsst.afw.detection.Psf"
+        persistable:        "Psf"
+        storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_visit
+        tables:        raw_skyTile
+    }
+    apCorr: {
+        template:      "apCorr/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.pickle"
+        python:        "lsst.meas.algorithms.ApertureCorrection.ApertureCorrection"
+        persistable:        "ApertureCorrection"
+        storage:    "PickleStorage"
+        tables:        raw
+        tables:        raw_visit
+        tables:        raw_skyTile
+    }
+    sdqaAmp: {
+        template:      "sdqaAmp/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s/C%(channel)s.boost"
+        python:        "lsst.sdqa.PersistableSdqaRatingVector"
+        persistable:        "PersistableSdqaRatingVector"
+        storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_visit
+        tables:        raw_skyTile
+    }
+    sdqaCcd: {
+        template:      "sdqaCcd/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s.boost"
+        python:        "lsst.sdqa.PersistableSdqaRatingVector"
+        persistable:        "PersistableSdqaRatingVector"
+        storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_visit
+        tables:        raw_skyTile
+    }
+    src: {
+        template:      "src/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
+        python:        "lsst.afw.detection.PersistableSourceVector"
+        persistable:        "PersistableSourceVector"
+        storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_visit
+        tables:        raw_skyTile
+    }
+    sourceHist: {
+        template:      "results/st%(skyTile)d/sourceHist.fits"
+        python:        "lsst.afw.image.DecoratedImageU"
+        persistable:        "DecoratedImageU"
+        storage:    "FitsStorage"
+        tables:        raw_visit
+        tables:        raw_skyTile
+    }
+    badSourceHist: {
+        template:      "results/st%(skyTile)d/badSourceHist.fits"
+        python:        "lsst.afw.image.DecoratedImageU"
+        persistable:        "DecoratedImageU"
+        storage:    "FitsStorage"
+        tables:        raw_visit
+        tables:        raw_skyTile
+    }
+    source: {
+        template:      "results/st%(skyTile)d/source.boost"
+        python:        "lsst.afw.detection.PersistableSourceVector"
+        persistable:        "PersistableSourceVector"
+        storage:    "BoostStorage"
+        tables:        raw_visit
+        tables:        raw_skyTile
+    }
+    badSource: {
+        template:      "results/st%(skyTile)d/badSource.boost"
+        python:        "lsst.afw.detection.PersistableSourceVector"
+        persistable:        "PersistableSourceVector"
+        storage:    "BoostStorage"
+        tables:        raw_visit
+        tables:        raw_skyTile
+    }
+    invalidSource: {
+        template:      "results/st%(skyTile)d/invalidSource.boost"
+        python:        "lsst.afw.detection.PersistableSourceVector"
+        persistable:        "PersistableSourceVector"
+        storage:    "BoostStorage"
+        tables:        raw_visit
+        tables:        raw_skyTile
+    }
+    object: {
+        template:      "results/st%(skyTile)d/object.boost"
+        python:        "lsst.afw.detection.PersistableSourceClusterVector"
+        persistable:        "PersistableSourceClusterVector"
+        storage:    "BoostStorage"
+        tables:        raw_visit
+        tables:        raw_skyTile
+    }
+    badObject: {
+        template:      "results/st%(skyTile)d/badObject.boost"
+        python:        "lsst.afw.detection.PersistableSourceClusterVector"
+        persistable:        "PersistableSourceClusterVector"
+        storage:    "BoostStorage"
+        tables:        raw_visit
+        tables:        raw_skyTile
+    }
+}
