@@ -35,13 +35,14 @@ import lsst.meas.algorithms as measAlgo
 import lsst.meas.multifit as measMultifit
 
 class LsstSimMapper(CameraMapper):
-    def __init__(self, policy=None, **kwargs):
+    def __init__(self, inputPolicy=None, **kwargs):
         policyFile = pexPolicy.DefaultPolicyFile("obs_lsstSim", "LsstSimMapper.paf", "policy")
-        basePolicy = pexPolicy.Policy(policyFile)
-        if policy is None:
-            policy = basePolicy
-        else:
-            policy.mergeDefaults(basePolicy)
+        policy = pexPolicy.Policy(policyFile)
+
+        if inputPolicy is not None:
+            for kw in inputPolicy.paramNames(True):
+                kwargs[kw] = inputPolicy.get(kw)
+
         super(LsstSimMapper, self).__init__(policy, policyFile.getRepositoryPath(), **kwargs)
         self.filterIdMap = {
                 'u': 0, 'g': 1, 'r': 2, 'i': 3, 'z': 4, 'y': 5, 'i2': 5}
