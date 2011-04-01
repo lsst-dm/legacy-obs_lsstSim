@@ -14,7 +14,6 @@ exposures: {
         storage:     "FitsStorage"
         level:        "Amp"
         tables:        raw
-        tables:        raw_visit
         tables:        raw_skyTile
     }
     postISR: {
@@ -24,7 +23,6 @@ exposures: {
         storage:    "FitsStorage"
         level:        "Amp"
         tables:        raw
-        tables:        raw_visit
         tables:        raw_skyTile
     }
     postISRCCD: {
@@ -34,7 +32,6 @@ exposures: {
         storage:    "FitsStorage"
         level:        "Ccd"
         tables:        raw
-        tables:        raw_visit
         tables:        raw_skyTile
     }
     visitim: {
@@ -44,7 +41,6 @@ exposures: {
         storage:    "FitsStorage"
         level:        "Ccd"
         tables:        raw
-        tables:        raw_visit
         tables:        raw_skyTile
     }
     calexp: {
@@ -54,7 +50,6 @@ exposures: {
         storage:    "FitsStorage"
         level:        "Ccd"
         tables:        raw
-        tables:        raw_visit
         tables:        raw_skyTile
     }
 }
@@ -81,7 +76,6 @@ calibrations: {
         storage:    "FitsStorage"
         level:        "Amp"
         reference:    "raw"
-        reference:    "raw_visit"
         columns:      "filter"
     }
     fringe: {
@@ -91,7 +85,6 @@ calibrations: {
         storage:    "FitsStorage"
         level:        "Amp"
         reference:    "raw"
-        reference:    "raw_visit"
         columns:      "filter"
     }
 }
@@ -103,7 +96,6 @@ datasets: {
         persistable:        "PersistableSourceVector"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_visit
         tables:        raw_skyTile
     }
     icMatch: {
@@ -112,7 +104,6 @@ datasets: {
         persistable:        "PersistableSourceMatchVector"
         storage:    "FitsStorage"
         tables:        raw
-        tables:        raw_visit
         tables:        raw_skyTile
     }
     psf: {
@@ -121,7 +112,6 @@ datasets: {
         persistable:        "Psf"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_visit
         tables:        raw_skyTile
     }
     apCorr: {
@@ -130,7 +120,6 @@ datasets: {
         persistable:        "ApertureCorrection"
         storage:    "PickleStorage"
         tables:        raw
-        tables:        raw_visit
         tables:        raw_skyTile
     }
     sdqaAmp: {
@@ -139,7 +128,6 @@ datasets: {
         persistable:        "PersistableSdqaRatingVector"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_visit
         tables:        raw_skyTile
     }
     sdqaCcd: {
@@ -148,7 +136,6 @@ datasets: {
         persistable:        "PersistableSdqaRatingVector"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_visit
         tables:        raw_skyTile
     }
     src: {
@@ -157,7 +144,6 @@ datasets: {
         persistable:        "PersistableSourceVector"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_visit
         tables:        raw_skyTile
     }
     sourceHist: {
@@ -165,7 +151,7 @@ datasets: {
         python:        "lsst.afw.image.DecoratedImageU"
         persistable:        "DecoratedImageU"
         storage:    "FitsStorage"
-        tables:        raw_visit
+        tables:        raw
         tables:        raw_skyTile
     }
     badSourceHist: {
@@ -173,7 +159,7 @@ datasets: {
         python:        "lsst.afw.image.DecoratedImageU"
         persistable:        "DecoratedImageU"
         storage:    "FitsStorage"
-        tables:        raw_visit
+        tables:        raw
         tables:        raw_skyTile
     }
     source: {
@@ -181,7 +167,7 @@ datasets: {
         python:        "lsst.afw.detection.PersistableSourceVector"
         persistable:        "PersistableSourceVector"
         storage:    "BoostStorage"
-        tables:        raw_visit
+        tables:        raw
         tables:        raw_skyTile
     }
     badSource: {
@@ -189,7 +175,7 @@ datasets: {
         python:        "lsst.afw.detection.PersistableSourceVector"
         persistable:        "PersistableSourceVector"
         storage:    "BoostStorage"
-        tables:        raw_visit
+        tables:        raw
         tables:        raw_skyTile
     }
     invalidSource: {
@@ -197,7 +183,7 @@ datasets: {
         python:        "lsst.afw.detection.PersistableSourceVector"
         persistable:        "PersistableSourceVector"
         storage:    "BoostStorage"
-        tables:        raw_visit
+        tables:        raw
         tables:        raw_skyTile
     }
     object: {
@@ -205,7 +191,7 @@ datasets: {
         python:        "lsst.afw.detection.PersistableSourceClusterVector"
         persistable:        "PersistableSourceClusterVector"
         storage:    "BoostStorage"
-        tables:        raw_visit
+        tables:        raw
         tables:        raw_skyTile
     }
     badObject: {
@@ -213,7 +199,7 @@ datasets: {
         python:        "lsst.afw.detection.PersistableSourceClusterVector"
         persistable:        "PersistableSourceClusterVector"
         storage:    "BoostStorage"
-        tables:        raw_visit
+        tables:        raw
         tables:        raw_skyTile
     }
 }
