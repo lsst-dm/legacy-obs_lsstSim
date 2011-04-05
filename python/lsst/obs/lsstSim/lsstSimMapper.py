@@ -200,6 +200,6 @@ for dsType in ("source", "badSource", "invalidSource", "object", "badObject"):
 for dsType in ("raw", "postISR"):
     setattr(LsstSimMapper, "std_" + dsType + "_md",
             lambda self, item, dataId: self._setAmpExposureId(item))
-for dsType in ("eimage", "postISRCCD", "visitim", "calexp"):
+for dsType in ("eimage", "postISRCCD", "visitim", "calexp", "calsnap"):
     setattr(LsstSimMapper, "std_" + dsType + "_md",
             lambda self, item, dataId: self._setCcdExposureId(item))
