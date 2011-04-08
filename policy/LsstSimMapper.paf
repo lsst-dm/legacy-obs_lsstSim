@@ -125,7 +125,7 @@ datasets: {
     }
     apCorr: {
         template:      "apCorr/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.pickle"
-        python:        "lsst.meas.algorithms.ApertureCorrection.ApertureCorrection"
+        python:        "lsst.meas.algorithms.ApertureCorrection"
         persistable:        "ApertureCorrection"
         storage:    "PickleStorage"
         tables:        raw
