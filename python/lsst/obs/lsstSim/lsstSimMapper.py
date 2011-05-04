@@ -39,9 +39,13 @@ class LsstSimMapper(CameraMapper):
         policyFile = pexPolicy.DefaultPolicyFile("obs_lsstSim", "LsstSimMapper.paf", "policy")
         policy = pexPolicy.Policy(policyFile)
 
+        self.doFootprints = False
         if inputPolicy is not None:
             for kw in inputPolicy.paramNames(True):
-                kwargs[kw] = inputPolicy.get(kw)
+                if kw == "doFootprints":
+                    self.doFootprints = True
+                else:
+                    kwargs[kw] = inputPolicy.get(kw)
 
         super(LsstSimMapper, self).__init__(policy, policyFile.getRepositoryPath(), **kwargs)
         self.filterIdMap = {
@@ -184,7 +188,10 @@ class LsstSimMapper(CameraMapper):
         ampExposureId = self._computeCcdExposureId(dataId)
         pathId = self._transformId(dataId)
         filterId = self.filterIdMap[pathId['filter']]
-        return {"ampExposureId": ampExposureId, "filterId": filterId}
+        ad = dict(ampExposureId=ampExposureId, filterId=filterId)
+        if self.doFootprints:
+            ad["doFootprints"] = True
+        return ad
 
     def _addSkytile(self, dataId):
         """Generic 'add' function to add skyTileId"""
