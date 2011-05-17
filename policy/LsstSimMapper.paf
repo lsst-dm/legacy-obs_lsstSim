@@ -65,21 +65,21 @@ exposures: {
 
 calibrations: {
     bias: {
-        template:    "bias/R%(raft)s/S%(sensor)s/C%(channel)s.fits"
+        template:    "bias/v0/R%(raft)s/S%(sensor)s/imsim_0_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
         python:        "lsst.afw.image.ExposureF"
         persistable:        "ExposureF"
         storage:    "FitsStorage"
         level:        "Amp"
     }
     dark: {
-        template:    "dark/R%(raft)s/S%(sensor)s/C%(channel)s.fits"
+        template:    "dark/v1/R%(raft)s/S%(sensor)s/imsim_1_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
         python:        "lsst.afw.image.ExposureF"
         persistable:        "ExposureF"
         storage:    "FitsStorage"
         level:        "Amp"
     }
     flat: {
-        template:    "flat_%(filter)s/R%(raft)s/S%(sensor)s/C%(channel)s.fits"
+        template:    "flat/v2-f%(filter)s/R%(raft)s/S%(sensor)s/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
         python:        "lsst.afw.image.ExposureF"
         persistable:        "ExposureF"
         storage:    "FitsStorage"
@@ -88,7 +88,7 @@ calibrations: {
         columns:      "filter"
     }
     fringe: {
-        template:    "fringe_%(filter)s/R%(raft)s/S%(sensor)s/C%(channel)s.fits"
+        template:    "fringe/v2-f%(filter)s/R%(raft)s/S%(sensor)s/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
         python:        "lsst.afw.image.ExposureF"
         persistable:        "ExposureF"
         storage:    "FitsStorage"
