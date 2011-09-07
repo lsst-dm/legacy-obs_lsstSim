@@ -159,12 +159,11 @@ class LsstSimMapper(CameraMapper):
             wcs = exposure.getWcs()
             origin = wcs.getSkyOrigin()
             refCoord = afwCoord.Fk5Coord(
-                    origin.getLongitude(afwCoord.DEGREES),
-                    origin.getLatitude(afwCoord.DEGREES), epoch)
+                origin.getLongitude(), origin.getLatitude(), epoch)
             newRefCoord = refCoord.precess(2000.)
             crval = afwGeom.PointD()
-            crval.setX(newRefCoord.getRa(afwCoord.DEGREES))
-            crval.setY(newRefCoord.getDec(afwCoord.DEGREES))
+            crval.setX(newRefCoord.getRa().asDegrees())
+            crval.setY(newRefCoord.getDec().asDegrees())
             wcs = afwImage.Wcs(crval, wcs.getPixelOrigin(),
                     wcs.getCDMatrix())
             exposure.setWcs(wcs)
