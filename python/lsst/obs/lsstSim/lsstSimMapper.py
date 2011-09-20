@@ -169,7 +169,7 @@ class LsstSimMapper(CameraMapper):
                     wcs.getCDMatrix())
             exposure.setWcs(wcs)
         
-        return self._standardizeExposure(self.exposures['raw'], exposure, dataId)
+        return exposure
 
 ###############################################################################
 
