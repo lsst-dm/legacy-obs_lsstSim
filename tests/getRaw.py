@@ -54,9 +54,9 @@ class GetRawTestCase(unittest.TestCase):
 				"R:0,3 S:0,1")
 		origin = raw.getWcs().getSkyOrigin()
 		self.assertAlmostEqual(
-				origin.getLongitude(afwCoord.DEGREES), 0.005865, 6)
+            origin.getLongitude().asDegrees(), 0.005865, 6)
 		self.assertAlmostEqual(
-				origin.getLatitude(afwCoord.DEGREES), -2.305262, 6)
+            origin.getLatitude().asDegrees(), -2.305262, 6)
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
