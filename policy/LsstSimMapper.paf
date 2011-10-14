@@ -34,6 +34,15 @@ exposures: {
         tables:        raw
         tables:        raw_skyTile
     }
+    crDiffim: {
+        template:    "crDiffim/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
+        level:        "Ccd"
+        tables:        raw
+        tables:        raw_skyTile
+    }
     visitim: {
         template:      "visitim/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
         python:        "lsst.afw.image.ExposureF"
@@ -99,6 +108,14 @@ calibrations: {
 }
 
 datasets: {
+    crDiffimSrc: {
+        template:      "crDiffimSrc/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
+        python:        "lsst.afw.detection.PersistableSourceVector"
+        persistable:        "PersistableSourceVector"
+        storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
     icSrc: {
         template:      "icSrc/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
         python:        "lsst.afw.detection.PersistableSourceVector"
