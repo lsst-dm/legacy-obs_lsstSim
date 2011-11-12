@@ -66,13 +66,13 @@ class LsstSimMapper(CameraMapper):
             channelNumber = int(m.group(1))
             channelX = channelNumber % 8
             channelY = channelNumber // 8
-            actualId['channel'] = str(channelY) + "," + str(channelX)
+            actualId['channel'] = str(channelX) + "," + str(channelY)
         if actualId.has_key("ampName"):
             m = re.search(r'ID(\d+)', actualId['ampName'])
             channelNumber = int(m.group(1))
             channelX = channelNumber % 8
             channelY = channelNumber // 8
-            actualId['channel'] = str(channelY) + "," + str(channelX)
+            actualId['channel'] = str(channelX) + "," + str(channelY)
         if actualId.has_key("exposure"):
             actualId['snap'] = actualId['exposure']
         if actualId.has_key("ccd"):
@@ -97,7 +97,7 @@ class LsstSimMapper(CameraMapper):
         # Note that indices are swapped in the camera geometry vs. official
         # channel specification.
         return (self._extractDetectorName(dataId),
-                int(m.group(2)), int(m.group(1)))
+                int(m.group(1)), int(m.group(2)))
 
     def _computeAmpExposureId(self, dataId):
         #visit, snap, raft, sensor, channel):
