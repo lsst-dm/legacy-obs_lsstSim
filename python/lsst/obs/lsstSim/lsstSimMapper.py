@@ -24,6 +24,7 @@ import re
 
 import lsst.daf.base as dafBase
 import lsst.afw.image as afwImage
+import lsst.afw.math as afwMath
 import lsst.afw.coord as afwCoord
 import lsst.afw.geom as afwGeom
 import lsst.pex.policy as pexPolicy
@@ -169,6 +170,13 @@ class LsstSimMapper(CameraMapper):
             exposure.setWcs(wcs)
         
         return exposure
+
+    def std_eimage(self, item, dataId):
+        eimage = afwMath.rotateImageBy90(
+                afwMath.flipImage(item.getImage(), False, True), 1)
+        eimage = afwImage.DecoratedImageF(eimage)
+        eimage.setMetadata(item.getMetadata())
+        return self.exposures['eimage'].standardize(self, eimage, dataId)
 
 ###############################################################################
 
