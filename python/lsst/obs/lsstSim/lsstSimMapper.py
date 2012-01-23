@@ -24,6 +24,7 @@ import re
 
 import lsst.daf.base as dafBase
 import lsst.afw.image as afwImage
+import lsst.afw.image.utils as afwImageUtils
 import lsst.afw.coord as afwCoord
 import lsst.afw.geom as afwGeom
 import lsst.pex.policy as pexPolicy
@@ -50,6 +51,18 @@ class LsstSimMapper(CameraMapper):
         super(LsstSimMapper, self).__init__(policy, policyFile.getRepositoryPath(), **kwargs)
         self.filterIdMap = {
                 'u': 0, 'g': 1, 'r': 2, 'i': 3, 'z': 4, 'y': 5, 'i2': 5}
+
+        #The LSST Filters from L. Jones 04/07/10
+        afwImageUtils.defineFilter('u', 364.59)
+        afwImageUtils.defineFilter('g', 476.31)
+        afwImageUtils.defineFilter('r', 619.42)
+        afwImageUtils.defineFilter('i', 752.06)
+        afwImageUtils.defineFilter('z', 866.85)
+        afwImageUtils.defineFilter('y', 971.68, alias=['y4']) # official y filter
+        afwImageUtils.defineFilter('y3', 1002.44) # candidate y-band
+
+
+
 
     def _transformId(self, dataId):
         actualId = dataId.copy()

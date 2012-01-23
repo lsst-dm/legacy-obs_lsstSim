@@ -2,7 +2,6 @@
 
 camera:        "../description/Full_STA_geom.paf"
 defects:    "../description/defects"
-filters:    "../description/LsstFilters.paf"
 
 needCalibRegistry: false
 
