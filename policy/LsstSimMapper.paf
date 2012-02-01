@@ -5,6 +5,20 @@ defects:    "../description/defects"
 
 needCalibRegistry: false
 
+levels: {
+    skyTile: "visit" "raft" "sensor"
+    visit: "snap" "raft" "sensor" "channel"
+    raft: "snap" "sensor" "amp"
+    sensor: "snap" "amp"
+}
+defaultLevel: "sensor"
+defaultSubLevels: {
+    skyTile: "sensor"
+    visit: "sensor"
+    raft: "sensor"
+    sensor: "amp"
+}
+
 exposures: {
     raw: {
         template:    "raw/v%(visit)d-f%(filter)s/E%(snap)03d/R%(raft)s/S%(sensor)s/imsim_%(visit)d_R%(raft)s_S%(sensor)s_C%(channel)s_E%(snap)03d.fits.gz"
