@@ -8,8 +8,8 @@ needCalibRegistry: false
 levels: {
     skyTile: "visit" "raft" "sensor"
     visit: "snap" "raft" "sensor" "channel"
-    raft: "snap" "sensor" "amp"
-    sensor: "snap" "amp"
+    raft: "snap" "sensor" "channel"
+    sensor: "snap" "channel"
 }
 defaultLevel: "sensor"
 defaultSubLevels: {
