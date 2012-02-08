@@ -16,7 +16,7 @@ defaultSubLevels: {
     skyTile: "sensor"
     visit: "sensor"
     raft: "sensor"
-    sensor: "amp"
+    sensor: "channel"
 }
 
 exposures: {
