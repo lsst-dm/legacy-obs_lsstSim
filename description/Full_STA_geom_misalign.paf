@@ -4856,7 +4856,6 @@ Electronic: {
             }
         }
     }
-    }
     Raft: {     
         name: R:1,0
         serial: 10
@@ -18551,7 +18550,6 @@ Electronic: {
                 saturationLevel: 54481.040000
             }
         }
-    }
     }
     Raft: {     
         name: R:4,1
