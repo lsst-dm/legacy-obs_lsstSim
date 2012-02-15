@@ -10,6 +10,7 @@ levels: {
     visit: "snap" "raft" "sensor" "channel"
     raft: "snap" "sensor" "channel"
     sensor: "snap" "channel"
+    snap: "channel"
 }
 defaultLevel: "sensor"
 defaultSubLevels: {
