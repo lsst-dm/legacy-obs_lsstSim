@@ -229,6 +229,7 @@ datasets: {
     config: {
         template:      "config/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.pickle"
         python:        "lsst.pex.config.Config"
+        persistable:      "Config"
         storage:    "PickleStorage"
         tables:        raw
         tables:        raw_skyTile
