@@ -226,16 +226,16 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
-    config: {
-        template:      "config/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.pickle"
+    processCcd_config: {
+        template:      "processCcd_config/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.pickle"
         python:        "lsst.pex.config.Config"
         persistable:      "Config"
-        storage:    "PickleStorage"
+        storage:    "ConfigStorage"
         tables:        raw
         tables:        raw_skyTile
     }
-    pipe_metadata: {
-        template:      "pipe_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.pickle"
+    processCcd_metadata: {
+        template:      "processCcd_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.pickle"
         python:        "lsst.daf.base.PropertySet"
         persistable:        "PropertySet"
         storage:    "BoostStorage"
