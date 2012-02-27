@@ -162,22 +162,6 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
-    sdqaAmp: {
-        template:      "sdqaAmp/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s/C%(channel)s.boost"
-        python:        "lsst.sdqa.PersistableSdqaRatingVector"
-        persistable:        "PersistableSdqaRatingVector"
-        storage:    "BoostStorage"
-        tables:        raw
-        tables:        raw_skyTile
-    }
-    sdqaCcd: {
-        template:      "sdqaCcd/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s.boost"
-        python:        "lsst.sdqa.PersistableSdqaRatingVector"
-        persistable:        "PersistableSdqaRatingVector"
-        storage:    "BoostStorage"
-        tables:        raw
-        tables:        raw_skyTile
-    }
     src: {
         template:      "src/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
         python:        "lsst.afw.detection.PersistableSourceVector"
@@ -238,6 +222,21 @@ datasets: {
         template:      "results/st%(skyTile)d/badObject.boost"
         python:        "lsst.afw.detection.PersistableSourceClusterVector"
         persistable:        "PersistableSourceClusterVector"
+        storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    config: {
+        template:      "config/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.pickle"
+        python:        "lsst.pex.config.Config"
+        storage:    "PickleStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    pipe_metadata: {
+        template:      "pipe_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.pickle"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
         tables:        raw_skyTile
