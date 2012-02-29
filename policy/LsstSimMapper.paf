@@ -131,18 +131,18 @@ datasets: {
         tables:        raw_skyTile
     }
     icSrc: {
-        template:      "icSrc/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
-        python:        "lsst.afw.detection.PersistableSourceVector"
-        persistable:        "PersistableSourceVector"
-        storage:    "BoostStorage"
+        template:      "icSrc/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "SourceCatalog"
+        storage:    "FitsCatalogStorage"
         tables:        raw
         tables:        raw_skyTile
     }
     icMatch: {
         template:      "icMatch/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
-        python:        "lsst.afw.detection.PersistableSourceMatchVector"
-        persistable:        "PersistableSourceMatchVector"
-        storage:    "FitsStorage"
+        python:        "lsst.afw.table.BaseCatalog"
+        persistable:        "BaseCatalog"
+        storage:    "FitsCatalogStorage"
         tables:        raw
         tables:        raw_skyTile
     }
@@ -164,9 +164,9 @@ datasets: {
     }
     src: {
         template:      "src/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
-        python:        "lsst.afw.detection.PersistableSourceVector"
-        persistable:        "PersistableSourceVector"
-        storage:    "BoostStorage"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "SourceCatalog"
+        storage:    "FitsCatalogStorage"
         tables:        raw
         tables:        raw_skyTile
     }
@@ -188,25 +188,25 @@ datasets: {
     }
     source: {
         template:      "results/st%(skyTile)d/source.boost"
-        python:        "lsst.afw.detection.PersistableSourceVector"
-        persistable:        "PersistableSourceVector"
-        storage:    "BoostStorage"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "SourceCatalog"
+        storage:    "FitsCatalogStorage"
         tables:        raw
         tables:        raw_skyTile
     }
     badSource: {
         template:      "results/st%(skyTile)d/badSource.boost"
-        python:        "lsst.afw.detection.PersistableSourceVector"
-        persistable:        "PersistableSourceVector"
-        storage:    "BoostStorage"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "SourceCatalog"
+        storage:    "FitsCatalogStorage"
         tables:        raw
         tables:        raw_skyTile
     }
     invalidSource: {
         template:      "results/st%(skyTile)d/invalidSource.boost"
-        python:        "lsst.afw.detection.PersistableSourceVector"
-        persistable:        "PersistableSourceVector"
-        storage:    "BoostStorage"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "SourceCatalog"
+        storage:    "FitsCatalogStorage"
         tables:        raw
         tables:        raw_skyTile
     }
