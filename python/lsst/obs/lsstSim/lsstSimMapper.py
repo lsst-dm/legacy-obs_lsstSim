@@ -33,7 +33,6 @@ from lsst.daf.butlerUtils import CameraMapper
 
 # Solely to get boost serialization registrations for Measurement subclasses
 import lsst.meas.algorithms as measAlgo
-import lsst.meas.multifit as measMultifit
 
 class LsstSimMapper(CameraMapper):
     def __init__(self, inputPolicy=None, **kwargs):
