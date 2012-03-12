@@ -48,6 +48,15 @@ exposures: {
         tables:        raw
         tables:        raw_skyTile
     }
+    visitCCD: {
+        template:    "visitCCD/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
+        level:        "Ccd"
+        tables:        raw
+        tables:        raw_skyTile
+    }
     crDiffim: {
         template:    "crDiffim/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
         python:        "lsst.afw.image.ExposureF"
@@ -194,22 +203,6 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
-    sdqaAmp: {
-        template:      "sdqaAmp/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s/C%(channel)s.boost"
-        python:        "lsst.sdqa.PersistableSdqaRatingVector"
-        persistable:        "PersistableSdqaRatingVector"
-        storage:    "BoostStorage"
-        tables:        raw
-        tables:        raw_skyTile
-    }
-    sdqaCcd: {
-        template:      "sdqaCcd/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s.boost"
-        python:        "lsst.sdqa.PersistableSdqaRatingVector"
-        persistable:        "PersistableSdqaRatingVector"
-        storage:    "BoostStorage"
-        tables:        raw
-        tables:        raw_skyTile
-    }
     src: {
         template:      "src/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
         python:        "lsst.afw.detection.PersistableSourceVector"
@@ -270,6 +263,22 @@ datasets: {
         template:      "results/st%(skyTile)d/badObject.boost"
         python:        "lsst.afw.detection.PersistableSourceClusterVector"
         persistable:        "PersistableSourceClusterVector"
+        storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    processCcd_config: {
+        template:      "processCcd_config/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.py"
+        python:        "lsst.pex.config.Config"
+        persistable:      "Config"
+        storage:    "ConfigStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    processCcd_metadata: {
+        template:      "processCcd_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
         tables:        raw_skyTile

@@ -101,6 +101,20 @@ class LsstSimMapper(CameraMapper):
 
         return actualId
 
+    def validate(self, dataId):
+        for component in ("raft", "sensor", "channel"):
+            if component not in dataId:
+                continue
+            id = dataId[component]
+            if not isinstance(id, str):
+                raise RuntimeError, \
+                        "%s identifier should be type str, not %s: %s" % \
+                        (component.title(), type(id), repr(id))
+            if not re.search(r'^(\d),(\d)$', id):
+                raise RuntimeError, \
+                        "Invalid %s identifier: %s" % (component, repr(id))
+        return dataId
+
     def _extractDetectorName(self, dataId):
         return "R:%(raft)s S:%(sensor)s" % dataId
 
