@@ -56,7 +56,7 @@ class ProcessCalibLsstSimTask(pipeBase.Task):
                                 'flat': ["doConversionForIsr", "doSaturationDetection", "doOverscanCorrection", "doBiasSubtraction", "doDarkCorrection"]
                               }
         self.config.isr.methodList = self.methodListDict[self.config.type]
-        self.config.isr.trimAmps = True
+        self.config.isr.normalizeGain = True
         self.makeSubtask('isr', IsrTask)
         self.statsCtrl = afwMath.StatisticsControl()
         self.statsCtrl.setNumSigmaClip(self.config.sigmaClip)
