@@ -93,7 +93,7 @@ exposures: {
         tables:        raw
         tables:        raw_skyTile
     }
-    biasOut: {
+    bias: {
         template:    "bias/v0/R%(raft)s/S%(sensor)s/imsim_0_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
         python:        "lsst.afw.image.ExposureF"
         persistable:        "ExposureF"
@@ -101,7 +101,7 @@ exposures: {
         level:        "Amp"
         tables:       raw
     }
-    darkOut: {
+    dark: {
         template:    "dark/v1/R%(raft)s/S%(sensor)s/imsim_1_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
         python:        "lsst.afw.image.ExposureF"
         persistable:        "ExposureF"
@@ -109,7 +109,7 @@ exposures: {
         level:        "Amp"
         tables:       raw
     }
-    flatOut: {
+    flat: {
         template:    "flat/v2-f%(filter)s/R%(raft)s/S%(sensor)s/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
         python:        "lsst.afw.image.ExposureF"
         persistable:        "ExposureF"
@@ -117,7 +117,7 @@ exposures: {
         level:        "Amp"
         tables:       raw
     }
-    fringeOut: {
+    fringe: {
         template:    "fringe/v2-f%(filter)s/R%(raft)s/S%(sensor)s/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
         python:        "lsst.afw.image.ExposureF"
         persistable:        "ExposureF"
