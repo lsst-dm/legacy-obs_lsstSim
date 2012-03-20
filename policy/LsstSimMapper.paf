@@ -204,7 +204,7 @@ datasets: {
         tables:        raw_skyTile
     }
     src: {
-        template:      "src/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
+        template:      "src/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
         python:        "lsst.afw.table.SourceCatalog"
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
@@ -228,7 +228,7 @@ datasets: {
         tables:        raw_skyTile
     }
     source: {
-        template:      "results/st%(skyTile)d/source.boost"
+        template:      "results/st%(skyTile)d/source.fits"
         python:        "lsst.afw.table.SourceCatalog"
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
@@ -236,7 +236,7 @@ datasets: {
         tables:        raw_skyTile
     }
     badSource: {
-        template:      "results/st%(skyTile)d/badSource.boost"
+        template:      "results/st%(skyTile)d/badSource.fits"
         python:        "lsst.afw.table.SourceCatalog"
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
@@ -244,7 +244,7 @@ datasets: {
         tables:        raw_skyTile
     }
     invalidSource: {
-        template:      "results/st%(skyTile)d/invalidSource.boost"
+        template:      "results/st%(skyTile)d/invalidSource.fits"
         python:        "lsst.afw.table.SourceCatalog"
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
