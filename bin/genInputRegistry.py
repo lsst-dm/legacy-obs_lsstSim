@@ -83,6 +83,10 @@ def process(dirList, inputRegistry, outputRegistry="registry.sqlite3"):
                 SELECT DISTINCT visit, filter, taiObs, expTime FROM raw
                 WHERE snap = 0""")
         conn.commit()
+        conn.execute("""CREATE UNIQUE INDEX uq_raw ON raw
+                (visit, snap, raft, sensor, channel)""")
+        conn.execute("CREATE INDEX ix_skyTile_id ON raw_skyTile (id)")
+        conn.execute("CREATE INDEX ix_skyTile_tile ON raw_skyTile (skyTile)")
         conn.close()
 
 def processVisit(visitDir, conn, done, qsp):
