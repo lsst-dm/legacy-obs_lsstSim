@@ -49,7 +49,7 @@ exposures: {
         tables:        raw_skyTile
     }
     visitCCD: {
-        template:    "visitCCD/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s.fits"
+        template:    "visitCCD/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
         python:        "lsst.afw.image.ExposureF"
         persistable:        "ExposureF"
         storage:    "FitsStorage"
