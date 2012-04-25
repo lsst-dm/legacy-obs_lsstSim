@@ -20,4 +20,6 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 from .version import *
-from lsstSimMapper import *
+from .lsstSimMapper import *
+from .lsstSimAssembleCcdTask import *
+from .lsstSimIsrTask import *

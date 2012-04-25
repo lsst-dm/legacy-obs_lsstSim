@@ -28,23 +28,9 @@ import lsst.ip.isr as ipIsr
 
 __all__ = ["LsstSimAssembleCcdTask"]
 
-class LsstSimAssembleCcdConfig(pexConfig.Config):
-    def setDefaults(self):
-        pass
-
-    def doCcdAssembly(self, exposureList):
-        renorm = self.config.reNormAssembledCcd
-        setgain = self.config.setGainAssembledCcd
-        k2rm = self.config.keysToRemoveFromAssembledCcd
-        assembler = CcdAssembler(exposureList, reNorm=renorm, setGain=setgain, keysToRemove=k2rm)
-        return assembler.assembleCcd()
-
-
 class LsstSimAssembleCcdTask(ipIsr.AssembleCcdTask):
     """Assemble a CCD
     """
-    ConfigClass = LsstSimAssembleCcdConfig
-    
     def run(self, ampExposureList):
         """Assemble a CCD by trimming non-data areas
 
@@ -55,7 +41,7 @@ class LsstSimAssembleCcdTask(ipIsr.AssembleCcdTask):
         """
         outExposure = self.assemblePixels(ampExposureList=ampExposureList)
 
-        self.setExposureComponents(outExposure=outExposure, inExposure=inExposure)
+        self.setExposureComponents(outExposure=outExposure, inExposure=ampExposureList[0])
 
         self.display("assembledExposure", exposure=outExposure)
     
@@ -77,18 +63,29 @@ class LsstSimAssembleCcdTask(ipIsr.AssembleCcdTask):
             raise RuntimeError("No ccd detector found in amp detector")
         ccd.setTrimmed(self.config.doTrim)
 
-        outExposure = afwImage.ExposureF(ccd.getAllPixels(isTrimmed))
+        outExposure = afwImage.ExposureF(ccd.getAllPixels(self.config.doTrim))
         outMI = outExposure.getMaskedImage()
+        outImageDict = dict(
+            getImage = outMI.getImage(),
+            getMask = outMI.getMask(),
+            getVariance = outMI.getVariance(),
+        )
         for ampExp in ampExposureList:
             amp = cameraGeom.cast_Amp(ampExp.getDetector())
-            outView = outMI.Factory(outMI, amp.getAllPixels(isTrimmed), afwImage.LOCAL)
+            outBBox = amp.getAllPixels(self.config.doTrim)
             if self.config.doTrim:
                 inBBox = amp.getDiskDataSec()
             else:
                 inBBox = amp.getDiskAllPixels()
-            ampMI = ampExp.getMaskedImage()
-            inView = inMI.Factory(inMI, inBBox, afwImage.PARENT)
-            outView <<= amp.prepareAmpData(inView)
+
+            for getterName in ("getImage", "getMask", "getVariance"):
+                outImage = outImageDict[getterName]
+                outView = outImage.Factory(outImage, outBBox, afwImage.LOCAL)
+
+                inMI = ampExp.getMaskedImage()
+                inImage = getattr(inMI, getterName)()
+                inView = inImage.Factory(inImage, inBBox, afwImage.PARENT)
+                outView <<= amp.prepareAmpData(inView)
 
         outExposure.setDetector(ccd)
         return outExposure

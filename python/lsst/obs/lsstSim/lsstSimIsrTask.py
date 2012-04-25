@@ -90,13 +90,16 @@ class LsstSimIsrTask(IsrTask):
     
                 self.overscanCorrection(ampExp, amp)
     
-                self.biasCorrection(ampExp, ampRef)
+                if self.config.doBias:
+                    self.biasCorrection(ampExp, ampRef)
                 
-                self.darkCorrection(ampExp, ampRef)
+                if self.config.doDark:
+                    self.darkCorrection(ampExp, ampRef)
                 
                 self.updateVariance(ampExp, amp)
                 
-                self.flatCorrection(ampExp, ampRef)
+                if self.config.doFlat:
+                    self.flatCorrection(ampExp, ampRef)
                 
                 ampExpList.append(ampExp)
         

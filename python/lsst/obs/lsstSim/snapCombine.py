@@ -29,9 +29,8 @@ import lsst.pipe.base as pipeBase
 from lsst.coadd.utils import Coadd, addToCoadd, setCoaddEdgeBits
 from lsst.ip.diffim import SnapPsfMatchTask
 from lsst.meas.algorithms import SourceDetectionTask, SourceMeasurementTask
-
-from .repair import RepairTask
-from .calibrate import InitialPsfConfig
+from lsst.pipe.tasks.repair import RepairTask
+from lsst.pipe.tasks.calibrate import InitialPsfConfig
 
 class SnapCombineConfig(pexConfig.Config):
     doRepair = pexConfig.Field(
