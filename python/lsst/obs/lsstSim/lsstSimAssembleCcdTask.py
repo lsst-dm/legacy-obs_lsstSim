@@ -19,7 +19,6 @@
 # the GNU General Public License along with this program.  If not, 
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
-
 import lsst.afw.cameraGeom as cameraGeom
 import lsst.afw.cameraGeom.utils as cameraGeomUtils
 import lsst.afw.image as afwImage
@@ -49,93 +48,47 @@ class LsstSimAssembleCcdTask(ipIsr.AssembleCcdTask):
     def run(self, ampExposureList):
         """Assemble a CCD by trimming non-data areas
 
-        @param[in]      ampExposureList   list of amp exposures to assemble
+        @param[in,out]  ampExposureList list of amp exposures to assemble;
+                                        the setTrimmed flag of the ccd device info may be modified
+        @return a pipe_base Struct with one field:
+        - exposure: assembled exposure
         """
-        llAmpExp = ampExposureList[0]
-        llAmp = cameraGeom.cast_Amp(llAmpExp.getDetector())
-        ccd = cameraGeom.cast_Ccd(llAmp.getParent())
+        outExposure = self.assemblePixels(ampExposureList=ampExposureList)
 
-        if ccd is None or not isinstance(ccd, cameraGeom.Ccd) or \
-               llAmp is None or not isinstance(llAmp, cameraGeom.Amp):
-            raise RuntimeError("Detector in exposure does not match calling pattern")
-        
-        # convert CCD for assembled exposure
-        ccd.setTrimmed(True)
-        
-        outExposure = self.assemblePixels(
-            ampExposureList = ampExposureList,
-            ccd = ccd,
-        )
+        self.setExposureComponents(outExposure=outExposure, inExposure=inExposure)
 
-        self.setExposureComponents(
-            outExposure = outExposure,
-            ampExposureList = ampExposureList,
-            ccd = ccd,
-            llAmp = llAmp,
-        )
-
-        if self.config.setGain:
-            if ccdVariance.getArray().max() == 0:
-                raise("Can't calculate the effective gain since the variance plane is set to zero")
-            self.setGain(
-                outExposure = outExposure,
-                ccd = ccd,
-            )
-
-        self.display("assembledExposure", exposure = outExposure)
+        self.display("assembledExposure", exposure=outExposure)
     
-        return pipeBase.Struct(
-            exposure = outExposure
-        )
+        return pipeBase.Struct(exposure=outExposure)
     
-    def assemblePixels(self, ampExposureList, ccd):
+    def assemblePixels(self, ampExposureList):
         """Assemble CCD pixels
 
         @param[in]      ampExposureList   list of amp exposures to assemble
         @param[in]      ccd         device info for assembled exposure
         @return         outExposure assembled exposure (just the pixels data is set)
         """
-        maskedImageList = [exp.getMaskedImage() for exp in ampExposureList]
-        ccdImage = cameraGeomUtils.makeImageFromCcd(
-            ccd = ccd,
-            imageSource = GetCcdImageData([mi.getImage() for mi in maskedImageList]),
-            imageFactory = inMaskedImage.getImage().Factory,
-            bin = False,
-        )
-        ccdVariance = cameraGeomUtils.makeImageFromCcd(
-            ccd = ccd,
-            imageSource = GetCcdImageData([mi.getVariance() for mi in maskedImageList]),
-            imageFactory = afwImage.ImageF,
-            bin = False,
-        )
-        ccdMask = cameraGeomUtils.makeImageFromCcd(
-            ccd = ccd,
-            imageSource = GetCcdImageData([mi.getMask() for mi in maskedImageList]),
-            imageFactory = afwImage.MaskU,
-            bin = False,
-        )
-        mi = afwImage.makeMaskedImage(ccdImage, ccdMask, ccdVariance)
-        return afwImage.makeExposure(mi)
+        ampExp0 = ampExposureList[0]
+        amp0 = cameraGeom.cast_Amp(ampExp0.getDetector())
+        if amp0 is None:
+            raise RuntimeError("No amp detector found in first amp exposure")
+        ccd = cameraGeom.cast_Ccd(amp0.getParent())
+        if ccd is None:
+            raise RuntimeError("No ccd detector found in amp detector")
+        ccd.setTrimmed(self.config.doTrim)
 
+        outExposure = afwImage.ExposureF(ccd.getAllPixels(isTrimmed))
+        outMI = outExposure.getMaskedImage()
+        for ampExp in ampExposureList:
+            amp = cameraGeom.cast_Amp(ampExp.getDetector())
+            outView = outMI.Factory(outMI, amp.getAllPixels(isTrimmed), afwImage.LOCAL)
+            if self.config.doTrim:
+                inBBox = amp.getDiskDataSec()
+            else:
+                inBBox = amp.getDiskAllPixels()
+            ampMI = ampExp.getMaskedImage()
+            inView = inMI.Factory(inMI, inBBox, afwImage.PARENT)
+            outView <<= amp.prepareAmpData(inView)
 
-class GetCcdImageData(cameraGeomUtils.GetCcdImage):
-    def __init__(self, imageList, isTrimmed=True):
-        self.ampDict = {}
-        for image in imageList:
-            ampId = e.getDetector().getId()
-            self.ampDict[ampId] = image
-        self.isRaw = True
-        self.isTrimmed = isTrimmed
-
-    def getImage(self, ccd, amp, expType=None, imageFactory=afwImage.ImageF):
-        ampId = amp.getId()
-        image = self.ampDict.get(ampId)
-        if image is None:
-            return None
-        
-        if self.isTrimmed:
-            bbox = amp.getDiskDataSec()
-        else:
-            bbox = amp.getDiskAllPixels()
-        subImage = imageFactory(image, bbox, afwImage.PARENT)
-        return amp.prepareAmpData(subImage)
+        outExposure.setDetector(ccd)
+        return outExposure

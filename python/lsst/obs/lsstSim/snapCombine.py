@@ -84,6 +84,7 @@ class SnapCombineTask(pipeBase.Task):
  
     @pipeBase.timeMethod
     def run(self, snap0, snap1, defects=None):
+        self.log.log(self.log.INFO, "Combining snaps")
 
         if self.config.doRepair:
             psf = self.makeInitialPsf(snap0, fwhmPix=self.config.repairPsfFwhm)

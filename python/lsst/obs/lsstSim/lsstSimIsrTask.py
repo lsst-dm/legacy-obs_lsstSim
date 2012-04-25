@@ -37,7 +37,7 @@ class LsstSimIsrConfig(IsrTask.ConfigClass):
     )
     doSnapCombine = pexConfig.Field(
         dtype = bool,
-        doc = "Combine Snaps? If False then use snap 0 as the visitCCD.",
+        doc = "Combine Snaps? If False then use snap 0 as output exposure.",
         default = True,
     )
     snapCombine = pexConfig.ConfigurableField(
@@ -58,12 +58,21 @@ class LsstSimIsrTask(IsrTask):
 
     @pipeBase.timeMethod
     def run(self, sensorRef):
-        """Do instrument signature removal on an exposure: saturation, bias, overscan, dark, flat, fringe correction
+        """Do instrument signature removal on an exposure
+        
+        Correct for saturation, bias, overscan, dark, flat..., perform CCD assembly,
+        optionally combine snaps, and interpolate over defects and saturated pixels.
+        
+        If config.doSnapCombine true then combine the two ISR-corrected snaps to produce the final exposure.
+        If config.doSnapCombine false then uses ISR-corrected snap 0 as the final exposure.
+        In either case, the final exposure is persisted as "visitCCD" if config.doWriteSpans is True,
+        and the two snaps are persisted as "postISRCCD" if config.doWriteSnaps is True.
 
         @param sensorRef daf.persistence.butlerSubset.ButlerDataRef of the data to be processed
         @return a pipeBase.Struct with fields:
         - exposure: the exposure after application of ISR
         """
+        self.log.log(self.log.INFO, "Performing ISR on sensor %s" % (sensorRef.dataId))
         snapDict = dict()
         for snapRef in sensorRef.subItems(level="snap"):
             snapId = snapRef.dataId['snap']
@@ -74,29 +83,25 @@ class LsstSimIsrTask(IsrTask):
             # perform amp-level ISR
             ampExpList = list()
             for ampRef in snapRef.subItems(level="channel"):
-                self.log.log(self.log.INFO, "Performing ISR on channel %s" % (ampRef.dataId))
                 ampExp = ampRef.get("raw")
                 amp = cameraGeom.cast_Amp(ampExp.getDetector())
         
                 self.saturationDetection(ampExp, amp)
     
-#                self.linearization(ampExp, ampRef, amp)
-    
                 self.overscanCorrection(ampExp, amp)
     
                 self.biasCorrection(ampExp, ampRef)
                 
-                isr.updateVariance(ampExp.getMaskedImage(), amp.getElectronicParams().getGain())
-                
                 self.darkCorrection(ampExp, ampRef)
+                
+                self.updateVariance(ampExp, amp)
                 
                 self.flatCorrection(ampExp, ampRef)
                 
                 ampExpList.append(ampExp)
         
-            assembleRes = self.assembleCcd.run(ampExpList)
+            ccdExp = self.assembleCcd.run(ampExpList).exposure
             del ampExpList
-            ccdExp = assembleRes.exposure
             ccd = cameraGeom.cast_Ccd(ccdExp.getDetector())
 
             self.maskAndInterpDefect(ccdExp, ccd)
@@ -105,28 +110,41 @@ class LsstSimIsrTask(IsrTask):
 
             self.maskAndInterpNan(ccdExp)
 
-            self.display("postISRCCD%d" % (snapId,), exposure=ccdExp)
-
             snapDict[snapId] = ccdExp
     
-            if self.config.doWrite:
-                sensorRef.put(ccdExp, "postISRCCD")
+            if self.config.doWriteSnaps:
+                sensorRef.put(ccdExp, "postISRCCD", snap=snapId)
+
+            self.display("postISRCCD%d" % (snapId,), exposure=ccdExp)
         
         if self.config.doSnapCombine:
-            for snapId in (0, 1):
-                if snapId not in snapDict:
-                    snapDict[snapId] = sensorRef.get("postISRCCD", snap=snapId)
-
-            combineRes = self.snapCombine.run(snapDict[0], snapDict[1])
-            outExposure = combineRes.outExposure
+            loadSnapDict(snapDict, snapIdList=(0, 1), sensorRef=sensorRef)
+            outExposure = self.snapCombine.run(snapDict[0], snapDict[1]).outExposure
         else:
+            self.log.log(self.log.WARN, "doSnapCombine false; using snap 0 as the result")
+            loadSnapDict(snapDict, snapIdList=(0,), sensorRef=sensorRef)
             outExposure = snapDict[0]
 
         if self.config.doWrite:
             sensorRef.put(outExposure, "visitCCD")
-        self.display("visitCcd", exposure=outExposure)
+
+        self.display("visitCCD", exposure=outExposure)
                 
         return pipeBase.Struct(
             exposure = outExposure,
         )
+
+def loadSnapDict(snapDict, snapIdList, sensorRef):
+    """Load missing snaps from disk.
+    
+    @paramp[in,out] snapDict: a dictionary of snapId: snap exposure ("postISRCCD")
+    @param[in] snapIdList: a list of snap IDs
+    @param[in] sensorRef: sensor reference for snap, excluding the snap ID.
+    """
+    for snapID in snapIdList:
+        if snapId not in snapDict:
+            snapExposure = sensorRef.get("postISRCCD", snap=snapId)
+            if snapExposure is None:
+                raise RuntimeError("Could not find postISRCCD for snap=%s; id=%s" % (snapId, sensorRef.dataId))
+            snapDict[snapId] = snapExposure
     
