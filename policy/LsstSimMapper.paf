@@ -165,9 +165,9 @@ calibrations: {
 datasets: {
     crDiffimSrc: {
         template:      "crDiffimSrc/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
-        python:        "lsst.afw.detection.PersistableSourceVector"
-        persistable:        "PersistableSourceVector"
-        storage:    "BoostStorage"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "SourceCatalog"
+        storage:    "FitsCatalogStorage"
         tables:        raw
         tables:        raw_skyTile
     }
@@ -253,17 +253,17 @@ datasets: {
     }
     object: {
         template:      "results/st%(skyTile)d/object.boost"
-        python:        "lsst.afw.detection.PersistableSourceClusterVector"
-        persistable:        "PersistableSourceClusterVector"
-        storage:    "BoostStorage"
+        python:        "lsst.ap.cluster.SourceClusterCatalog"
+        persistable:        "SourceClusterCatalog"
+        storage:    "FitsCatalogStorage"
         tables:        raw
         tables:        raw_skyTile
     }
     badObject: {
         template:      "results/st%(skyTile)d/badObject.boost"
-        python:        "lsst.afw.detection.PersistableSourceClusterVector"
-        persistable:        "PersistableSourceClusterVector"
-        storage:    "BoostStorage"
+        python:        "lsst.ap.cluster.SourceClusterCatalog"
+        persistable:        "SourceClusterCatalog"
+        storage:    "FitsCatalogStorage"
         tables:        raw
         tables:        raw_skyTile
     }
