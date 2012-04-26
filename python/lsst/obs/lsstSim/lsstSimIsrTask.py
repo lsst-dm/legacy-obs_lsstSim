@@ -23,9 +23,8 @@
 import lsst.afw.cameraGeom as cameraGeom
 import lsst.pex.config as pexConfig
 import lsst.pipe.base as pipeBase
-from lsst.ip.isr import IsrTask
+from lsst.ip.isr import AssembleCcdTask, IsrTask
 from .snapCombine import SnapCombineTask
-from .lsstSimAssembleCcdTask import LsstSimAssembleCcdTask
 
 __all__ = ["LsstSimIsrTask"]
 
@@ -44,9 +43,6 @@ class LsstSimIsrConfig(IsrTask.ConfigClass):
         target = SnapCombineTask,
         doc = "Combine snaps task",
     )
-    
-    def setDefaults(self):
-        self.assembleCcdTask.retarget(LsstSimAssembleCcdTask)
 
 
 class LsstSimIsrTask(IsrTask):
@@ -103,11 +99,10 @@ class LsstSimIsrTask(IsrTask):
                 
                 ampExpList.append(ampExp)
         
-            ccdExp = self.assembleCcd.run(ampExpList).exposure
+            ccdExp = self.assembleCcd.assembleAmpList(ampExpList)
             del ampExpList
-            ccd = cameraGeom.cast_Ccd(ccdExp.getDetector())
 
-            self.maskAndInterpDefect(ccdExp, ccd)
+            self.maskAndInterpDefect(ccdExp)
             
             self.saturationInterpolation(ccdExp)
 
