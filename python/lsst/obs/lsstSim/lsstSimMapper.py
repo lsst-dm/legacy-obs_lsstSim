@@ -224,7 +224,7 @@ class LsstSimMapper(CameraMapper):
 
 for dsType in ("icSrc", "src"):
     setattr(LsstSimMapper, "add_" + dsType, LsstSimMapper._addSources)
-for dsType in ("source", "badSource", "invalidSource", "object", "badObject"):
+for dsType in ("source", "badSource", "invalidSource", "object"):
     setattr(LsstSimMapper, "add_" + dsType, LsstSimMapper._addSkytile)
 
 ###############################################################################

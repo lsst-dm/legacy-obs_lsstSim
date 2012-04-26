@@ -230,7 +230,7 @@ datasets: {
     source: {
         template:      "results/st%(skyTile)d/source.fits"
         python:        "lsst.afw.table.SourceCatalog"
-        persistable:        "SourceCatalog"
+        persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
         tables:        raw_skyTile
@@ -238,7 +238,7 @@ datasets: {
     badSource: {
         template:      "results/st%(skyTile)d/badSource.fits"
         python:        "lsst.afw.table.SourceCatalog"
-        persistable:        "SourceCatalog"
+        persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
         tables:        raw_skyTile
@@ -246,23 +246,15 @@ datasets: {
     invalidSource: {
         template:      "results/st%(skyTile)d/invalidSource.fits"
         python:        "lsst.afw.table.SourceCatalog"
-        persistable:        "SourceCatalog"
+        persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
         tables:        raw_skyTile
     }
     object: {
-        template:      "results/st%(skyTile)d/object.boost"
+        template:      "results/st%(skyTile)d/object.fits"
         python:        "lsst.ap.cluster.SourceClusterCatalog"
-        persistable:        "SourceClusterCatalog"
-        storage:    "FitsCatalogStorage"
-        tables:        raw
-        tables:        raw_skyTile
-    }
-    badObject: {
-        template:      "results/st%(skyTile)d/badObject.boost"
-        python:        "lsst.ap.cluster.SourceClusterCatalog"
-        persistable:        "SourceClusterCatalog"
+        persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
         tables:        raw_skyTile
