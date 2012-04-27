@@ -63,6 +63,7 @@ class SnapCombineConfig(pexConfig.Config):
 
     def setDefaults(self):
         self.detection.thresholdPolarity = "both"
+        self.diffim.doWarping = True # see ticket #2075
 
     def validate(self):
         if self.detection.thresholdPolarity != "both":
