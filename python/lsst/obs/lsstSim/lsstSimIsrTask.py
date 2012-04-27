@@ -50,6 +50,7 @@ class LsstSimIsrTask(IsrTask):
 
     def __init__(self, **kwargs):
         IsrTask.__init__(self, **kwargs)
+        self.transposeForInterpolation = True # temporary hack until LSST data is in proper order
         self.makeSubtask("snapCombine")
 
     @pipeBase.timeMethod
@@ -77,43 +78,45 @@ class LsstSimIsrTask(IsrTask):
 
             self.log.log(self.log.INFO, "Performing ISR on snap %s" % (snapRef.dataId))
             # perform amp-level ISR
-            ampExpList = list()
+            ampExposureList = list()
             for ampRef in snapRef.subItems(level="channel"):
-                ampExp = ampRef.get("raw")
-                amp = cameraGeom.cast_Amp(ampExp.getDetector())
-        
-                self.saturationDetection(ampExp, amp)
+                ampExposure = ampRef.get("raw")
+                amp = cameraGeom.cast_Amp(ampExposure.getDetector())
+
+                ampExposure = self.convertIntToFloat(ampExposure)
+
+                self.saturationDetection(ampExposure, amp)
     
-                self.overscanCorrection(ampExp, amp)
+                self.overscanCorrection(ampExposure, amp)
     
                 if self.config.doBias:
-                    self.biasCorrection(ampExp, ampRef)
+                    self.biasCorrection(ampExposure, ampRef)
                 
                 if self.config.doDark:
-                    self.darkCorrection(ampExp, ampRef)
+                    self.darkCorrection(ampExposure, ampRef)
                 
-                self.updateVariance(ampExp, amp)
+                self.updateVariance(ampExposure, amp)
                 
                 if self.config.doFlat:
-                    self.flatCorrection(ampExp, ampRef)
+                    self.flatCorrection(ampExposure, ampRef)
                 
-                ampExpList.append(ampExp)
+                ampExposureList.append(ampExposure)
         
-            ccdExp = self.assembleCcd.assembleAmpList(ampExpList)
-            del ampExpList
+            ccdExposure = self.assembleCcd.assembleAmpList(ampExposureList)
+            del ampExposureList
 
-            self.maskAndInterpDefect(ccdExp)
+            self.maskAndInterpDefect(ccdExposure)
             
-            self.saturationInterpolation(ccdExp)
+            self.saturationInterpolation(ccdExposure)
 
-            self.maskAndInterpNan(ccdExp)
+            self.maskAndInterpNan(ccdExposure)
 
-            snapDict[snapId] = ccdExp
+            snapDict[snapId] = ccdExposure
     
             if self.config.doWriteSnaps:
-                sensorRef.put(ccdExp, "postISRCCD", snap=snapId)
+                sensorRef.put(ccdExposure, "postISRCCD", snap=snapId)
 
-            self.display("postISRCCD%d" % (snapId,), exposure=ccdExp)
+            self.display("postISRCCD%d" % (snapId,), exposure=ccdExposure)
         
         if self.config.doSnapCombine:
             loadSnapDict(snapDict, snapIdList=(0, 1), sensorRef=sensorRef)
@@ -139,7 +142,7 @@ def loadSnapDict(snapDict, snapIdList, sensorRef):
     @param[in] snapIdList: a list of snap IDs
     @param[in] sensorRef: sensor reference for snap, excluding the snap ID.
     """
-    for snapID in snapIdList:
+    for snapId in snapIdList:
         if snapId not in snapDict:
             snapExposure = sensorRef.get("postISRCCD", snap=snapId)
             if snapExposure is None:
