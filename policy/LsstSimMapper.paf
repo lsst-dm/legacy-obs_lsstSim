@@ -275,4 +275,20 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
+    sourceAssoc_config: {
+        template:      "sourceAssoc_config/st%(skyTile)d/config.py"
+        python:        "lsst.pex.config.Config"
+        persistable:   "Config"
+        storage:       "ConfigStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    sourceAssoc_metadata: {
+        template:      "sourceAssoc_metadata/st%(skyTile)d/metadata.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:   "PropertySet"
+        storage:       "BoostStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
 }
