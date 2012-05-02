@@ -21,5 +21,4 @@
 #
 from .version import *
 from .lsstSimMapper import *
-from .lsstSimAssembleCcdTask import *
 from .lsstSimIsrTask import *
