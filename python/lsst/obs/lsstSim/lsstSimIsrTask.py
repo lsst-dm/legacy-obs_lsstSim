@@ -37,7 +37,7 @@ class LsstSimIsrConfig(IsrTask.ConfigClass):
     doSnapCombine = pexConfig.Field(
         dtype = bool,
         doc = "Combine Snaps? If False then use snap 0 as output exposure.",
-        default = True,
+        default = False,
     )
     snapCombine = pexConfig.ConfigurableField(
         target = SnapCombineTask,
@@ -105,11 +105,15 @@ class LsstSimIsrTask(IsrTask):
             ccdExposure = self.assembleCcd.assembleAmpList(ampExposureList)
             del ampExposureList
 
-            self.maskAndInterpDefect(ccdExposure)
+            self.defectMasking(ccdExposure)
+
+            self.defectInterpolation(ccdExposure)
             
             self.saturationInterpolation(ccdExposure)
 
-            self.maskAndInterpNan(ccdExposure)
+            self.nanMasking(ccdExposure)
+            
+            self.nanInterpolation(ccdExposure)
 
             snapDict[snapId] = ccdExposure
     
