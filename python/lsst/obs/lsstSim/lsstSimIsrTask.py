@@ -105,15 +105,11 @@ class LsstSimIsrTask(IsrTask):
             ccdExposure = self.assembleCcd.assembleAmpList(ampExposureList)
             del ampExposureList
 
-            self.defectMasking(ccdExposure)
-
-            self.defectInterpolation(ccdExposure)
+            self.maskAndInterpDefect(ccdExposure)
             
             self.saturationInterpolation(ccdExposure)
 
-            self.nanMasking(ccdExposure)
-            
-            self.nanInterpolation(ccdExposure)
+            self.maskAndInterpNan(ccdExposure)
 
             snapDict[snapId] = ccdExposure
     
