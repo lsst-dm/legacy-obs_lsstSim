@@ -261,7 +261,7 @@ datasets: {
     }
     processCcd_config: {
         template:      "processCcd_config/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.py"
-        python:        "lsst.pex.config.Config"
+        python:        "lsst.pipe.tasks.processCcdLsstSim.ProcessCcdLsstSimConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
@@ -277,7 +277,7 @@ datasets: {
     }
     sourceAssoc_config: {
         template:      "sourceAssoc_config/st%(skyTile)d/config.py"
-        python:        "lsst.pex.config.Config"
+        python:        "lsst.pipe.tasks.sourceAssoc.SourceAssocConfig"
         persistable:   "Config"
         storage:       "ConfigStorage"
         tables:        raw
