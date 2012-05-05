@@ -283,4 +283,82 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
+
+    deepCoadd: {
+        template:    "deepCoadd/%(filter)/%(tract)/%(patch).fits"
+        python:      "lsst.afw.image.ExposureF"
+        persistable: "ExposureF"
+        storage:     "FitsStorage"
+        tables:      raw
+    }
+    deepCoadd_depth: {
+        template:    "deepCoadd/%(filter)/%(tract)/%(patch).depth.fits"
+        python:      "lsst.afw.image.ImageF"
+        persistable: "ImageF"
+        storage:     "FitsStorage"
+        tables:      raw
+    }
+    deepCoadd_psf: {
+        template:    "deepCoadd/%(filter)/%(tract)/%(patch).boost"
+        python:      "lsst.afw.detection.Psf"
+        persistable: "Psf"
+        storage:     "BoostStorage"
+        tables:      raw
+    }
+    deepCoadd_skyMap: {
+        template:    "deepCoadd/%(filter)/skyMap.pickle"
+        python:      "lsst.skymap.BaseSkyMap"
+        persistable: "ignored"
+        storage:     "PickleStorage"
+        tables:      raw
+    }
+    goodSeeingCoadd: {
+        template:    "goodSeeingCoadd/%(filter)/%(tract)/%(patch).fits"
+        python:      "lsst.afw.image.ExposureF"
+        persistable: "ExposureF"
+        storage:     "FitsStorage"
+        tables:      raw
+    }
+    goodSeeingCoadd_depth: {
+        template:    "goodSeeingCoadd/%(filter)/%(tract)/%(patch).depth.fits"
+        python:      "lsst.afw.image.ImageF"
+        persistable: "ImageF"
+        storage:     "FitsStorage"
+        tables:      raw
+    }
+    goodSeeingCoadd_psf: {
+        template:    "goodSeeingCoadd/%(filter)/%(tract)/%(patch).boost"
+        python:      "lsst.afw.detection.Psf"
+        persistable: "Psf"
+        storage:     "BoostStorage"
+        tables:      raw
+    }
+    goodSeeingCoadd_skyMap: {
+        template:    "goodSeeingCoadd/%(filter)/skyMap.pickle"
+        python:      "lsst.skymap.BaseSkyMap"
+        persistable: "ignored"
+        storage:     "PickleStorage"
+        tables:      raw
+    }
+    chiSquaredCoadd: {
+        template:    "chiSquaredCoadd/%(tract)/%(patch).fits"
+        python:      "lsst.afw.image.ExposureF"
+        persistable: "ExposureF"
+        storage:     "FitsStorage"
+        tables:      raw
+    }
+    chiSquaredCoadd_psf: {
+        template:    "chiSquaredCoadd/%(tract)/%(patch).boost"
+        python:      "lsst.afw.detection.Psf"
+        persistable: "Psf"
+        storage:     "BoostStorage"
+        tables:      raw
+    }
+    chiSquaredCoadd_skyMap: {
+        template:    "chiSquaredCoadd/skyMap.pickle"
+        python:      "lsst.skymap.BaseSkyMap"
+        persistable: "ignored"
+        storage:     "PickleStorage"
+        tables:      raw
+    }
 }
