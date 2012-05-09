@@ -163,6 +163,22 @@ calibrations: {
 }
 
 datasets: {
+    ampExposureId: {
+        template:     "ignored"
+        # Provide something to import, although we actually return a tuple
+        python:       "lsst.daf.base.PropertySet"
+        persistable:  "ignored"
+        storage:      "ignored"
+        tables:       "raw"
+    }
+    ccdExposureId: {
+        template:     "ignored"
+        # Provide something to import, although we actually return a tuple
+        python:       "lsst.daf.base.PropertySet"
+        persistable:  "ignored"
+        storage:      "ignored"
+        tables:       "raw"
+    }
     crDiffimSrc: {
         template:      "crDiffimSrc/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
         python:        "lsst.afw.detection.PersistableSourceVector"
