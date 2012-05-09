@@ -318,21 +318,21 @@ datasets: {
     }
 
     deepCoadd: {
-        template:    "deepCoadd/%(filter)s/%(tract)d/%(patch)d.fits"
+        template:    "deepCoadd/%(filter)s/%(tract)d/%(patch)s.fits"
         python:      "lsst.afw.image.ExposureF"
         persistable: "ExposureF"
         storage:     "FitsStorage"
         tables:      raw
     }
     deepCoadd_depth: {
-        template:    "deepCoadd/%(filter)s/%(tract)d/%(patch)d.depth.fits"
+        template:    "deepCoadd/%(filter)s/%(tract)d/%(patch)s.depth.fits"
         python:      "lsst.afw.image.ImageF"
         persistable: "ImageF"
         storage:     "FitsStorage"
         tables:      raw
     }
     deepCoadd_psf: {
-        template:    "deepCoadd/%(filter)s/%(tract)d/%(patch)d.boost"
+        template:    "deepCoadd/%(filter)s/%(tract)d/%(patch)s.boost"
         python:      "lsst.afw.detection.Psf"
         persistable: "Psf"
         storage:     "BoostStorage"
@@ -346,21 +346,21 @@ datasets: {
         tables:      raw
     }
     goodSeeingCoadd: {
-        template:    "goodSeeingCoadd/%(filter)s/%(tract)d/%(patch)d.fits"
+        template:    "goodSeeingCoadd/%(filter)s/%(tract)d/%(patch)s.fits"
         python:      "lsst.afw.image.ExposureF"
         persistable: "ExposureF"
         storage:     "FitsStorage"
         tables:      raw
     }
     goodSeeingCoadd_depth: {
-        template:    "goodSeeingCoadd/%(filter)s/%(tract)d/%(patch)d.depth.fits"
+        template:    "goodSeeingCoadd/%(filter)s/%(tract)d/%(patch)s.depth.fits"
         python:      "lsst.afw.image.ImageF"
         persistable: "ImageF"
         storage:     "FitsStorage"
         tables:      raw
     }
     goodSeeingCoadd_psf: {
-        template:    "goodSeeingCoadd/%(filter)s/%(tract)d/%(patch)d.boost"
+        template:    "goodSeeingCoadd/%(filter)s/%(tract)d/%(patch)s.boost"
         python:      "lsst.afw.detection.Psf"
         persistable: "Psf"
         storage:     "BoostStorage"
@@ -374,14 +374,14 @@ datasets: {
         tables:      raw
     }
     chiSquaredCoadd: {
-        template:    "chiSquaredCoadd/%(tract)d/%(patch)d.fits"
+        template:    "chiSquaredCoadd/%(tract)d/%(patch)s.fits"
         python:      "lsst.afw.image.ExposureF"
         persistable: "ExposureF"
         storage:     "FitsStorage"
         tables:      raw
     }
     chiSquaredCoadd_psf: {
-        template:    "chiSquaredCoadd/%(tract)d/%(patch)d.boost"
+        template:    "chiSquaredCoadd/%(tract)d/%(patch)s.boost"
         python:      "lsst.afw.detection.Psf"
         persistable: "Psf"
         storage:     "BoostStorage"
