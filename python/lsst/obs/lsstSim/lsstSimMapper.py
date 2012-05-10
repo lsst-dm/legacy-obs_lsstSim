@@ -58,10 +58,9 @@ class LsstSimMapper(CameraMapper):
         afwImageUtils.defineFilter('i', 752.06)
         afwImageUtils.defineFilter('z', 866.85)
         afwImageUtils.defineFilter('y', 971.68, alias=['y4']) # official y filter
-        afwImageUtils.defineFilter('y3', 1002.44) # candidate y-band
-
-
-
+        # If/when y3 sim data becomes available, uncomment this and
+        # modify the schema appropriately
+        #afwImageUtils.defineFilter('y3', 1002.44) # candidate y-band
 
     def _transformId(self, dataId):
         actualId = dataId.copy()
