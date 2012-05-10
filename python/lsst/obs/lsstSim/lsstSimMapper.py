@@ -197,6 +197,17 @@ class LsstSimMapper(CameraMapper):
 
 ###############################################################################
 
+    def bypass_ampExposureId(self, datasetType, pythonType, location, dataId):
+        return self._computeAmpExposureId(dataId)
+    def bypass_ampExposureId_bits(self, datasetType, pythonType, location, dataId):
+        return 45
+    def bypass_ccdExposureId(self, datasetType, pythonType, location, dataId):
+        return self._computeCcdExposureId(dataId)
+    def bypass_ccdExposureId_bits(self, datasetType, pythonType, location, dataId):
+        return 41
+
+###############################################################################
+
     def add_sdqaAmp(self, dataId):
         ampExposureId = self._computeAmpExposureId(dataId)
         return {"ampExposureId": ampExposureId, "sdqaRatingScope": "AMP"}
