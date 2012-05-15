@@ -19,8 +19,8 @@
 # the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
-
 import lsst.afw.cameraGeom as cameraGeom
+import lsst.afw.image as afwImage
 import lsst.pex.config as pexConfig
 import lsst.pipe.base as pipeBase
 from lsst.ip.isr import AssembleCcdTask, IsrTask
@@ -84,7 +84,7 @@ class LsstSimIsrTask(IsrTask):
                 amp = cameraGeom.cast_Amp(ampExposure.getDetector())
 
                 ampExposure = self.convertIntToFloat(ampExposure)
-                ampExpDataView = ampExposure.Factory(ampExpsoure, amp.getDiskDataSec(), afwImage.PARENT)
+                ampExpDataView = ampExposure.Factory(ampExposure, amp.getDiskDataSec(), afwImage.PARENT)
                 
                 self.saturationDetection(ampExposure, amp)
     
