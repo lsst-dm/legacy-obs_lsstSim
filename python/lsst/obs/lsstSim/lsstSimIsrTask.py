@@ -84,21 +84,22 @@ class LsstSimIsrTask(IsrTask):
                 amp = cameraGeom.cast_Amp(ampExposure.getDetector())
 
                 ampExposure = self.convertIntToFloat(ampExposure)
-
+                ampExpDataView = ampExposure.Factory(ampExpsoure, amp.getDiskDataSec(), afwImage.PARENT)
+                
                 self.saturationDetection(ampExposure, amp)
     
                 self.overscanCorrection(ampExposure, amp)
     
                 if self.config.doBias:
-                    self.biasCorrection(ampExposure, ampRef)
+                    self.biasCorrection(ampExpDataView, ampRef)
                 
                 if self.config.doDark:
-                    self.darkCorrection(ampExposure, ampRef)
+                    self.darkCorrection(ampExpDataView, ampRef)
                 
-                self.updateVariance(ampExposure, amp)
+                self.updateVariance(ampExpDataView, amp)
                 
                 if self.config.doFlat:
-                    self.flatCorrection(ampExposure, ampRef)
+                    self.flatCorrection(ampExpDataView, ampRef)
                 
                 ampExposureList.append(ampExposure)
         
