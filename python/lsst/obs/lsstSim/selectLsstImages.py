@@ -60,6 +60,11 @@ class SelectLSSTImagesConfig(pexConfig.Config):
         dtype = float,
         default = 2.0,
     )
+    maxImages = pexConfig.Field(
+        doc = "maximum images to select; intended for debugging; ignored in None",
+        dtype = int,
+        optional = True,
+    )
 
 class CcdExposureInfo(object):
     """Data about a found CCD exposure
@@ -130,6 +135,11 @@ class SelectLSSTImagesTask(pipeBase.Task):
             """ % CcdExposureInfo.getColumnNames())
         cursor.execute(queryStr, (filter, self.config.flagMask, self.config.maxFwhm))
         ccdInfoList = [CcdExposureInfo(result) for result in cursor]
+        
+        if self.config.maxImages and self.config.maxImages < len(ccdInfoList):
+            self.log.log(self.log.WARN, "Found %d images; truncating to config.maxImages=%d" % \
+                (len(ccdInfoList), self.config.maxImages))
+            ccdInfoList = ccdInfoList[0:self.config.maxImages]
 
         return pipeBase.Struct(
             ccdInfoList = ccdInfoList,
@@ -150,7 +160,7 @@ class SelectLSSTImagesTask(pipeBase.Task):
         dataRefList = [butler.dataRef(dataId=dataId, level="sensor") for dataId in dataIdList]
         return pipeBase.Struct(
             dataRefList = dataRefList,
-            ccdInfoList = ccdinfoList,
+            ccdInfoList = ccdInfoList,
         )
 
 if __name__ == "__main__":
