@@ -11,6 +11,7 @@ levels: {
     raft: "snap" "sensor" "channel"
     sensor: "snap" "channel"
     snap: "channel"
+    tract: "patch"
 }
 defaultLevel: "sensor"
 defaultSubLevels: {
@@ -402,7 +403,7 @@ datasets: {
         tables:      raw
     }
     coaddTempExp: {
-        template:    "coaddTempExp/%(filter)s/%(tract)d/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
+        template:    "coaddTempExp/%(filter)s/%(tract)d/%(patch)s/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
         python:      "lsst.afw.image.ExposureF"
         persistable: "ExposureF"
         storage:     "FitsStorage"
