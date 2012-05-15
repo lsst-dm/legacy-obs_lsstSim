@@ -31,7 +31,7 @@ __all__ = ["LsstSimIsrTask"]
 class LsstSimIsrConfig(IsrTask.ConfigClass):
     doWriteSnaps = pexConfig.Field(
         dtype = bool,
-        doc = "Persist postIsrCCD for each snap?",
+        doc = "Persist snapExp for each snap?",
         default = True,
     )
     doSnapCombine = pexConfig.Field(
@@ -62,8 +62,8 @@ class LsstSimIsrTask(IsrTask):
         
         If config.doSnapCombine true then combine the two ISR-corrected snaps to produce the final exposure.
         If config.doSnapCombine false then uses ISR-corrected snap 0 as the final exposure.
-        In either case, the final exposure is persisted as "visitCCD" if config.doWriteSpans is True,
-        and the two snaps are persisted as "postISRCCD" if config.doWriteSnaps is True.
+        In either case, the final exposure is persisted as "postISRCCD" if config.doWriteSpans is True,
+        and the two snaps are persisted as "snapExp" if config.doWriteSnaps is True.
 
         @param sensorRef daf.persistence.butlerSubset.ButlerDataRef of the data to be processed
         @return a pipeBase.Struct with fields:
@@ -115,9 +115,9 @@ class LsstSimIsrTask(IsrTask):
             snapDict[snapId] = ccdExposure
     
             if self.config.doWriteSnaps:
-                sensorRef.put(ccdExposure, "postISRCCD", snap=snapId)
+                sensorRef.put(ccdExposure, "snapExp", snap=snapId)
 
-            self.display("postISRCCD%d" % (snapId,), exposure=ccdExposure)
+            self.display("snapExp%d" % (snapId,), exposure=ccdExposure)
         
         if self.config.doSnapCombine:
             loadSnapDict(snapDict, snapIdList=(0, 1), sensorRef=sensorRef)
@@ -128,9 +128,9 @@ class LsstSimIsrTask(IsrTask):
             outExposure = snapDict[0]
 
         if self.config.doWrite:
-            sensorRef.put(outExposure, "visitCCD")
+            sensorRef.put(outExposure, "postISRCCD")
 
-        self.display("visitCCD", exposure=outExposure)
+        self.display("postISRCCD", exposure=outExposure)
                 
         return pipeBase.Struct(
             exposure = outExposure,
@@ -139,14 +139,14 @@ class LsstSimIsrTask(IsrTask):
 def loadSnapDict(snapDict, snapIdList, sensorRef):
     """Load missing snaps from disk.
     
-    @paramp[in,out] snapDict: a dictionary of snapId: snap exposure ("postISRCCD")
+    @paramp[in,out] snapDict: a dictionary of snapId: snap exposure ("snapExp")
     @param[in] snapIdList: a list of snap IDs
     @param[in] sensorRef: sensor reference for snap, excluding the snap ID.
     """
     for snapId in snapIdList:
         if snapId not in snapDict:
-            snapExposure = sensorRef.get("postISRCCD", snap=snapId)
+            snapExposure = sensorRef.get("snapExp", snap=snapId)
             if snapExposure is None:
-                raise RuntimeError("Could not find postISRCCD for snap=%s; id=%s" % (snapId, sensorRef.dataId))
+                raise RuntimeError("Could not find snapExp for snap=%s; id=%s" % (snapId, sensorRef.dataId))
             snapDict[snapId] = snapExposure
     
