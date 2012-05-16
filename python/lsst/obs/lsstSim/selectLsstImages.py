@@ -155,9 +155,12 @@ class SelectLSSTImagesTask(pipeBase.Task):
         - ccdInfoList: a list of ccdInfo objects
         """
         butler = dataRef.butlerSubset.butler
-        filter = dataRef["filter"]
-        dataIdList = self.run(filter, coordList).dataIddList
-        dataRefList = [butler.dataRef(dataId=dataId, level="sensor") for dataId in dataIdList]
+        filter = dataRef.dataId["filter"]
+        ccdInfoList = self.run(filter, coordList).ccdInfoList
+        dataRefList = [butler.dataRef(
+            datasetType = "calexp",
+            dataId = ccdInfo.dataId,
+        ) for ccdInfo in ccdInfoList]
         return pipeBase.Struct(
             dataRefList = dataRefList,
             ccdInfoList = ccdInfoList,
