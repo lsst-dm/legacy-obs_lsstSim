@@ -331,7 +331,7 @@ datasets: {
         tables:      raw
     }
     deepCoadd_skyMap: {
-        template:    "deepCoadd/skyMap.pickle"
+        template:    "deepCoadd/%(filter)s/skyMap.pickle"
         python:      "lsst.skymap.BaseSkyMap"
         persistable: "ignored"
         storage:     "PickleStorage"
@@ -359,7 +359,7 @@ datasets: {
         tables:      raw
     }
     goodSeeingCoadd_skyMap: {
-        template:    "goodSeeingCoadd/skyMap.pickle"
+        template:    "goodSeeingCoadd/%(filter)s/skyMap.pickle"
         python:      "lsst.skymap.BaseSkyMap"
         persistable: "ignored"
         storage:     "PickleStorage"
