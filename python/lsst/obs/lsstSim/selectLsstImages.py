@@ -73,19 +73,20 @@ class CcdExposureInfo(object):
         """Create image information from a query result from a db connection
         """
         self.dataId = dict(
-            visit = result[0],
-            raftName = result[1],
-            ccdName = result[2],
+            raft = result[0],
+            visit = result[1],
+            sensor = result[2],
+            filter = result[3]
         )
-        self.ctrRaDec = result[3:5]
-        self.fwhm = result[5]
-        self.flags = result[6]
+        self.ctrRaDec = result[4:6]
+        self.fwhm = result[6]
+        self.flags = result[7]
 
     @staticmethod
     def getColumnNames():
         """Set database query columns to be consistent with constructor
         """
-        return "visit, raftName, ccdName, ra, decl, fwhm, flags"
+        return "raftName, visit, ccdName, filterName, ra, decl, fwhm, flags"
 
 class SelectLSSTImagesTask(pipeBase.Task):
     """Select LSST CCD exposures suitable for coaddition
