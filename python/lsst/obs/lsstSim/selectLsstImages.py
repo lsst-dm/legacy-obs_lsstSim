@@ -77,14 +77,15 @@ class CcdExposureInfo(object):
             raftName = result[1],
             ccdName = result[2],
         )
-        self.fwhm = result[3]
-        self.flags = result[4]
+        self.ctrRaDec = result[3:5]
+        self.fwhm = result[5]
+        self.flags = result[6]
 
     @staticmethod
     def getColumnNames():
         """Set database query columns to be consistent with constructor
         """
-        return "visit, raftName, ccdName, fwhm, flags"
+        return "visit, raftName, ccdName, ra, decl, fwhm, flags"
 
 class SelectLSSTImagesTask(pipeBase.Task):
     """Select LSST CCD exposures suitable for coaddition
@@ -97,7 +98,7 @@ class SelectLSSTImagesTask(pipeBase.Task):
         """Select LSST images suitable for coaddition in a particular region
         
         @param[in] filter: filter filter for images (e.g. "g", "r", "i"...)
-        @param[in] coordList: list of coordinates defining region of interest
+        @param[in] coordList: list of coordinates defining region of interest; if None then select all images
         
         @return a pipeBase Struct containing:
         - ccdInfoList: a list of CcdExposureInfo objects, which have the following fields:
@@ -114,28 +115,39 @@ class SelectLSSTImagesTask(pipeBase.Task):
         )
         cursor = db.cursor()
 
-        # create table scisql.Region containing patch region
-        coordStrList = ["%s, %s" % (c.getLongitude().asDegrees(),
-                                    c.getLatitude().asDegrees()) for c in coordList]
-        coordStr = ", ".join(coordStrList)
-        coordCmd = "call scisql.scisql_s2CPolyRegion(scisql_s2CPolyToBin(%s), 10)" % (coordStr,)
-        cursor.execute(coordCmd)
-        cursor.nextset() # ignore one-line result of coordCmd
+        if coordList is not None:
+            # look for exposures that overlap the specified region
+
+            # create table scisql.Region containing patch region
+            coordStrList = ["%s, %s" % (c.getLongitude().asDegrees(),
+                                        c.getLatitude().asDegrees()) for c in coordList]
+            coordStr = ", ".join(coordStrList)
+            coordCmd = "call scisql.scisql_s2CPolyRegion(scisql_s2CPolyToBin(%s), 10)" % (coordStr,)
+            cursor.execute(coordCmd)
+            cursor.nextset() # ignore one-line result of coordCmd
         
-        # find exposures
-        queryStr = ("""select %s
-            from Science_Ccd_Exposure as ccdExp,
-                (select distinct scienceCcdExposureId
-                from Science_Ccd_Exposure_To_Htm10 as ccdHtm inner join scisql.Region
-                on (ccdHtm.htmId10 between scisql.Region.htmMin and scisql.Region.htmMax)) as idList
-            where ccdExp.scienceCcdExposureId = idList.scienceCcdExposureId
-                and ccdExp.filterName = %%s
-                and not (flags & ~%%s)
-                and fwhm < %%s
-            """ % CcdExposureInfo.getColumnNames())
+            # find exposures
+            queryStr = ("""select %s
+                from Science_Ccd_Exposure as ccdExp,
+                    (select distinct scienceCcdExposureId
+                    from Science_Ccd_Exposure_To_Htm10 as ccdHtm inner join scisql.Region
+                    on (ccdHtm.htmId10 between scisql.Region.htmMin and scisql.Region.htmMax)) as idList
+                where ccdExp.scienceCcdExposureId = idList.scienceCcdExposureId
+                    and filterName = %%s
+                    and not (flags & ~%%s)
+                    and fwhm < %%s
+                """ % CcdExposureInfo.getColumnNames())
+        else:
+            # no region specified; look over the whole sky
+            queryStr = ("""select %s
+                from Science_Ccd_Exposure
+                where filterName = %%s
+                    and not (flags & ~%%s)
+                    and fwhm < %%s
+                """ % CcdExposureInfo.getColumnNames())
         cursor.execute(queryStr, (filter, self.config.flagMask, self.config.maxFwhm))
         ccdInfoList = [CcdExposureInfo(result) for result in cursor]
-        
+            
         if self.config.maxImages and self.config.maxImages < len(ccdInfoList):
             self.log.log(self.log.WARN, "Found %d images; truncating to config.maxImages=%d" % \
                 (len(ccdInfoList), self.config.maxImages))
@@ -165,6 +177,16 @@ class SelectLSSTImagesTask(pipeBase.Task):
             dataRefList = dataRefList,
             ccdInfoList = ccdInfoList,
         )
+    
+    def searchWholeSky(self, dataRef):
+        """Search the whole sky using a data reference
+        @param[in] dataRef: data reference; must contain key "filter"
+        @return a pipeBase Struct containing:
+        - ccdInfoList: a list of ccdInfo objects
+        """
+        filter = dataRef.dataId["filter"]
+        return self.run(filter, coordList=None)
+
 
 if __name__ == "__main__":
     # example of use
