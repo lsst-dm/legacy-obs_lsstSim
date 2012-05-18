@@ -91,15 +91,15 @@ class LsstSimIsrTask(IsrTask):
                 self.overscanCorrection(ampExposure, amp)
     
                 if self.config.doBias:
-                    self.biasCorrection(ampExpDataView, ampRef)
+                    self.biasCorrection(ampExposure, ampRef)
                 
                 if self.config.doDark:
-                    self.darkCorrection(ampExpDataView, ampRef)
+                    self.darkCorrection(ampExposure, ampRef)
                 
                 self.updateVariance(ampExpDataView, amp)
                 
                 if self.config.doFlat:
-                    self.flatCorrection(ampExpDataView, ampRef)
+                    self.flatCorrection(ampExposure, ampRef)
                 
                 ampExposureList.append(ampExposure)
         
@@ -121,19 +121,19 @@ class LsstSimIsrTask(IsrTask):
         
         if self.config.doSnapCombine:
             loadSnapDict(snapDict, snapIdList=(0, 1), sensorRef=sensorRef)
-            outExposure = self.snapCombine.run(snapDict[0], snapDict[1]).outExposure
+            postIsrExposure = self.snapCombine.run(snapDict[0], snapDict[1]).exposure
         else:
             self.log.log(self.log.WARN, "doSnapCombine false; using snap 0 as the result")
             loadSnapDict(snapDict, snapIdList=(0,), sensorRef=sensorRef)
-            outExposure = snapDict[0]
+            postIsrExposure = snapDict[0]
 
         if self.config.doWrite:
-            sensorRef.put(outExposure, "postISRCCD")
+            sensorRef.put(postIsrExposure, "postISRCCD")
 
-        self.display("postISRCCD", exposure=outExposure)
+        self.display("postISRCCD", exposure=postIsrExposure)
                 
         return pipeBase.Struct(
-            exposure = outExposure,
+            exposure = postIsrExposure,
         )
 
 def loadSnapDict(snapDict, snapIdList, sensorRef):
