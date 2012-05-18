@@ -24,7 +24,7 @@ import lsst.afw.image as afwImage
 import lsst.pex.config as pexConfig
 import lsst.pipe.base as pipeBase
 from lsst.ip.isr import AssembleCcdTask, IsrTask
-from .snapCombine import SnapCombineTask
+from lsst.pipe.tasks.snapCombine import SnapCombineTask 
 
 __all__ = ["LsstSimIsrTask"]
 
@@ -37,7 +37,7 @@ class LsstSimIsrConfig(IsrTask.ConfigClass):
     doSnapCombine = pexConfig.Field(
         dtype = bool,
         doc = "Combine Snaps? If False then use snap 0 as output exposure.",
-        default = False,
+        default = True,
     )
     snapCombine = pexConfig.ConfigurableField(
         target = SnapCombineTask,
