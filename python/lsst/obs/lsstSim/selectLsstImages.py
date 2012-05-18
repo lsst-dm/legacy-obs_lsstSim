@@ -45,7 +45,7 @@ class SelectLSSTImagesConfig(pexConfig.Config):
     database = pexConfig.Field(
         doc = "Name of database",
         dtype = str,
-        default = "ktlim_PT1_2_u_ktlim_2012_0308_110900",
+        default = "adm_smm_S12_lsstsim_u_smm_2012_0514_173319",
     )
     flagMask = pexConfig.Field(
         doc = """LSST quality mask; set allowed bits:
