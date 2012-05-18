@@ -31,17 +31,8 @@ exposures: {
         tables:        raw
         tables:        raw_skyTile
     }
-    postISR: {
-        template:    "postISR/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s/C%(channel)s.fits"
-        python:        "lsst.afw.image.ExposureF"
-        persistable:        "ExposureF"
-        storage:    "FitsStorage"
-        level:        "Amp"
-        tables:        raw
-        tables:        raw_skyTile
-    }
-    postISRCCD: {
-        template:    "postISRCCD/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s.fits"
+    snapExp: {
+        template:    "snapExp/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s.fits"
         python:        "lsst.afw.image.ExposureF"
         persistable:        "ExposureF"
         storage:    "FitsStorage"
@@ -49,8 +40,8 @@ exposures: {
         tables:        raw
         tables:        raw_skyTile
     }
-    visitCCD: {
-        template:    "visitCCD/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
+    postISRCCD: {
+        template:    "postISRCCD/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
         python:        "lsst.afw.image.ExposureF"
         persistable:        "ExposureF"
         storage:    "FitsStorage"
