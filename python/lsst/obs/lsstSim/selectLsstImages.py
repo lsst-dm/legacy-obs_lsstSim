@@ -26,27 +26,13 @@ import MySQLdb
 from lsst.daf.persistence import DbAuth
 import lsst.pex.config as pexConfig
 import lsst.pipe.base as pipeBase
+from lsst.pipe.tasks.selectImages import BaseSelectImagesTask, BaseExposureInfo
 
 __all__ = ["SelectLSSTImagesTask"]
 
-class SelectLSSTImagesConfig(pexConfig.Config):
+class SelectLSSTImagesConfig(BaseSelectImagesTask.ConfigClass):
     """Config for SelectLSSTImagesTask
     """
-    host = pexConfig.Field(
-        doc = "Database server host name",
-        dtype = str,
-        default = "lsst-db.ncsa.illinois.edu",
-    )
-    port = pexConfig.Field(
-        doc = "Database server port",
-        dtype = int,
-        default = 3306,
-    )
-    database = pexConfig.Field(
-        doc = "Name of database",
-        dtype = str,
-        default = "adm_smm_S12_lsstsim_u_smm_2012_0514_173319",
-    )
     flagMask = pexConfig.Field(
         doc = """LSST quality mask; set allowed bits:
 0x01 PROCESSING_FAILED: The pipeline failed to process this CCD
@@ -60,33 +46,56 @@ class SelectLSSTImagesConfig(pexConfig.Config):
         dtype = float,
         default = 2.0,
     )
-    maxImages = pexConfig.Field(
-        doc = "maximum images to select; intended for debugging; ignored in None",
-        dtype = int,
-        optional = True,
-    )
+    
+    def setDefaults(self):
+        self.host = "lsst-db.ncsa.illinois.edu"
+        self.port = 3306
+        self.database = "adm_smm_S12_lsstsim_u_smm_2012_0514_173319"
 
-class CcdExposureInfo(object):
-    """Data about a found CCD exposure
+
+class ExposureInfo(BaseExposureInfo):
+    """Data about a selected exposure
+    
+    Data includes:
+    - dataId: data ID of exposure
+    - coordList: list of afwCoord.IcrsCoord of corners of exposure
+    - 
     """
-    def __init__(self, result):
-        """Create image information from a query result from a db connection
+    def _setData(self, result):
+        """Set exposure information based on a query result from a db connection
+        
+        Sets at least the following fields:
+        - dataId: data ID of exposure (a dict)
+        - coordList: a list of corner coordinates of the exposure (list of afwCoord.Coord)
+        - fwhm: mean FWHM of exposure
+        - flags: flags field from Science_Ccd_Exposure table
         """
         self.dataId = dict(
-            raft = result[0],
-            visit = result[1],
-            sensor = result[2],
-            filter = result[3]
+            raft = result[self._nextInd],
+            visit = result[self._nextInd],
+            sensor = result[self._nextInd],
+            filter = result[self._nextInd]
         )
-        self.ctrRaDec = result[4:6]
-        self.fwhm = result[6]
-        self.flags = result[7]
+        self.coordList = []
+        for i in range(4):
+            self.coordList.append(
+                afwCoord.IcrsCoord(
+                    afwGeom.Angle(result[self._nextInd], afwGeom.degrees),
+                    afwGeom.Angle(result[self._nextInd], afwGeom.degrees),
+                )
+            )
+        self.fwhm = result[self._nextInd]
+        self.flags = result[self._nextInd]
 
     @staticmethod
     def getColumnNames():
         """Set database query columns to be consistent with constructor
         """
-        return "raftName, visit, ccdName, filterName, ra, decl, fwhm, flags"
+        return "raftName, visit, ccdName, filterName, " + \
+            "corner1Ra, corner1Decl, corner2Ra, corner2Decl, " + \
+            "corner3Ra, corner3Decl, corner4Ra, corner4Decl, " + \
+            "fwhm, flags"
+
 
 class SelectLSSTImagesTask(pipeBase.Task):
     """Select LSST CCD exposures suitable for coaddition
@@ -95,14 +104,14 @@ class SelectLSSTImagesTask(pipeBase.Task):
     _DefaultName = "selectImages"
     
     @pipeBase.timeMethod
-    def run(self, filter, coordList):
+    def run(self, coordList, filter):
         """Select LSST images suitable for coaddition in a particular region
         
-        @param[in] filter: filter filter for images (e.g. "g", "r", "i"...)
         @param[in] coordList: list of coordinates defining region of interest; if None then select all images
+        @param[in] filter: filter (e.g. "g", "r", "i"...)
         
         @return a pipeBase Struct containing:
-        - ccdInfoList: a list of CcdExposureInfo objects, which have the following fields:
+        - ccdInfoList: a list of ExposureInfo objects, which have the following fields:
             - dataId: data ID dictionary
             - fwhm: fwhm column
             - flags: flags column
@@ -137,7 +146,7 @@ class SelectLSSTImagesTask(pipeBase.Task):
                     and filterName = %%s
                     and not (flags & ~%%s)
                     and fwhm < %%s
-                """ % CcdExposureInfo.getColumnNames())
+                """ % ExposureInfo.getColumnNames())
         else:
             # no region specified; look over the whole sky
             queryStr = ("""select %s
@@ -145,48 +154,26 @@ class SelectLSSTImagesTask(pipeBase.Task):
                 where filterName = %%s
                     and not (flags & ~%%s)
                     and fwhm < %%s
-                """ % CcdExposureInfo.getColumnNames())
+                """ % ExposureInfo.getColumnNames())
+        
+        if self.config.maxExposures:
+            queryStr += " limit %s" % (self.config.maxExposures,)
+
         cursor.execute(queryStr, (filter, self.config.flagMask, self.config.maxFwhm))
-        ccdInfoList = [CcdExposureInfo(result) for result in cursor]
-            
-        if self.config.maxImages and self.config.maxImages < len(ccdInfoList):
-            self.log.log(self.log.WARN, "Found %d images; truncating to config.maxImages=%d" % \
-                (len(ccdInfoList), self.config.maxImages))
-            ccdInfoList = ccdInfoList[0:self.config.maxImages]
+        ccdInfoList = [ExposureInfo(result) for result in cursor]
 
         return pipeBase.Struct(
             ccdInfoList = ccdInfoList,
         )
-    
-    def runDataRef(self, dataRef, coordList):
-        """Run based on a data reference
+
+    def _runArgDictFromDataId(self, dataId):
+        """Extract keyword arguments for run (other than coordList) from a data ID
         
-        @param[in] dataRef: data reference; must contain key "filter"
-        @param[in] coordList: list of coordinates defining region of interest
-        @return a pipeBase Struct containing:
-        - dataRefList: a list of data references
-        - ccdInfoList: a list of ccdInfo objects
+        @return keyword arguments for run (other than coordList), as a dict
         """
-        butler = dataRef.butlerSubset.butler
-        filter = dataRef.dataId["filter"]
-        ccdInfoList = self.run(filter, coordList).ccdInfoList
-        dataRefList = [butler.dataRef(
-            datasetType = "calexp",
-            dataId = ccdInfo.dataId,
-        ) for ccdInfo in ccdInfoList]
-        return pipeBase.Struct(
-            dataRefList = dataRefList,
-            ccdInfoList = ccdInfoList,
+        return dict(
+            filter = dataId["filter"]
         )
-    
-    def searchWholeSky(self, dataRef):
-        """Search the whole sky using a data reference
-        @param[in] dataRef: data reference; must contain key "filter"
-        @return a pipeBase Struct containing:
-        - ccdInfoList: a list of ccdInfo objects
-        """
-        filter = dataRef.dataId["filter"]
-        return self.run(filter, coordList=None)
 
 
 if __name__ == "__main__":
@@ -205,7 +192,7 @@ if __name__ == "__main__":
         afwCoord.Coord(maxRa, maxDec),
         afwCoord.Coord(minRa, maxDec),
     ]
-    results = selectTask.run('r', coordList)
+    results = selectTask.run(coordList = coordList, filter = 'r')
     for ccdInfo in results.ccdInfoList:
         print "dataId=%s, fwhm=%s, flags=%s" % (ccdInfo.dataId, ccdInfo.fwhm, ccdInfo.flags)
     
