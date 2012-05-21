@@ -23,6 +23,8 @@
 """Note: this code uses MySQLdb primarily because daf_persistence cannot call scisql.scisql_s2CPolyRegion
 """
 import MySQLdb
+from lsst.afw.coord import IcrsCoord
+import lsst.afw.geom as afwGeom
 from lsst.daf.persistence import DbAuth
 import lsst.pex.config as pexConfig
 import lsst.pipe.base as pipeBase
@@ -58,7 +60,7 @@ class ExposureInfo(BaseExposureInfo):
     
     Data includes:
     - dataId: data ID of exposure
-    - coordList: list of afwCoord.IcrsCoord of corners of exposure
+    - coordList: list of IcrsCoord of corners of exposure
     - 
     """
     def _setData(self, result):
@@ -66,7 +68,7 @@ class ExposureInfo(BaseExposureInfo):
         
         Sets at least the following fields:
         - dataId: data ID of exposure (a dict)
-        - coordList: a list of corner coordinates of the exposure (list of afwCoord.Coord)
+        - coordList: a list of corner coordinates of the exposure (list of IcrsCoord)
         - fwhm: mean FWHM of exposure
         - flags: flags field from Science_Ccd_Exposure table
         """
@@ -79,7 +81,7 @@ class ExposureInfo(BaseExposureInfo):
         self.coordList = []
         for i in range(4):
             self.coordList.append(
-                afwCoord.IcrsCoord(
+                IcrsCoord(
                     afwGeom.Angle(result[self._nextInd], afwGeom.degrees),
                     afwGeom.Angle(result[self._nextInd], afwGeom.degrees),
                 )
@@ -97,7 +99,7 @@ class ExposureInfo(BaseExposureInfo):
             "fwhm, flags"
 
 
-class SelectLSSTImagesTask(pipeBase.Task):
+class SelectLSSTImagesTask(BaseSelectImagesTask):
     """Select LSST CCD exposures suitable for coaddition
     """
     ConfigClass = SelectLSSTImagesConfig
@@ -111,8 +113,9 @@ class SelectLSSTImagesTask(pipeBase.Task):
         @param[in] filter: filter (e.g. "g", "r", "i"...)
         
         @return a pipeBase Struct containing:
-        - ccdInfoList: a list of ExposureInfo objects, which have the following fields:
-            - dataId: data ID dictionary
+        - exposureInfoList: a list of ExposureInfo objects, which have the following fields:
+            - dataId: data ID of exposure (a dict)
+            - coordList: a list of corner coordinates of the exposure (list of afwCoord.IcrsCoord)
             - fwhm: fwhm column
             - flags: flags column
         """
@@ -160,10 +163,10 @@ class SelectLSSTImagesTask(pipeBase.Task):
             queryStr += " limit %s" % (self.config.maxExposures,)
 
         cursor.execute(queryStr, (filter, self.config.flagMask, self.config.maxFwhm))
-        ccdInfoList = [ExposureInfo(result) for result in cursor]
+        exposureInfoList = [ExposureInfo(result) for result in cursor]
 
         return pipeBase.Struct(
-            ccdInfoList = ccdInfoList,
+            exposureInfoList = exposureInfoList,
         )
 
     def _runArgDictFromDataId(self, dataId):
@@ -178,21 +181,18 @@ class SelectLSSTImagesTask(pipeBase.Task):
 
 if __name__ == "__main__":
     # example of use
-    import lsst.afw.coord as afwCoord
-    import lsst.afw.geom as afwGeom
-    
     selectTask = SelectLSSTImagesTask()
     minRa = afwGeom.Angle(1, afwGeom.degrees)
     maxRa = afwGeom.Angle(2, afwGeom.degrees)
     minDec = afwGeom.Angle(5, afwGeom.degrees)
     maxDec = afwGeom.Angle(6, afwGeom.degrees)
     coordList = [
-        afwCoord.Coord(minRa, minDec),
-        afwCoord.Coord(maxRa, minDec),
-        afwCoord.Coord(maxRa, maxDec),
-        afwCoord.Coord(minRa, maxDec),
+        IcrsCoord(minRa, minDec),
+        IcrsCoord(maxRa, minDec),
+        IcrsCoord(maxRa, maxDec),
+        IcrsCoord(minRa, maxDec),
     ]
     results = selectTask.run(coordList = coordList, filter = 'r')
-    for ccdInfo in results.ccdInfoList:
+    for ccdInfo in results.exposureInfoList:
         print "dataId=%s, fwhm=%s, flags=%s" % (ccdInfo.dataId, ccdInfo.fwhm, ccdInfo.flags)
     
