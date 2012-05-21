@@ -126,6 +126,13 @@ exposures: {
         level:        "Amp"
         tables:       raw
     }
+    coaddTempExp: {
+        template:    "coaddTempExp/%(filter)s/%(tract)d/%(patch)s/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
+        python:      "lsst.afw.image.ExposureF"
+        persistable: "ExposureF"
+        storage:     "FitsStorage"
+        tables:      raw
+    }
 }
 
 calibrations: {
@@ -393,13 +400,6 @@ datasets: {
         python:      "lsst.skymap.BaseSkyMap"
         persistable: "ignored"
         storage:     "PickleStorage"
-        tables:      raw
-    }
-    coaddTempExp: {
-        template:    "coaddTempExp/%(filter)s/%(tract)d/%(patch)s/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
-        python:      "lsst.afw.image.ExposureF"
-        persistable: "ExposureF"
-        storage:     "FitsStorage"
         tables:      raw
     }
 }
