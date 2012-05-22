@@ -60,18 +60,13 @@ class ExposureInfo(BaseExposureInfo):
     """Data about a selected exposure
     
     Data includes:
-    - dataId: data ID of exposure
-    - coordList: list of IcrsCoord of corners of exposure
-    - 
+    - dataId: data ID of exposure (a dict)
+    - coordList: a list of corner coordinates of the exposure (list of IcrsCoord)
+    - fwhm: mean FWHM of exposure
+    - flags: flags field from Science_Ccd_Exposure table
     """
     def __init__(self, result):
         """Set exposure information based on a query result from a db connection
-        
-        Sets at least the following fields:
-        - dataId: data ID of exposure (a dict)
-        - coordList: a list of corner coordinates of the exposure (list of IcrsCoord)
-        - fwhm: mean FWHM of exposure
-        - flags: flags field from Science_Ccd_Exposure table
         """
         BaseExposureInfo.__init__(self)
         self.dataId = dict(
@@ -93,7 +88,9 @@ class ExposureInfo(BaseExposureInfo):
 
     @staticmethod
     def getColumnNames():
-        """Set database query columns to be consistent with constructor
+        """Get database columns to retrieve, in a format useful to the database interface
+        
+        @return database column names as string of comma-separated values
         """
         return "raftName, visit, ccdName, filterName, " + \
             "corner1Ra, corner1Decl, corner2Ra, corner2Decl, " + \
