@@ -1,3 +1,3 @@
-from lsst.obs.lsstSim.selectLsstImages import SelectLSSTImagesTask
+from lsst.obs.lsstSim.selectLsstImages import SelectLsstImagesTask
 
-root.select.retarget(SelectLSSTImagesTask)
+root.select.retarget(SelectLsstImagesTask)

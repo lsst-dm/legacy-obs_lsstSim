@@ -30,10 +30,10 @@ import lsst.pex.config as pexConfig
 import lsst.pipe.base as pipeBase
 from lsst.pipe.tasks.selectImages import BaseSelectImagesTask, BaseExposureInfo
 
-__all__ = ["SelectLSSTImagesTask"]
+__all__ = ["SelectLsstImagesTask"]
 
-class SelectLSSTImagesConfig(BaseSelectImagesTask.ConfigClass):
-    """Config for SelectLSSTImagesTask
+class SelectLsstImagesConfig(BaseSelectImagesTask.ConfigClass):
+    """Config for SelectLsstImagesTask
     """
     flagMask = pexConfig.Field(
         doc = """LSST quality mask; set allowed bits:
@@ -101,10 +101,10 @@ class ExposureInfo(BaseExposureInfo):
             "fwhm, flags"
 
 
-class SelectLSSTImagesTask(BaseSelectImagesTask):
+class SelectLsstImagesTask(BaseSelectImagesTask):
     """Select LSST CCD exposures suitable for coaddition
     """
-    ConfigClass = SelectLSSTImagesConfig
+    ConfigClass = SelectLsstImagesConfig
     _DefaultName = "selectImages"
     
     @pipeBase.timeMethod
@@ -183,7 +183,7 @@ class SelectLSSTImagesTask(BaseSelectImagesTask):
 
 if __name__ == "__main__":
     # example of use
-    selectTask = SelectLSSTImagesTask()
+    selectTask = SelectLsstImagesTask()
     minRa = afwGeom.Angle(1, afwGeom.degrees)
     maxRa = afwGeom.Angle(2, afwGeom.degrees)
     minDec = afwGeom.Angle(5, afwGeom.degrees)
