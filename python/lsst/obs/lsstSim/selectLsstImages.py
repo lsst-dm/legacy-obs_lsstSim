@@ -30,10 +30,10 @@ import lsst.pex.config as pexConfig
 import lsst.pipe.base as pipeBase
 from lsst.pipe.tasks.selectImages import BaseSelectImagesTask, BaseExposureInfo
 
-__all__ = ["SelectLSSTImagesTask"]
+__all__ = ["SelectLsstImagesTask"]
 
-class SelectLSSTImagesConfig(BaseSelectImagesTask.ConfigClass):
-    """Config for SelectLSSTImagesTask
+class SelectLsstImagesConfig(BaseSelectImagesTask.ConfigClass):
+    """Config for SelectLsstImagesTask
     """
     flagMask = pexConfig.Field(
         doc = """LSST quality mask; set allowed bits:
@@ -59,18 +59,13 @@ class ExposureInfo(BaseExposureInfo):
     """Data about a selected exposure
     
     Data includes:
-    - dataId: data ID of exposure
-    - coordList: list of IcrsCoord of corners of exposure
-    - 
+    - dataId: data ID of exposure (a dict)
+    - coordList: a list of corner coordinates of the exposure (list of IcrsCoord)
+    - fwhm: mean FWHM of exposure
+    - flags: flags field from Science_Ccd_Exposure table
     """
     def _setData(self, result):
         """Set exposure information based on a query result from a db connection
-        
-        Sets at least the following fields:
-        - dataId: data ID of exposure (a dict)
-        - coordList: a list of corner coordinates of the exposure (list of IcrsCoord)
-        - fwhm: mean FWHM of exposure
-        - flags: flags field from Science_Ccd_Exposure table
         """
         self.dataId = dict(
             raft = result[self._nextInd],
@@ -91,7 +86,9 @@ class ExposureInfo(BaseExposureInfo):
 
     @staticmethod
     def getColumnNames():
-        """Set database query columns to be consistent with constructor
+        """Get database columns to retrieve, in a format useful to the database interface
+        
+        @return database column names as string of comma-separated values
         """
         return "raftName, visit, ccdName, filterName, " + \
             "corner1Ra, corner1Decl, corner2Ra, corner2Decl, " + \
@@ -99,10 +96,10 @@ class ExposureInfo(BaseExposureInfo):
             "fwhm, flags"
 
 
-class SelectLSSTImagesTask(BaseSelectImagesTask):
+class SelectLsstImagesTask(BaseSelectImagesTask):
     """Select LSST CCD exposures suitable for coaddition
     """
-    ConfigClass = SelectLSSTImagesConfig
+    ConfigClass = SelectLsstImagesConfig
     _DefaultName = "selectImages"
     
     @pipeBase.timeMethod
@@ -181,7 +178,7 @@ class SelectLSSTImagesTask(BaseSelectImagesTask):
 
 if __name__ == "__main__":
     # example of use
-    selectTask = SelectLSSTImagesTask()
+    selectTask = SelectLsstImagesTask()
     minRa = afwGeom.Angle(1, afwGeom.degrees)
     maxRa = afwGeom.Angle(2, afwGeom.degrees)
     minDec = afwGeom.Angle(5, afwGeom.degrees)
