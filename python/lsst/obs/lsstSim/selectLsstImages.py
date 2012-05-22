@@ -50,6 +50,7 @@ class SelectLSSTImagesConfig(BaseSelectImagesTask.ConfigClass):
     )
     
     def setDefaults(self):
+        BaseSelectImagesTask.ConfigClass.setDefaults(self)
         self.host = "lsst-db.ncsa.illinois.edu"
         self.port = 3306
         self.database = "adm_smm_S12_lsstsim_u_smm_2012_0514_173319"
@@ -63,7 +64,7 @@ class ExposureInfo(BaseExposureInfo):
     - coordList: list of IcrsCoord of corners of exposure
     - 
     """
-    def _setData(self, result):
+    def __init__(self, result):
         """Set exposure information based on a query result from a db connection
         
         Sets at least the following fields:
@@ -72,6 +73,7 @@ class ExposureInfo(BaseExposureInfo):
         - fwhm: mean FWHM of exposure
         - flags: flags field from Science_Ccd_Exposure table
         """
+        BaseExposureInfo.__init__(self)
         self.dataId = dict(
             raft = result[self._nextInd],
             visit = result[self._nextInd],
