@@ -302,7 +302,7 @@ datasets: {
     }
     sourceAssoc_config: {
         template:      "sourceAssoc_config/st%(skyTile)d/config.py"
-        python:        "lsst.pipe.tasks.sourceAssoc.SourceAssocConfig"
+        python:        "lsst.ap.tasks.sourceAssoc.SourceAssocConfig"
         persistable:   "Config"
         storage:       "ConfigStorage"
         tables:        raw
