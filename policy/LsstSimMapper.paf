@@ -286,7 +286,7 @@ datasets: {
     }
     processCcd_config: {
         template:      "processCcd_config/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.py"
-        python:        "lsst.pipe.tasks.processCcdLsstSim.ProcessCcdLsstSimConfig"
+        python:        "lsst.pipe.tasks.processCcd.ProcessCcdConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
