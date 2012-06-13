@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -13,28 +12,28 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.    See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the LSST License Statement and
 # the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
-import numpy
+import lsst.afw.cameraGeom as cameraGeom
+import lsst.afw.image as afwImage
+import lsst.afw.math as afwMath
+import lsst.afw.geom as afwGeom
+import lsst.meas.algorithms as measAlg
 import lsst.pex.config as pexConfig
 import lsst.pipe.base as pipeBase
-import lsst.afw.image as afwImage
-import lsst.meas.algorithms as measAlg
-import lsst.afw.math as afwMath
-import lsst.afw.cameraGeom as cameraGeom
-import lsst.afw.geom as afwGeom
-
 from lsst.ip.isr import IsrTask
-from lsst.ip.isr import IsrTaskConfig
+from lsst.ip.isr import isr
 
-class ProcessCalibLsstSimConfig(pexConfig.Config):
+import numpy
+
+__all__ = ["processLsstSimCalibsTask"]
+class ProcessCalibLsstSimConfig(IsrTask.ConfigClass):
     """Config for ProcessCcdLsstSim"""
-    isr = pexConfig.ConfigField(dtype=IsrTask.ConfigClass, doc="Amp-level instrumental signature removal")
     sigmaClip = pexConfig.Field(dtype=float, default=3., doc="Sigma level for sigma clipping")
     clipIter = pexConfig.Field(dtype=int, default=5, doc="Number of iterations for sigma clipping")
     type = pexConfig.ChoiceField(dtype=str, default='bias', doc="Type of master calibration to produce", allowed={'bias':"make master bias(zero)", 'dark':"make master dark", 'flat':"make master flat"})
@@ -42,91 +41,86 @@ class ProcessCalibLsstSimConfig(pexConfig.Config):
     def __init__(self, *args, **kwargs):
         pexConfig.Config.__init__(self, *args, **kwargs)
 
-class ProcessCalibLsstSimTask(pipeBase.Task):
-    """Process a CCD for LSSTSim
-    
-    @todo: this variant of ProcessCcdTask can be eliminated once IsrTask is unified.
-    """
+
+
+class ProcessCalibLsstSimTask(IsrTask):
     ConfigClass = ProcessCalibLsstSimConfig
 
-    def __init__(self, *args, **kwargs):
-        pipeBase.Task.__init__(self, *args, **kwargs)
-        self.methodListDict = { 'bias': ["doConversionForIsr", "doSaturationDetection", "doOverscanCorrection"],
-                                'dark': ["doConversionForIsr", "doSaturationDetection", "doOverscanCorrection", "doBiasSubtraction"],
-                                'flat': ["doConversionForIsr", "doSaturationDetection", "doOverscanCorrection", "doBiasSubtraction", "doDarkCorrection"]
-                              }
-        self.config.isr.methodList = self.methodListDict[self.config.type]
-        self.config.isr.normalizeGain = True
-        self.makeSubtask('isr', IsrTask)
+    def __init__(self, **kwargs):
+        IsrTask.__init__(self, **kwargs)
+        self.transposeForInterpolation = True # temporary hack until LSST data is in proper order
         self.statsCtrl = afwMath.StatisticsControl()
         self.statsCtrl.setNumSigmaClip(self.config.sigmaClip)
         self.statsCtrl.setNumIter(self.config.clipIter)
         #Not sure how to do this.
         #self.statsCtrl.setAndMask('BAD')
+        self.isr = isr
+
 
     @pipeBase.timeMethod
     def run(self, sensorRefList, calibType):
-        """Process a CCD: including ISR, source detection, photometry and WCS determination
+        """Process a calibration frame.
         
         @param sensorRef: sensor-level butler data reference
         @return pipe_base Struct containing these fields:
-        - calibFrame: exposure after ISR performed if calib.doIsr, else None
+        - masterExpList: amp exposures of master calibration products
         """
         referenceAmps = sensorRefList[0].subItems(level="channel")
-        print referenceAmps.dataId
         masterExpList = []
         dataIdList = []
         expmeta = None
-        self.isr.config.methodList = self.methodListDict[calibType]
-        methodList = []
-        for methodname in self.methodListDict[calibType]:
-            methodList.append(getattr(self.isr, methodname))
-        self.isr.methodList = methodList
         for amp in referenceAmps:
             if amp.dataId['snap'] == 1:
                 continue
             self.log.log(self.log.INFO, "Amp: Processing %s" % (amp.dataId))
+            print "dataid %s"%(amp.dataId)
             butler = amp.butlerSubset.butler
             ampMIList = afwImage.vectorMaskedImageF()
             for sRef in sensorRefList:
                 self.log.log(self.log.INFO, "Sensor: Processing %s" % (sRef.dataId))
                 ampSnapMIList = afwImage.vectorMaskedImageF()
-                calibSet = self.isr.makeCalibDict(butler, amp.dataId)
                 dataId = eval(amp.dataId.__repr__())
                 dataId['visit'] = sRef.dataId['visit']
-                #for snap in amp.subItems(level="snap"):
                 for snap in (0,1):
                     dataId['snap'] = snap
-                    raw = sRef.butlerSubset.butler.get('raw', dataId)
+                    ampExposure = sRef.butlerSubset.butler.get('raw', dataId)
                     if expmeta is None:
-                        expmeta = raw.getMetadata()
-                        expfilter = raw.getFilter()
-                        expcalib = raw.getCalib()
-                    detector = cameraGeom.cast_Amp(raw.getDetector())
-                    #Following is a hack to deal with trimming the amps.
-                    #raw = self.isr.doConversionForIsr(raw, calibSet)
-                    #raw = self.isr.doSaturationDetection(raw, calibSet)
-                    #raw = self.isr.doOverscanCorrection(raw, calibSet)
-                    resexp = self.isr.run(raw, calibSet).postIsrExposure
-                    #trimmedexp = resexp.Factory(resexp, detector.getDiskDataSec())
-                    ampSnapMIList.append(resexp.getMaskedImage())
+                        expmeta = ampExposure.getMetadata()
+                        expfilter = ampExposure.getFilter()
+                        expcalib = ampExposure.getCalib()
+                    ampDetector = cameraGeom.cast_Amp(ampExposure.getDetector())
+
+                    ampExposure = self.convertIntToFloat(ampExposure)
+                    ampExpDataView = ampExposure.Factory(ampExposure, ampDetector.getDiskDataSec(), afwImage.PARENT)
+                
+                    self.saturationDetection(ampExposure, ampDetector)
+    
+                    self.overscanCorrection(ampExposure, ampDetector)
+                    if calibType in ('flat', 'dark'):
+                        self.biasCorrection(ampExpDataView, amp)
+                
+                    if False:
+                        self.darkCorrection(ampExpDataView, amp)
+                
+                    self.updateVariance(ampExpDataView, ampDetector)
+                    ampSnapMIList.append(ampExpDataView.getMaskedImage())
                 ampMIList.append(self.combineMIList(ampSnapMIList))
             masterFrame = self.combineMIList(ampMIList) 
             #Fix saturation too???
-            self.fixDefects(masterFrame, detector)
+            self.fixDefectsAndSat(masterFrame, ampDetector)
             exp = afwImage.ExposureF(masterFrame)
             self.copyMetadata(exp, expmeta, calibType)
-            exp.setDetector(detector)
+            exp.setDetector(ampDetector)
             exp.setWcs(afwImage.Wcs())
             exp.setCalib(expcalib)
             if calibType is 'flat':
                 exp.setFilter(expfilter)
-            if self.isr.config.doWrite and calibType is not 'flat':
+            if self.config.doWrite and calibType is not 'flat':
                 print "writing file %s"%dataId
                 butler.put(exp, calibType, dataId = amp.dataId)
             masterExpList.append(exp)
             dataIdList.append(amp.dataId)
-        if self.isr.config.doWrite and calibType is 'flat':
+        if self.config.doWrite and calibType is 'flat':
             self.normChipAmps(masterExpList)
             for exp, dataId in zip(masterExpList, dataIdList):
                 print "writing flat file %s"%dataId
@@ -152,8 +146,8 @@ class ProcessCalibLsstSimTask(pipeBase.Task):
             outmetadata.add(card, metadata.get(card))
         outmetadata.add('ID', outmetadata.get('CCDID'))
 
-    def fixDefects(self, masterFrame, detector):
-        fwhm = self.isr.config.fwhm
+    def fixDefectsAndSat(self, masterFrame, detector):
+        fwhm = self.config.fwhm
         dataBbox = detector.getDataSec(True)
         #Reversing the x and y is essentially a hack since we have to apply the defects in Amp coordinates and they are recorded in chip coordinates
         #This should go away when the data from imSim is all in chip coordinates
@@ -167,11 +161,14 @@ class ProcessCalibLsstSimTask(pipeBase.Task):
         for d in dl:
             d.shift(-x, -y)
             if detector.getId().getSerial()>8:
-                d.shift(0, height - 2*d.getBBox().getMinY()-1)
-        self.isr.isr.maskPixelsFromDefectList(masterFrame, dl, maskName='BAD')
-        self.isr.isr.interpolateDefectList(masterFrame, dl, fwhm)
+                d.shift(0, height - 2*d.getBBox().getMinY()-d.getBBox().getHeight())
+        #Should saturation be interpolated as well?
+        #sdl = self.isr.getDefectListFromMask(masterFrame, 'SAT', growFootprints=0)
+        #for d in sdl:
+        #    dl.push_back(d)
+        self.isr.maskPixelsFromDefectList(masterFrame, dl, maskName='BAD')
+        self.isr.interpolateDefectList(masterFrame, dl, fwhm)
         return masterFrame
-            
 
     def transposeDefectList(self, defectList, checkBbox=None):
         retDefectList = measAlg.DefectListT()
@@ -191,6 +188,7 @@ class ProcessCalibLsstSimTask(pipeBase.Task):
         
                 
     def combineMIList(self, miList, method='MEANCLIP'):
+       combinedFrame = miList[0].Factory()
        try:
            if method is 'MEANCLIP':
                combinedFrame = afwMath.statisticsStack(
@@ -201,6 +199,6 @@ class ProcessCalibLsstSimTask(pipeBase.Task):
            else:
                raise ValueError("Method %s is not supported for combining frames"%(method))
        except Exception, e:
-           self.log.log(self.log.INFO, "Could not combine the frames. %s"%(e,))
+           self.log.log(self.log.WARN, "Could not combine the frames. %s"%(e,))
 
        return combinedFrame

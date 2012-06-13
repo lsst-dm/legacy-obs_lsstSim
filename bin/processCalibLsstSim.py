@@ -48,7 +48,7 @@ if __name__ == "__main__":
         if not t == type:
             raise ValueError("All calib visits must be of the same type: %s is not %s"%(t, type))
 
-    task = TaskClass(namespace.config, log = namespace.log)
+    task = TaskClass()
     if type in ('flat_u', 'flat_g', 'flat_r', 'flat_i', 'flat_z', 'flat_y'):
         type = 'flat'
     
