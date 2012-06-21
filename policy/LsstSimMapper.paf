@@ -194,6 +194,54 @@ datasets: {
         storage:      "ignored"
         tables:       "raw"
     }
+    goodSeeingCoaddId: {
+        template:     "ignored"
+        # Provide something to import, although we actually return a Long
+        python:       "lsst.daf.base.PropertySet"
+        persistable:  "ignored"
+        storage:      "ignored"
+        tables:       "raw"
+    }
+    goodSeeingCoaddId_bits: {
+        template:     "ignored"
+        # Provide something to import, although we actually return an int
+        python:       "lsst.daf.base.PropertySet"
+        persistable:  "ignored"
+        storage:      "ignored"
+        tables:       "raw"
+    }
+    deepCoaddId: {
+        template:     "ignored"
+        # Provide something to import, although we actually return a Long
+        python:       "lsst.daf.base.PropertySet"
+        persistable:  "ignored"
+        storage:      "ignored"
+        tables:       "raw"
+    }
+    deepCoaddId_bits: {
+        template:     "ignored"
+        # Provide something to import, although we actually return an int
+        python:       "lsst.daf.base.PropertySet"
+        persistable:  "ignored"
+        storage:      "ignored"
+        tables:       "raw"
+    }
+    chiSquaredCoaddId: {
+        template:     "ignored"
+        # Provide something to import, although we actually return a Long
+        python:       "lsst.daf.base.PropertySet"
+        persistable:  "ignored"
+        storage:      "ignored"
+        tables:       "raw"
+    }
+    chiSquaredCoaddId_bits: {
+        template:     "ignored"
+        # Provide something to import, although we actually return an int
+        python:       "lsst.daf.base.PropertySet"
+        persistable:  "ignored"
+        storage:      "ignored"
+        tables:       "raw"
+    }
 
     crDiffimSrc: {
         template:      "crDiffimSrc/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
