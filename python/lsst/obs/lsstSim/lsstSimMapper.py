@@ -172,7 +172,12 @@ class LsstSimMapper(CameraMapper):
                                    must contain filter.
         """
         tract = long(dataId['tract'])
+        if tract < 0 or tract >= 128:
+            raise RuntimeError('tract not in range [0,128)')
         patchX, patchY = map(int, dataId['patch'].split(','))
+        for p in (patchX, patchY):
+            if p < 0 or p >= 2**13:
+                raise RuntimeError('patch component not in range [0, 8192)')
         id = (tract * 2**13 + patchX) * 2**13 + patchY
         if singleFilter:
             return id * 8 + self.filterIdMap[dataId['filter']]
