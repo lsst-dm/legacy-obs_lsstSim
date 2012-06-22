@@ -368,6 +368,20 @@ datasets: {
         storage:     "PickleStorage"
         tables:      raw
     }
+    deep_makeSkyMap_config: {
+        template:      "deepCoadd/config.py"
+        python:        "lsst.pipe.tasks.makeSkyMap.MakeSkyMapTask.ConfigClass"
+        persistable:   "Config"
+        storage:       "ConfigStorage"
+        tables:        raw
+    }
+    deep_makeSkyMap_metadata: {
+        template:      "deepCoadd/metadata.py"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:   "PropertySet"
+        storage:       "BoostStorage"
+        tables:        raw
+    }
     deep_coadd_config: {
         template:      "deep_coadd_config/%(filter)s/%(tract)d/%(patch)s.py"
         python:        "lsst.pipe.tasks.outlierRejectedCoadd.OutlierRejectedCoaddConfig"
@@ -477,6 +491,20 @@ datasets: {
         storage:     "PickleStorage"
         tables:      raw
     }
+    goodSeeing_makeSkyMap_config: {
+        template:      "goodSeeingCoadd/config.py"
+        python:        "lsst.pipe.tasks.makeSkyMap.MakeSkyMapTask.ConfigClass"
+        persistable:   "Config"
+        storage:       "ConfigStorage"
+        tables:        raw
+    }
+    goodSeeing_makeSkyMap_metadata: {
+        template:      "goodSeeingCoadd/metadata.py"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:   "PropertySet"
+        storage:       "BoostStorage"
+        tables:        raw
+    }
     goodSeeing_coadd_config: {
         template:      "goodSeeing_coadd_config/%(filter)s/%(tract)d/%(patch)s.py"
         python:        "lsst.pipe.tasks.outlierRejectedCoadd.OutlierRejectedCoaddConfig"
@@ -578,6 +606,20 @@ datasets: {
         persistable: "ignored"
         storage:     "PickleStorage"
         tables:      raw
+    }
+    chiSquared_makeSkyMap_config: {
+        template:      "chiSquaredCoadd/config.py"
+        python:        "lsst.pipe.tasks.makeSkyMap.MakeSkyMapTask.ConfigClass"
+        persistable:   "Config"
+        storage:       "ConfigStorage"
+        tables:        raw
+    }
+    chiSquared_makeSkyMap_metadata: {
+        template:      "chiSquaredCoadd/metadata.py"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:   "PropertySet"
+        storage:       "BoostStorage"
+        tables:        raw
     }
     chiSquared_coadd_config: {
         template:      "chiSquared_coadd_config/%(tract)d/%(patch)s.py"
