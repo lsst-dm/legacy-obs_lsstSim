@@ -163,6 +163,26 @@ class LsstSimMapper(CameraMapper):
                 (long(r1) * 5 + long(r2)) * 10 + \
                 (long(s1) * 3 + long(s2))
 
+    def _computeCoaddExposureId(self, dataId, singleFilter):
+        """Compute the 64-bit (long) identifier for a coadd.
+
+        @param dataId (dict)       Data identifier with tract and patch.
+        @param singleFilter (bool) True means the desired ID is for a single- 
+                                   filter coadd, in which case dataId
+                                   must contain filter.
+        """
+        tract = long(dataId['tract'])
+        if tract < 0 or tract >= 128:
+            raise RuntimeError('tract not in range [0,128)')
+        patchX, patchY = map(int, dataId['patch'].split(','))
+        for p in (patchX, patchY):
+            if p < 0 or p >= 2**13:
+                raise RuntimeError('patch component not in range [0, 8192)')
+        id = (tract * 2**13 + patchX) * 2**13 + patchY
+        if singleFilter:
+            return id * 8 + self.filterIdMap[dataId['filter']]
+        return id
+
     def _setAmpExposureId(self, propertyList, dataId):
         propertyList.set("Computed_ampExposureId", self._computeAmpExposureId(dataId))
         return propertyList
@@ -205,6 +225,20 @@ class LsstSimMapper(CameraMapper):
         return self._computeCcdExposureId(dataId)
     def bypass_ccdExposureId_bits(self, datasetType, pythonType, location, dataId):
         return 41
+
+    def bypass_goodSeeingCoaddId(self, datasetType, pythonType, location, dataId):
+        return self._computeCoaddExposureId(dataId, True)
+    def bypass_goodSeeingCoaddId_bits(self, datasetType, pythonType, location, dataId):
+        return 1 + 7 + 13*2 + 3
+
+    # Deep coadds use tract, patch, and filter just like good-seeing coadds
+    bypass_deepCoaddId = bypass_goodSeeingCoaddId
+    bypass_deepCoaddId_bits = bypass_goodSeeingCoaddId_bits
+
+    def bypass_chiSquaredCoaddId(self, datasetType, pythonType, location, dataId):
+        return self._computeCoaddExposureId(dataId, False)
+    def bypass_chiSquaredCoaddId_bits(self, datasetType, pythonType, location, dataId):
+        return 1 + 7 + 13*2
 
 ###############################################################################
 

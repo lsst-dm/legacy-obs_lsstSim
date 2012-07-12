@@ -194,6 +194,54 @@ datasets: {
         storage:      "ignored"
         tables:       "raw"
     }
+    goodSeeingCoaddId: {
+        template:     "ignored"
+        # Provide something to import, although we actually return a Long
+        python:       "lsst.daf.base.PropertySet"
+        persistable:  "ignored"
+        storage:      "ignored"
+        tables:       "raw"
+    }
+    goodSeeingCoaddId_bits: {
+        template:     "ignored"
+        # Provide something to import, although we actually return an int
+        python:       "lsst.daf.base.PropertySet"
+        persistable:  "ignored"
+        storage:      "ignored"
+        tables:       "raw"
+    }
+    deepCoaddId: {
+        template:     "ignored"
+        # Provide something to import, although we actually return a Long
+        python:       "lsst.daf.base.PropertySet"
+        persistable:  "ignored"
+        storage:      "ignored"
+        tables:       "raw"
+    }
+    deepCoaddId_bits: {
+        template:     "ignored"
+        # Provide something to import, although we actually return an int
+        python:       "lsst.daf.base.PropertySet"
+        persistable:  "ignored"
+        storage:      "ignored"
+        tables:       "raw"
+    }
+    chiSquaredCoaddId: {
+        template:     "ignored"
+        # Provide something to import, although we actually return a Long
+        python:       "lsst.daf.base.PropertySet"
+        persistable:  "ignored"
+        storage:      "ignored"
+        tables:       "raw"
+    }
+    chiSquaredCoaddId_bits: {
+        template:     "ignored"
+        # Provide something to import, although we actually return an int
+        python:       "lsst.daf.base.PropertySet"
+        persistable:  "ignored"
+        storage:      "ignored"
+        tables:       "raw"
+    }
 
     crDiffimSrc: {
         template:      "crDiffimSrc/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
@@ -448,7 +496,7 @@ datasets: {
     }
     deep_processCoadd_config: {
         template:      "deep_processCoadd_config/%(filter)s/%(tract)d/%(patch)s/config-%(filter)s-%(tract)d-%(patch)s.py"
-        python:        "lsst.pipe.tasks.processCcdSdssCoadd.ProcessCcdSdssCoaddConfig"
+        python:        "lsst.pipe.tasks.processCoadd.ProcessCoaddConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
@@ -571,7 +619,7 @@ datasets: {
     }
     goodSeeing_processCoadd_config: {
         template:      "goodSeeing_processCoadd_config/%(filter)s/%(tract)d/%(patch)s/config-%(filter)s-%(tract)d-%(patch)s.py"
-        python:        "lsst.pipe.tasks.processCcdSdssCoadd.ProcessCcdSdssCoaddConfig"
+        python:        "lsst.pipe.tasks.processCoadd.ProcessCoaddConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
@@ -687,7 +735,7 @@ datasets: {
     }
     chiSquared_processCoadd_config: {
         template:      "chiSquared_processCoadd_config/%(tract)d/%(patch)s/config-%(tract)d-%(patch)s.py"
-        python:        "lsst.pipe.tasks.processCcdSdssCoadd.ProcessCcdSdssCoaddConfig"
+        python:        "lsst.pipe.tasks.processCoadd.ProcessCoaddConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
