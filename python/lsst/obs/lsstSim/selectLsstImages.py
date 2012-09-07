@@ -145,10 +145,14 @@ class SelectLsstImagesTask(BaseSelectImagesTask):
                     and fwhm < %%s
                 """ % ExposureInfo.getColumnNames())
         
-        if self.config.maxExposures:
+        if self.config.maxExposures is not None:
             queryStr += " limit %s" % (self.config.maxExposures,)
 
-        cursor.execute(queryStr, (filter, self.config.maxFwhm))
+        dataTuple = (filter, self.config.maxFwhm)
+
+        self.log.log(self.log.INFO, "queryStr=%r; dataTuple=%s" % (queryStr, dataTuple))
+
+        cursor.execute(queryStr, dataTuple)
         exposureInfoList = [ExposureInfo(result) for result in cursor]
 
         return pipeBase.Struct(
