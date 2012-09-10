@@ -150,7 +150,7 @@ class SelectLsstImagesTask(BaseSelectImagesTask):
 
         dataTuple = (filter, self.config.maxFwhm)
 
-        self.log.log(self.log.INFO, "queryStr=%r; dataTuple=%s" % (queryStr, dataTuple))
+        self.log.info("queryStr=%r; dataTuple=%s" % (queryStr, dataTuple))
 
         cursor.execute(queryStr, dataTuple)
         exposureInfoList = [ExposureInfo(result) for result in cursor]
