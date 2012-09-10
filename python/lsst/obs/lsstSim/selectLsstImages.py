@@ -185,4 +185,3 @@ if __name__ == "__main__":
     results = selectTask.run(coordList = coordList, filter = 'r')
     for ccdInfo in results.exposureInfoList:
         print "dataId=%s, fwhm=%s" % (ccdInfo.dataId, ccdInfo.fwhm)
-    
