@@ -35,14 +35,6 @@ __all__ = ["SelectLsstImagesTask"]
 class SelectLsstImagesConfig(BaseSelectImagesTask.ConfigClass):
     """Config for SelectLsstImagesTask
     """
-    flagMask = pexConfig.Field(
-        doc = """LSST quality mask; set allowed bits:
-0x01 PROCESSING_FAILED: The pipeline failed to process this CCD
-0x02 BAD_PSF_ZEROPOINT: The PSF flux zero-point appears to be bad
-0x04 BAD_PSF_SCATTER: The PSF flux for stars shows excess scatter""",
-        dtype = int,
-        default = 0,
-    )
     maxFwhm = pexConfig.Field(
         doc = "maximum FWHM (arcsec)",
         dtype = float,
@@ -53,7 +45,6 @@ class SelectLsstImagesConfig(BaseSelectImagesTask.ConfigClass):
         BaseSelectImagesTask.ConfigClass.setDefaults(self)
         self.host = "lsst-db.ncsa.illinois.edu"
         self.port = 3306
-        self.database = "adm_smm_S12_lsstsim_u_smm_2012_0514_173319"
 
 
 class ExposureInfo(BaseExposureInfo):
@@ -63,7 +54,6 @@ class ExposureInfo(BaseExposureInfo):
     - dataId: data ID of exposure (a dict)
     - coordList: a list of corner coordinates of the exposure (list of IcrsCoord)
     - fwhm: mean FWHM of exposure
-    - flags: flags field from Science_Ccd_Exposure table
     """
     def __init__(self, result):
         """Set exposure information based on a query result from a db connection
@@ -84,7 +74,6 @@ class ExposureInfo(BaseExposureInfo):
                 )
             )
         self.fwhm = result[self._nextInd]
-        self.flags = result[self._nextInd]
 
     @staticmethod
     def getColumnNames():
@@ -95,7 +84,7 @@ class ExposureInfo(BaseExposureInfo):
         return "raftName, visit, ccdName, filterName, " + \
             "corner1Ra, corner1Decl, corner2Ra, corner2Decl, " + \
             "corner3Ra, corner3Decl, corner4Ra, corner4Decl, " + \
-            "fwhm, flags"
+            "fwhm"
 
 
 class SelectLsstImagesTask(BaseSelectImagesTask):
@@ -116,7 +105,6 @@ class SelectLsstImagesTask(BaseSelectImagesTask):
             - dataId: data ID of exposure (a dict)
             - coordList: a list of corner coordinates of the exposure (list of afwCoord.IcrsCoord)
             - fwhm: fwhm column
-            - flags: flags column
         """
         db = MySQLdb.connect(
             host = self.config.host,
@@ -146,7 +134,6 @@ class SelectLsstImagesTask(BaseSelectImagesTask):
                     on (ccdHtm.htmId10 between scisql.Region.htmMin and scisql.Region.htmMax)) as idList
                 where ccdExp.scienceCcdExposureId = idList.scienceCcdExposureId
                     and filterName = %%s
-                    and not (flags & ~%%s)
                     and fwhm < %%s
                 """ % ExposureInfo.getColumnNames())
         else:
@@ -154,14 +141,17 @@ class SelectLsstImagesTask(BaseSelectImagesTask):
             queryStr = ("""select %s
                 from Science_Ccd_Exposure
                 where filterName = %%s
-                    and not (flags & ~%%s)
                     and fwhm < %%s
                 """ % ExposureInfo.getColumnNames())
         
-        if self.config.maxExposures:
+        if self.config.maxExposures is not None:
             queryStr += " limit %s" % (self.config.maxExposures,)
 
-        cursor.execute(queryStr, (filter, self.config.flagMask, self.config.maxFwhm))
+        dataTuple = (filter, self.config.maxFwhm)
+
+        self.log.info("queryStr=%r; dataTuple=%s" % (queryStr, dataTuple))
+
+        cursor.execute(queryStr, dataTuple)
         exposureInfoList = [ExposureInfo(result) for result in cursor]
 
         return pipeBase.Struct(
@@ -193,5 +183,4 @@ if __name__ == "__main__":
     ]
     results = selectTask.run(coordList = coordList, filter = 'r')
     for ccdInfo in results.exposureInfoList:
-        print "dataId=%s, fwhm=%s, flags=%s" % (ccdInfo.dataId, ccdInfo.fwhm, ccdInfo.flags)
-    
+        print "dataId=%s, fwhm=%s" % (ccdInfo.dataId, ccdInfo.fwhm)
