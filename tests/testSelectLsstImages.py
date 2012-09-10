@@ -33,7 +33,7 @@ from lsst.obs.lsstSim.selectLsstImages import SelectLsstImagesTask
 
 # this database should be around for awhile, but in the long run
 # I hope we can define a standard database that is saved essentially forever
-Database = "krughoff_simDB_0906_2012"
+Database = "test_select_lsst_images"
 
 def getCoordList(minRa, minDec, maxRa, maxDec):
     degList = (

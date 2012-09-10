@@ -45,7 +45,6 @@ class SelectLsstImagesConfig(BaseSelectImagesTask.ConfigClass):
         BaseSelectImagesTask.ConfigClass.setDefaults(self)
         self.host = "lsst-db.ncsa.illinois.edu"
         self.port = 3306
-        self.database = "adm_smm_S12_lsstsim_u_smm_2012_0514_173319"
 
 
 class ExposureInfo(BaseExposureInfo):
