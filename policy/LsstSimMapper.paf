@@ -134,8 +134,26 @@ exposures: {
         tables:        raw
         tables:        raw_skyTile
     }
+    deepDiff_matchedExpExp: {
+        template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s/matchedExpExp-v%(visit)d-f%(filter)s-R%(raft)s-S%(sensor)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
+        level:        "Ccd"
+        tables:        raw
+        tables:        raw_skyTile
+    }
     goodSeeingDiff_subtractedExp: {
         template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s/subtractedExp-v%(visit)d-f%(filter)s-R%(raft)s-S%(sensor)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
+        level:        "Ccd"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    goodSeeingDiff_matchedExpExp: {
+        template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s/matchedExpExp-v%(visit)d-f%(filter)s-R%(raft)s-S%(sensor)s.fits"
         python:        "lsst.afw.image.ExposureF"
         persistable:        "ExposureF"
         storage:    "FitsStorage"
