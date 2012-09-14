@@ -124,6 +124,25 @@ exposures: {
         storage:     "FitsStorage"
         tables:      raw
     }
+
+    deepDiff_subtractedExp: {
+        template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s/subtractedExp-v%(visit)d-f%(filter)s-R%(raft)s-S%(sensor)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
+        level:        "Ccd"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    goodSeeingDiff_subtractedExp: {
+        template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s/subtractedExp-v%(visit)d-f%(filter)s-R%(raft)s-S%(sensor)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
+        level:        "Ccd"
+        tables:        raw
+        tables:        raw_skyTile
+    }
 }
 
 calibrations: {
@@ -750,4 +769,53 @@ datasets: {
         tables:        raw_skyTile
     }
 
+    deepDiff_config: {
+        template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s/config-v%(visit)d-f%(filter)s-R%(raft)s-S%(sensor)s.py"
+        python:        "lsst.pipe.tasks.imageDifference.ImageDifferenceConfig"
+        persistable:      "Config"
+        storage:    "ConfigStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    deepDiff_metadata: {
+        template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s/metadata-v%(visit)d-f%(filter)s-R%(raft)s-S%(sensor)s.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
+        storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    deepDiff_src: {
+        template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s/src-v%(visit)d-f%(filter)s-R%(raft)s-S%(sensor)s.fits"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "SourceCatalog"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+
+    goodSeeingDiff_config: {
+        template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s/config-v%(visit)d-f%(filter)s-R%(raft)s-S%(sensor)s.py"
+        python:        "lsst.pipe.tasks.imageDifference.ImageDifferenceConfig"
+        persistable:      "Config"
+        storage:    "ConfigStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    goodSeeingDiff_metadata: {
+        template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s/metadata-v%(visit)d-f%(filter)s-R%(raft)s-S%(sensor)s.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
+        storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    goodSeeingDiff_src: {
+        template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s/src-v%(visit)d-f%(filter)s-R%(raft)s-S%(sensor)s.fits"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "SourceCatalog"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
 }
