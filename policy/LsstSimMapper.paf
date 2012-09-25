@@ -117,8 +117,15 @@ exposures: {
         level:        "Amp"
         tables:       raw
     }
-    coaddTempExp: {
-        template:    "coaddTempExp/%(filter)s/%(tract)d/%(patch)s/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
+    deepCoadd_tempExp: {
+        template:    "deepCoadd/%(filter)s/%(tract)d/%(patch)stempExp/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
+        python:      "lsst.afw.image.ExposureF"
+        persistable: "ExposureF"
+        storage:     "FitsStorage"
+        tables:      raw
+    }
+    goodSeeingCoadd_tempExp: {
+        template:    "goodSeeingCoadd/%(filter)s/%(tract)d/%(patch)stempExp/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
         python:      "lsst.afw.image.ExposureF"
         persistable: "ExposureF"
         storage:     "FitsStorage"
@@ -494,6 +501,22 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
+    deep_makeCoaddTempExp_config: {
+        template:      "deep_makeCoaddTempExp_config/%(filter)s/%(tract)d/%(patch)stempExp/config.py"
+        python:        "lsst.pipe.tasks.outlierRejectedCoadd.OutlierRejectedCoaddConfig"
+        persistable:      "Config"
+        storage:    "ConfigStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    deep_makeCoaddTempExp_metadata: {
+        template:      "deep_makeCoaddTempExp_metadata/%(filter)s/%(tract)d/%(patch)stempExp/metadata.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
+        storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
     deep_processCoadd_config: {
         template:      "deep_processCoadd_config/%(filter)s/%(tract)d/%(patch)s/config-%(filter)s-%(tract)d-%(patch)s.py"
         python:        "lsst.pipe.tasks.processCoadd.ProcessCoaddConfig"
@@ -614,6 +637,22 @@ datasets: {
         python:        "lsst.afw.table.SourceCatalog"
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    goodSeeing_makeCoaddTempExp_config: {
+        template:      "goodSeeing_makeCoaddTempExp_config/%(filter)s/%(tract)d/%(patch)stempExp/config.py"
+        python:        "lsst.pipe.tasks.outlierRejectedCoadd.OutlierRejectedCoaddConfig"
+        persistable:      "Config"
+        storage:    "ConfigStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    goodSeeing_makeCoaddTempExp_metadata: {
+        template:      "goodSeeing_makeCoaddTempExp_metadata/%(filter)s/%(tract)d/%(patch)stempExp/metadata.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
+        storage:    "BoostStorage"
         tables:        raw
         tables:        raw_skyTile
     }
@@ -749,5 +788,4 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
-
 }
