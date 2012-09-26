@@ -25,6 +25,7 @@ import lsst.pex.config as pexConfig
 import lsst.pipe.base as pipeBase
 from lsst.ip.isr import AssembleCcdTask, IsrTask
 from lsst.pipe.tasks.snapCombine import SnapCombineTask 
+import numpy
 
 __all__ = ["LsstSimIsrTask"]
 
@@ -52,6 +53,17 @@ class LsstSimIsrTask(IsrTask):
         IsrTask.__init__(self, **kwargs)
         self.transposeForInterpolation = True # temporary hack until LSST data is in proper order
         self.makeSubtask("snapCombine")
+
+    def unmaskSatHotPixels(self, exposure):
+        mi = exposure.getMaskedImage()
+        mask = mi.getMask()
+        badBitmask = mask.getPlaneBitMask("BAD")
+        satBitmask = mask.getPlaneBitMask("SAT")
+        andMask = 2**17 - 1  #All possible bits set to 1 for unit16
+        andMask = andMask^satBitmask #Unset SAT bit
+        maskarr = mask.getArray()
+        idx = numpy.where(maskarr&badBitmask)
+        maskarr[idx] &= andMask #Turn off SAT bit where the BAD bit is set.
 
     @pipeBase.timeMethod
     def run(self, sensorRef):
@@ -107,6 +119,8 @@ class LsstSimIsrTask(IsrTask):
             del ampExposureList
 
             self.maskAndInterpDefect(ccdExposure)
+
+            self.unmaskSatHotPixels(ccdExposure)
             
             self.saturationInterpolation(ccdExposure)
 
