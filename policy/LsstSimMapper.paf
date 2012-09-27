@@ -123,6 +123,7 @@ exposures: {
         persistable: "ExposureF"
         storage:     "FitsStorage"
         tables:      raw
+        level:        "Ccd"
     }
 
     deepDiff_subtractedExp: {
