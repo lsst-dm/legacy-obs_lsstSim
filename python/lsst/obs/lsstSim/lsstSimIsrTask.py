@@ -59,23 +59,12 @@ class LsstSimIsrTask(IsrTask):
         mask = mi.getMask()
         badBitmask = mask.getPlaneBitMask("BAD")
         satBitmask = mask.getPlaneBitMask("SAT")
+        orBitmask = badBitmask|satBitmask
         andMask = 2**17 - 1  #All possible bits set to 1 for unit16
         andMask = andMask^satBitmask #Unset SAT bit
         maskarr = mask.getArray()
-        idx = numpy.where(maskarr&badBitmask)
-        satneighbors = 0
-        arrdim = maskarr.shape
-        #Unset the SAT bit then go through and set the SAT bit if three or more neighbors are saturated
-        #this should avoid calling hot bad columns saturated.
-        for ix,iy in zip(idx[0],idx[1]):
-            maskarr[ix][iy] &= andMask #Turn off SAT bit where BAD bit is set
-            for x,y in ((ix-1, iy), (ix+1, iy),(ix, iy-1), (ix, iy+1)):
-                if x < 0 or y < 0 or x >= arrdim[0] or y >= arrdim[1]:  #Check that the pixel is in the image
-                    continue
-                if maskarr[x][y]&satBitmask:
-                    satneighbors += 1
-            if satneighbors > 2:
-                maskarr[ix][iy] |= satBitmask
+	idx = numpy.where((maskarr&orBitmask)==orBitmask)
+        maskarr[idx] &= andMask
 
     @pipeBase.timeMethod
     def run(self, sensorRef):
