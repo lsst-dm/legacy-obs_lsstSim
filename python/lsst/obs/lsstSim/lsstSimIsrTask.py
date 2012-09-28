@@ -60,10 +60,9 @@ class LsstSimIsrTask(IsrTask):
         badBitmask = mask.getPlaneBitMask("BAD")
         satBitmask = mask.getPlaneBitMask("SAT")
         orBitmask = badBitmask|satBitmask
-        andMask = 2**17 - 1  #All possible bits set to 1 for unit16
-        andMask = andMask^satBitmask #Unset SAT bit
+        andMask = ~satBitmask
         maskarr = mask.getArray()
-	idx = numpy.where((maskarr&orBitmask)==orBitmask)
+        idx = numpy.where((maskarr&orBitmask)==orBitmask)
         maskarr[idx] &= andMask
 
     @pipeBase.timeMethod
