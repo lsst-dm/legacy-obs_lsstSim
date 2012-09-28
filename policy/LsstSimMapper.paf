@@ -402,7 +402,6 @@ datasets: {
         python:      "lsst.afw.image.ExposureF"
         persistable: "ExposureF"
         storage:     "FitsStorage"
-        level:        "Patch"
         tables:      raw
     }
     deepCoadd_depth: {
@@ -410,7 +409,6 @@ datasets: {
         python:      "lsst.afw.image.ImageF"
         persistable: "ImageF"
         storage:     "FitsStorage"
-        level:        "Patch"
         tables:      raw
     }
     deepCoadd_initPsf: {
@@ -543,7 +541,6 @@ datasets: {
         python:      "lsst.afw.image.ExposureF"
         persistable: "ExposureF"
         storage:     "FitsStorage"
-        level:        "Patch"
         tables:      raw
     }
     goodSeeingCoadd_depth: {
@@ -551,7 +548,6 @@ datasets: {
         python:      "lsst.afw.image.ImageF"
         persistable: "ImageF"
         storage:     "FitsStorage"
-        level:        "Patch"
         tables:      raw
     }
     goodSeeingCoadd_initPsf: {
@@ -684,7 +680,6 @@ datasets: {
         python:      "lsst.afw.image.ExposureF"
         persistable: "ExposureF"
         storage:     "FitsStorage"
-        level:        "Patch"
         tables:      raw
     }
     chiSquaredCoadd_initPsf: {
