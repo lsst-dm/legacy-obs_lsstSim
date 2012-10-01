@@ -504,15 +504,31 @@ datasets: {
         tables:        raw_skyTile
     }
     deep_makeCoaddTempExp_config: {
-        template:      "deep_makeCoaddTempExp_config/%(filter)s/%(tract)d/%(patch)stempExp/config.py"
-        python:        "lsst.pipe.tasks.outlierRejectedCoadd.OutlierRejectedCoaddConfig"
+        template:      "deep_makeCoaddTempExp_config/%(filter)s/%(tract)d/%(patch)s_config.py"
+        python:        "lsst.pipe.tasks.baseCoadd.BaseCoaddConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
         tables:        raw_skyTile
     }
     deep_makeCoaddTempExp_metadata: {
-        template:      "deep_makeCoaddTempExp_metadata/%(filter)s/%(tract)d/%(patch)stempExp/metadata.boost"
+        template:      "deep_makeCoaddTempExp_metadata/%(filter)s/%(tract)d/%(patch)s_metadata.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
+        storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    deep_assembleCoadd_config: {
+        template:      "deep_assembleCoadd_config/%(filter)s/%(tract)d/%(patch)s_config.py"
+        python:        "lsst.pipe.tasks.baseCoadd.BaseCoaddConfig"
+        persistable:      "Config"
+        storage:    "ConfigStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    deep_assembleCoadd_metadata: {
+        template:      "deep_assembleCoadd_metadata/%(filter)s/%(tract)d/%(patch)s_metadata.boost"
         python:        "lsst.daf.base.PropertySet"
         persistable:        "PropertySet"
         storage:    "BoostStorage"
@@ -643,15 +659,31 @@ datasets: {
         tables:        raw_skyTile
     }
     goodSeeing_makeCoaddTempExp_config: {
-        template:      "goodSeeing_makeCoaddTempExp_config/%(filter)s/%(tract)d/%(patch)stempExp/config.py"
-        python:        "lsst.pipe.tasks.outlierRejectedCoadd.OutlierRejectedCoaddConfig"
+        template:      "goodSeeing_makeCoaddTempExp_config/%(filter)s/%(tract)d/%(patch)s_config.py"
+        python:        "lsst.pipe.tasks.baseCoadd.BaseCoaddConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
         tables:        raw_skyTile
     }
     goodSeeing_makeCoaddTempExp_metadata: {
-        template:      "goodSeeing_makeCoaddTempExp_metadata/%(filter)s/%(tract)d/%(patch)stempExp/metadata.boost"
+        template:      "goodSeeing_makeCoaddTempExp_metadata/%(filter)s/%(tract)d/%(patch)s_metadata.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
+        storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    goodSeeing_assembleCoadd_config: {
+        template:      "goodSeeing_assembleCoadd_config/%(filter)s/%(tract)d/%(patch)s_config.py"
+        python:        "lsst.pipe.tasks.baseCoadd.BaseCoaddConfig"
+        persistable:      "Config"
+        storage:    "ConfigStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    goodSeeing_assembleCoadd_metadata: {
+        template:      "goodSeeing_assembleCoadd_metadata/%(filter)s/%(tract)d/%(patch)s_metadata.boost"
         python:        "lsst.daf.base.PropertySet"
         persistable:        "PropertySet"
         storage:    "BoostStorage"
