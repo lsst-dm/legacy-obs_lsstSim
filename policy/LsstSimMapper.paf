@@ -122,7 +122,7 @@ exposures: {
         python:      "lsst.afw.image.ExposureF"
         persistable: "ExposureF"
         storage:     "FitsStorage"
-        level:        "Ccd"
+        level:        "None"
         tables:      raw
     }
     goodSeeingCoadd_tempExp: {
@@ -130,7 +130,7 @@ exposures: {
         python:      "lsst.afw.image.ExposureF"
         persistable: "ExposureF"
         storage:     "FitsStorage"
-        level:        "Ccd"
+        level:        "None"
         tables:      raw
     }
 
@@ -139,7 +139,7 @@ exposures: {
         python:        "lsst.afw.image.ExposureF"
         persistable:        "ExposureF"
         storage:    "FitsStorage"
-        level:        "Ccd"
+        level:        "None"
         tables:        raw
         tables:        raw_skyTile
     }
@@ -148,7 +148,7 @@ exposures: {
         python:        "lsst.afw.image.ExposureF"
         persistable:        "ExposureF"
         storage:    "FitsStorage"
-        level:        "Ccd"
+        level:        "None"
         tables:        raw
         tables:        raw_skyTile
     }
@@ -157,7 +157,7 @@ exposures: {
         python:        "lsst.afw.image.ExposureF"
         persistable:        "ExposureF"
         storage:    "FitsStorage"
-        level:        "Ccd"
+        level:        "None"
         tables:        raw
         tables:        raw_skyTile
     }
