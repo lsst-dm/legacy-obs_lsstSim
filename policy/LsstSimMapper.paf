@@ -279,7 +279,14 @@ datasets: {
         storage:      "ignored"
         tables:       "raw"
     }
-
+    calexpBackground: {
+        template:      "calexp/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s_bkgd.fits"
+        python:        "lsst.afw.image.ImageF"
+        persistable:        "ImageF"
+        storage:    "FitsStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
     crDiffimSrc: {
         template:      "crDiffimSrc/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
         python:        "lsst.afw.table.SourceCatalog"
