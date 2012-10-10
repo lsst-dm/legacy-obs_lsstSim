@@ -812,6 +812,14 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
+    deepDiff_diaMatch: {
+        template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s/diaMatch-v%(visit)d-f%(filter)s-R%(raft)s-S%(sensor)s.fits"
+        python:        "lsst.afw.table.BaseCatalog"
+        persistable:        "BaseCatalog"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
 
     goodSeeingDiff_config: {
         template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s/config-v%(visit)d-f%(filter)s-R%(raft)s-S%(sensor)s.py"
@@ -837,4 +845,13 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
+    goodSeeingDiff_diaMatch: {
+        template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s/diaMatch-v%(visit)d-f%(filter)s-R%(raft)s-S%(sensor)s.fits"
+        python:        "lsst.afw.table.BaseCatalog"
+        persistable:        "BaseCatalog"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+
 }
