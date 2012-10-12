@@ -453,6 +453,14 @@ datasets: {
         storage:     "BoostStorage"
         tables:      raw
     }
+    deepCoadd_calexpBackground: {
+        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/calexp-%(filter)s-%(tract)d-%(patch)s_bkgd.fits"
+        python:        "lsst.afw.image.ImageF"
+        persistable:        "ImageF"
+        storage:    "FitsStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
     deepCoadd_skyMap: {
         template:    "deepCoadd/skyMap.pickle"
         python:      "lsst.skymap.BaseSkyMap"
@@ -599,6 +607,14 @@ datasets: {
         persistable: "Psf"
         storage:     "BoostStorage"
         tables:      raw
+    }
+    goodSeeingCoadd_calexpBackground: {
+        template:      "goodSeeingCoadd-results/%(filter)s/%(tract)d/%(patch)s/calexp-%(filter)s-%(tract)d-%(patch)s_bkgd.fits"
+        python:        "lsst.afw.image.ImageF"
+        persistable:        "ImageF"
+        storage:    "FitsStorage"
+        tables:        raw
+        tables:        raw_skyTile
     }
     goodSeeingCoadd_skyMap: {
         template:    "goodSeeingCoadd/skyMap.pickle"
