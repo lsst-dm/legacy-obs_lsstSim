@@ -453,14 +453,6 @@ datasets: {
         storage:     "BoostStorage"
         tables:      raw
     }
-    deepCoadd_calexpBackground: {
-        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/calexp-%(filter)s-%(tract)d-%(patch)s_bkgd.fits"
-        python:        "lsst.afw.image.ImageF"
-        persistable:        "ImageF"
-        storage:    "FitsStorage"
-        tables:        raw
-        tables:        raw_skyTile
-    }
     deepCoadd_skyMap: {
         template:    "deepCoadd/skyMap.pickle"
         python:      "lsst.skymap.BaseSkyMap"
@@ -554,6 +546,14 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
+    deepCoadd_calexpBackground: {
+        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/bkgd-%(filter)s-%(tract)d-%(patch)s.fits"
+        python:        "lsst.afw.image.ImageF"
+        persistable:        "ImageF"
+        storage:    "FitsStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
     deep_makeCoaddTempExp_config: {
         template:      "deep_makeCoaddTempExp_config/%(filter)s/%(tract)d/%(patch)s_config.py"
         python:        "lsst.pipe.tasks.baseCoadd.BaseCoaddConfig"
@@ -607,14 +607,6 @@ datasets: {
         persistable: "Psf"
         storage:     "BoostStorage"
         tables:      raw
-    }
-    goodSeeingCoadd_calexpBackground: {
-        template:      "goodSeeingCoadd-results/%(filter)s/%(tract)d/%(patch)s/calexp-%(filter)s-%(tract)d-%(patch)s_bkgd.fits"
-        python:        "lsst.afw.image.ImageF"
-        persistable:        "ImageF"
-        storage:    "FitsStorage"
-        tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeingCoadd_skyMap: {
         template:    "goodSeeingCoadd/skyMap.pickle"
@@ -706,6 +698,14 @@ datasets: {
         python:        "lsst.afw.table.SourceCatalog"
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    goodSeeingCoadd_calexpBackground: {
+        template:      "goodSeeingCoadd-results/%(filter)s/%(tract)d/%(patch)s/bkgd-%(filter)s-%(tract)d-%(patch)s.fits"
+        python:        "lsst.afw.image.ImageF"
+        persistable:        "ImageF"
+        storage:    "FitsStorage"
         tables:        raw
         tables:        raw_skyTile
     }
