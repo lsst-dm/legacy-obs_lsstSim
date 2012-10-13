@@ -62,16 +62,6 @@ class LsstSimMapper(CameraMapper):
         # modify the schema appropriately
         #afwImageUtils.defineFilter('y3', 1002.44) # candidate y-band
 
-    @classmethod
-    def getCameraName(cls):
-        """Return the name of the camera that this CameraMapper is for."""
-        return "lsstSim"
-
-    @classmethod
-    def getEupsProductName(cls):
-        """Return the name of the EUPS product containing this CameraMapper."""
-        return "obs_lsstSim"
-
     def _transformId(self, dataId):
         actualId = dataId.copy()
         if actualId.has_key("sensorName"):
