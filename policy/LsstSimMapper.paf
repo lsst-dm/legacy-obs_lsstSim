@@ -117,50 +117,6 @@ exposures: {
         level:        "Amp"
         tables:       raw
     }
-    deepCoadd_tempExp: {
-        template:    "deepCoadd/%(filter)s/%(tract)d/%(patch)stempExp/v%(visit)d-f%(filter)s.fits"
-        python:      "lsst.afw.image.ExposureF"
-        persistable: "ExposureF"
-        storage:     "FitsStorage"
-        level:        "None"
-        tables:      raw
-    }
-    goodSeeingCoadd_tempExp: {
-        template:    "goodSeeingCoadd/%(filter)s/%(tract)d/%(patch)stempExp/v%(visit)d-f%(filter)s.fits"
-        python:      "lsst.afw.image.ExposureF"
-        persistable: "ExposureF"
-        storage:     "FitsStorage"
-        level:        "None"
-        tables:      raw
-    }
-
-    deepCoadd_calexp: {
-        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/calexp-%(filter)s-%(tract)d-%(patch)s.fits"
-        python:        "lsst.afw.image.ExposureF"
-        persistable:        "ExposureF"
-        storage:    "FitsStorage"
-        level:        "None"
-        tables:        raw
-        tables:        raw_skyTile
-    }
-    goodSeeingCoadd_calexp: {
-        template:      "goodSeeingCoadd-results/%(filter)s/%(tract)d/%(patch)s/calexp-%(filter)s-%(tract)d-%(patch)s.fits"
-        python:        "lsst.afw.image.ExposureF"
-        persistable:        "ExposureF"
-        storage:    "FitsStorage"
-        level:        "None"
-        tables:        raw
-        tables:        raw_skyTile
-    }
-    chiSquaredCoadd_calexp: {
-        template:      "chiSquaredCoadd-results/%(tract)d/%(patch)s/calexp-%(tract)d-%(patch)s.fits"
-        python:        "lsst.afw.image.ExposureF"
-        persistable:        "ExposureF"
-        storage:    "FitsStorage"
-        level:        "None"
-        tables:        raw
-        tables:        raw_skyTile
-    }
 }
 
 calibrations: {
@@ -280,7 +236,7 @@ datasets: {
         tables:       "raw"
     }
     calexpBackground: {
-        template:      "calexp/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s_bkgd.fits"
+        template:      "calexp/v%(visit)d-f%(filter)s/R%(raft)s/bkgd-S%(sensor)s.fits"
         python:        "lsst.afw.image.ImageF"
         persistable:        "ImageF"
         storage:    "FitsStorage"
@@ -432,6 +388,13 @@ datasets: {
         tables:        raw_skyTile
     }
 
+    deepCoadd_tempExp: {
+        template:    "deepCoadd/%(filter)s/%(tract)d/%(patch)stempExp/v%(visit)d-f%(filter)s.fits"
+        python:      "lsst.afw.image.ExposureF"
+        persistable: "ExposureF"
+        storage:     "FitsStorage"
+        tables:      raw
+    }
     deepCoadd: {
         template:    "deepCoadd/%(filter)s/%(tract)d/%(patch)s.fits"
         python:      "lsst.afw.image.ExposureF"
@@ -503,6 +466,14 @@ datasets: {
         python:        "lsst.daf.base.PropertySet"
         persistable:        "PropertySet"
         storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    deepCoadd_calexp: {
+        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/calexp-%(filter)s-%(tract)d-%(patch)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
         tables:        raw
         tables:        raw_skyTile
     }
@@ -587,6 +558,13 @@ datasets: {
         tables:        raw_skyTile
     }
 
+    goodSeeingCoadd_tempExp: {
+        template:    "goodSeeingCoadd/%(filter)s/%(tract)d/%(patch)stempExp/v%(visit)d-f%(filter)s.fits"
+        python:      "lsst.afw.image.ExposureF"
+        persistable: "ExposureF"
+        storage:     "FitsStorage"
+        tables:      raw
+    }
     goodSeeingCoadd: {
         template:    "goodSeeingCoadd/%(filter)s/%(tract)d/%(patch)s.fits"
         python:      "lsst.afw.image.ExposureF"
@@ -658,6 +636,14 @@ datasets: {
         python:        "lsst.daf.base.PropertySet"
         persistable:        "PropertySet"
         storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    goodSeeingCoadd_calexp: {
+        template:      "goodSeeingCoadd-results/%(filter)s/%(tract)d/%(patch)s/calexp-%(filter)s-%(tract)d-%(patch)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
         tables:        raw
         tables:        raw_skyTile
     }
@@ -790,6 +776,14 @@ datasets: {
         python:        "lsst.daf.base.PropertySet"
         persistable:        "PropertySet"
         storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    chiSquaredCoadd_calexp: {
+        template:      "chiSquaredCoadd-results/%(tract)d/%(patch)s/calexp-%(tract)d-%(patch)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
         tables:        raw
         tables:        raw_skyTile
     }
