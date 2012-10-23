@@ -21,25 +21,21 @@
 # the GNU General Public License along with this program.  If not, 
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
-
-
+import os.path
 import unittest
-import lsst.utils.tests as utilsTests
 
+import lsst.utils.tests as utilsTests
 from lsst.pex.policy import Policy
 import lsst.daf.persistence as dafPersist
-from lsst.obs.lsstSim import LsstSimMapper
 
 class GetFlatTestCase(unittest.TestCase):
     """Testing butler flat image retrieval"""
 
     def setUp(self):
-        self.bf = dafPersist.ButlerFactory(mapper=LsstSimMapper(root="./tests/data"))
-        self.butler = self.bf.create()
+        self.butler = dafPersist.Butler(root=os.path.join(os.path.dirname(__file__), "data"))
 
     def tearDown(self):
         del self.butler
-        del self.bf
 
     def testFlat(self):
         """Test retrieval of flat image"""
