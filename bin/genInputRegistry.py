@@ -27,7 +27,10 @@ from optparse import OptionParser
 import os
 import re
 import shutil
-import sqlite as sqlite3
+try:
+    import sqlite as sqlite3
+except ImportError:
+    import sqlite3
 import sys
 import lsst.daf.base as dafBase
 import lsst.afw.image as afwImage

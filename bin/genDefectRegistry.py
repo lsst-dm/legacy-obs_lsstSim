@@ -23,7 +23,10 @@
 import glob
 import os
 import re
-import sqlite as sqlite3
+try:
+    import sqlite as sqlite3
+except ImportError:
+    import sqlite3
 import sys
 
 if os.path.exists("defectRegistry.sqlite3"):
