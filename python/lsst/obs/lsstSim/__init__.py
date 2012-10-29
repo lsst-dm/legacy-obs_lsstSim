@@ -22,3 +22,4 @@
 from .version import *
 from .lsstSimMapper import *
 from .lsstSimIsrTask import *
+from .lsstSimCalibIsrTask import *

@@ -40,6 +40,15 @@ exposures: {
         tables:        raw
         tables:        raw_skyTile
     }
+    postISR: {
+        template:    "postISR/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s/C%(channel)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
+        level:        "Amp"
+        tables:        raw
+        tables:        raw_skyTile
+    }
     postISRCCD: {
         template:    "postISRCCD/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
         python:        "lsst.afw.image.ExposureF"
