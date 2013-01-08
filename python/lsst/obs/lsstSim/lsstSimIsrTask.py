@@ -45,6 +45,11 @@ class LsstSimIsrConfig(IsrTask.ConfigClass):
         doc = "Combine snaps task",
     )
 
+    def setDefaults(self):
+        # LSSTSims do not include darks
+        IsrTask.ConfigClass.setDefaults(self)
+        self.doDark = False
+
 
 class LsstSimIsrTask(IsrTask):
     ConfigClass = LsstSimIsrConfig
