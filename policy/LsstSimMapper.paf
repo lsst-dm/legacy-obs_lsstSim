@@ -721,6 +721,30 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
+    goodSeeingDiff_differenceExp: {
+        template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/diffexp-S%(sensor)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    goodSeeingDiff_matchedExp: {
+        template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/matchexp-S%(sensor)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    goodSeeingDiff_diaSrc: {
+        template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/diaSrc-S%(sensor)s.fits"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "SourceCatalog"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
     goodSeeing_makeCoaddTempExp_config: {
         template:      "goodSeeing_makeCoaddTempExp_config/%(filter)s/%(tract)d/%(patch)s_config.py"
         python:        "lsst.pipe.tasks.baseCoadd.BaseCoaddConfig"
