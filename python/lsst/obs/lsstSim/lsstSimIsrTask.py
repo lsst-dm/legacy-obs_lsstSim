@@ -41,7 +41,7 @@ class LsstSimIsrConfig(IsrTask.ConfigClass):
         default = True,
     )
     snapCombine = pexConfig.ConfigurableField(
-        target = w,
+        target = SnapCombineTask,
         doc = "Combine snaps task",
     )
 
