@@ -629,6 +629,22 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
+    deepDiff_config: {
+        template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/config-S%(sensor)s.py"
+        python:        "lsst.pex.config.Config"
+        persistable:      "Config"
+        storage:    "ConfigStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    deepDiff_metadata: {
+        template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/metadata-S%(sensor)s.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
+        storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
 
     goodSeeingCoadd_depth: {
         template:    "goodSeeingCoadd/%(filter)s/%(tract)d/%(patch)s.depth.fits"
@@ -795,6 +811,22 @@ datasets: {
     }
     goodSeeing_processCoadd_metadata: {
         template:      "goodSeeing_processCoadd_metadata/%(filter)s/%(tract)d/%(patch)s/metadata-%(filter)s-%(tract)d-%(patch)s.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
+        storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    goodSeeingDiff_config: {
+        template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/config-S%(sensor)s.py"
+        python:        "lsst.pex.config.Config"
+        persistable:      "Config"
+        storage:    "ConfigStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    goodSeeingDiff_metadata: {
+        template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/metadata-S%(sensor)s.boost"
         python:        "lsst.daf.base.PropertySet"
         persistable:        "PropertySet"
         storage:    "BoostStorage"
