@@ -225,6 +225,13 @@ calibrations: {
 }
 
 datasets: {
+    eimage: {
+        template:   "eimage/v%(visit)d-f%(filter)s/E%(snap)03d/R%(raft)s/eimage_%(visit)d_R%(raft)s_S%(sensor)s_E%(snap)03d.fits.gz"
+        python:     "lsst.afw.image.ExposureF"
+        persistable:         "ExposureF"
+        storage:     "FitsStorage"
+        tables:        raw
+    }
     ampExposureId: {
         template:     "ignored"
         # Provide something to import, although we actually return a tuple
@@ -419,6 +426,22 @@ datasets: {
     }
     processCcd_metadata: {
         template:      "processCcd_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
+        storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    processEimage_config: {
+        template:      "processEimage_config/v%(visit)d-f%(filter)s/s%(snap)i/R%(raft)s/S%(sensor)s.py"
+        python:        "lsst.pipe.tasks.processCcd.ProcessCcdConfig"
+        persistable:      "Config"
+        storage:    "ConfigStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    processEimage_metadata: {
+        template:      "processEimage_metadata/v%(visit)d-f%(filter)s/s%(snap)i/R%(raft)s/S%(sensor)s.boost"
         python:        "lsst.daf.base.PropertySet"
         persistable:        "PropertySet"
         storage:    "BoostStorage"
