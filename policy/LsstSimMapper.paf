@@ -620,6 +620,14 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
+    deepDiff_kernelSrc: {
+        template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/kernelSrc-S%(sensor)s.fits"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "SourceCatalog"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
     deep_makeCoaddTempExp_config: {
         template:      "deep_makeCoaddTempExp_config/%(filter)s/%(tract)d/%(patch)s_config.py"
         python:        "lsst.pipe.tasks.baseCoadd.BaseCoaddConfig"
@@ -802,6 +810,14 @@ datasets: {
     }
     goodSeeingDiff_diaSrc: {
         template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/diaSrc-S%(sensor)s.fits"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "SourceCatalog"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    goodSeeingDiff_kernelSrc: {
+        template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/kernelSrc-S%(sensor)s.fits"
         python:        "lsst.afw.table.SourceCatalog"
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
