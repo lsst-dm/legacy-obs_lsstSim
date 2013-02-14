@@ -89,7 +89,7 @@ class LsstSimImageScaler(object):
             raise RuntimeError("Cannot create scaling image. Found no fluxMag0s to interpolate")
 
         image = afwImage.ImageF(bbox, numpy.mean(self._scaleList))
-        import pdb; pdb.set_trace()
+
         return image
 
 
