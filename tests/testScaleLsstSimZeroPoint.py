@@ -89,7 +89,7 @@ class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
         mi.set(1.0)
         mi.getVariance().set(1.0)
 
-        exposureId = dataId= {'visit': 882820621, 'filter': 'r'}
+        exposureId = dataId= {'visit': 882820621}
 
         #test methods: computeImageScale(), scaleMaskedImage(), getInterpImage()
         imageScaler = zpScaler.computeImageScaler(exposure,exposureId)

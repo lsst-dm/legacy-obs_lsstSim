@@ -96,25 +96,15 @@ class SelectLsstSimFluxMag0Task(pipeBase.Task):
     ConfigClass = SelectLsstSimFluxMag0Config
 
     @pipeBase.timeMethod
-    def run(self, filter, visit):
+    def run(self, visit):
         """Select flugMag0's of LsstSim images for a particular visit
 
-        @param[in] filter: filter for images (one of "u", "g", "r", "i", "z" or "y")
-        @param[in] coordList: list of coordinates defining region of interest
+        @param[in] visit: visit id 
         
         @return a pipeBase Struct containing:
         - fluxMagInfoList: a list of FluxMagInfo objects
         """
-        if filter not in set(("u", "g", "r", "i", "z", "y")):
-            raise RuntimeError("filter=%r is an invalid name" % (filter,))
-
-        filterDict = {"u": 0,
-                      "g": 1,
-                      "r": 2,
-                      "i": 3,
-                      "z": 4,
-                      "y": 5}
-                      
+        
         kwargs = dict(
         user = DbAuth.username(self.config.host, str(self.config.port)),
         passwd = DbAuth.password(self.config.host, str(self.config.port)),
@@ -141,7 +131,6 @@ class SelectLsstSimFluxMag0Task(pipeBase.Task):
       
         # compute where clauses as a list of (clause, data)
         whereDataList = [
-            ("filterId = %s", filterDict[filter]),
             ("visit = %s", visit),
         ]
         
@@ -168,6 +157,5 @@ class SelectLsstSimFluxMag0Task(pipeBase.Task):
         @return keyword arguments for visit (other than coordList), as a dict
         """
         return dict(
-            filter = dataId["filter"],
             visit = dataId["visit"]
         )
