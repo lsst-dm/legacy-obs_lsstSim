@@ -31,6 +31,7 @@ import lsst.daf.base
 import lsst.afw.geom as afwGeom
 import lsst.afw.image as afwImage
 import lsst.afw.math as afwMath
+
 import lsst.utils.tests as utilsTests
 import lsst.pex.exceptions as pexExcept
 import lsst.pex.logging as pexLog
@@ -89,7 +90,7 @@ class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
         mi.set(1.0)
         mi.getVariance().set(1.0)
 
-        exposureId = dataId= {'visit': 882820621}
+        exposureId = {'ignore_fake_key': 1234, 'visit': 882820621}
 
         #test methods: computeImageScale(), scaleMaskedImage(), getInterpImage()
         imageScaler = zpScaler.computeImageScaler(exposure,exposureId)

@@ -53,7 +53,7 @@ class LsstSimImageScaler(object):
         @param[in] interpStyle: interpolation style (CONSTANT is only option)
         @param[in] xList: list of X pixel positions
         @param[in] yList: list of Y pixel positions
-        @param[in] scaleList: list of multiplicative scales at (x,y)
+        @param[in] scaleList: list of multiplicative scale factors at (x,y)
 
         @raise RuntimeError if the lists have different lengths
         """
@@ -79,7 +79,7 @@ class LsstSimImageScaler(object):
         maskedImage *= scale
 
     def getInterpImage(self, bbox):
-        """Return an image interpolated in R.A direction covering supplied bounding box
+        """Return an image containing the scale correction with same bounding box as supplied.
         
         @param[in] bbox: integer bounding box for image (afwGeom.Box2I)
         """
@@ -120,7 +120,7 @@ class ScaleLsstSimZeroPointTask(ScaleZeroPointTask):
     _DefaultName = "scaleLsstSimZeroPoint"
     
     def __init__(self, *args, **kwargs):
-        """Construct a ScaleZeroPointTask
+        """Construct a ScalelsstSimZeroPointTask
         """
         pipeBase.Task.__init__(self, *args, **kwargs)
         self.makeSubtask("selectFluxMag0")
@@ -133,7 +133,7 @@ class ScaleLsstSimZeroPointTask(ScaleZeroPointTask):
         """Query a database for all fluxMag0s in a single visit and return a LsstSimImageScaler
         
         @param[in] exposure: exposure for which we want an image scaler
-        @param[in] exposureId: data ID of exposure
+        @param[in] exposureId: data ID of exposure (or a dict containing 'visit' e.g. {'visit': 882820621})
 
         """
         wcs = exposure.getWcs()
