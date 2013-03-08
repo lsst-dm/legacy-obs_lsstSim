@@ -28,11 +28,11 @@ import lsst.afw.geom as afwGeom
 from lsst.daf.persistence import DbAuth
 import lsst.pex.config as pexConfig
 import lsst.pipe.base as pipeBase
-from lsst.pipe.tasks.selectImages import DatabaseSelectImagesConfig, BaseSelectImagesTask, BaseExposureInfo
+from lsst.pipe.tasks.selectImages import BaseSelectImagesTask, BaseExposureInfo
 
 __all__ = ["SelectLsstImagesTask"]
 
-class SelectLsstImagesConfig(DatabaseSelectImagesConfig):
+class SelectLsstImagesConfig(BaseSelectImagesTask.ConfigClass):
     """Config for SelectLsstImagesTask
     """
     maxFwhm = pexConfig.Field(
