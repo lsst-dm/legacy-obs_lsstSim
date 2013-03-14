@@ -417,7 +417,7 @@ datasets: {
         tables:        raw_skyTile
     }
     processCcd_config: {
-        template:      "processCcd_config/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.py"
+        template:      "config/processCcd.py"
         python:        "lsst.pipe.tasks.processCcd.ProcessCcdConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
@@ -433,7 +433,7 @@ datasets: {
         tables:        raw_skyTile
     }
     processEimage_config: {
-        template:      "processEimage_config/v%(visit)d-f%(filter)s/s%(snap)i/R%(raft)s/S%(sensor)s.py"
+        template:      "config/processEimage.py"
         python:        "lsst.pipe.tasks.processCcd.ProcessCcdConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
@@ -449,7 +449,7 @@ datasets: {
         tables:        raw_skyTile
     }
     sourceAssoc_config: {
-        template:      "sourceAssoc_config/st%(skyTile)d/config.py"
+        template:      "config/sourceAssoc.py"
         python:        "lsst.ap.tasks.sourceAssoc.SourceAssocConfig"
         persistable:   "Config"
         storage:       "ConfigStorage"
@@ -465,7 +465,7 @@ datasets: {
         tables:        raw_skyTile
     }
     forcedPhot_config: {
-        template:      "forcedPhot_config/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.py"
+        template:      "config/forcedPhot.py"
         python:        "lsst.pex.config.Config"
         persistable:      "Config"
         storage:    "ConfigStorage"
@@ -503,21 +503,21 @@ datasets: {
         tables:      raw
     }
     deep_makeSkyMap_config: {
-        template:      "deepCoadd/config.py"
+        template:      "config/deep_makeSkyMap.py"
         python:        "lsst.pipe.tasks.makeSkyMap.MakeSkyMapTask.ConfigClass"
         persistable:   "Config"
         storage:       "ConfigStorage"
         tables:        raw
     }
     deep_makeSkyMap_metadata: {
-        template:      "deepCoadd/metadata.py"
+        template:      "deep_makeSkyMap_metadata.boost"
         python:        "lsst.daf.base.PropertySet"
         persistable:   "PropertySet"
         storage:       "BoostStorage"
         tables:        raw
     }
     deep_assembleCoadd_config: {
-        template:      "deep_assembleCoadd_config/%(filter)s/%(tract)d/%(patch)s.py"
+        template:      "config/deep_assembleCoadd.py"
         python:        "lsst.pipe.tasks.baseCoadd.BaseCoaddConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
@@ -533,7 +533,7 @@ datasets: {
         tables:        raw_skyTile
     }
     deep_coadd_config: {
-        template:      "deep_coadd_config/%(filter)s/%(tract)d/%(patch)s.py"
+        template:      "config/deep_coadd.py"
         python:        "lsst.pipe.tasks.baseCoadd.BaseCoaddConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
@@ -621,7 +621,7 @@ datasets: {
         tables:        raw_skyTile
     }
     deep_makeCoaddTempExp_config: {
-        template:      "deep_makeCoaddTempExp_config/%(filter)s/%(tract)d/%(patch)s_config.py"
+        template:      "config/deep_makeCoaddTempExp.py"
         python:        "lsst.pipe.tasks.baseCoadd.BaseCoaddConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
@@ -637,7 +637,7 @@ datasets: {
         tables:        raw_skyTile
     }
     deep_processCoadd_config: {
-        template:      "deep_processCoadd_config/%(filter)s/%(tract)d/%(patch)s/config-%(filter)s-%(tract)d-%(patch)s.py"
+        template:      "config/deep_processCoadd.py"
         python:        "lsst.pipe.tasks.processCoadd.ProcessCoaddConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
@@ -653,7 +653,7 @@ datasets: {
         tables:        raw_skyTile
     }
     deepDiff_config: {
-        template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/config-S%(sensor)s.py"
+        template:      "config/deepDiff.py"
         python:        "lsst.pex.config.Config"
         persistable:      "Config"
         storage:    "ConfigStorage"
@@ -691,21 +691,21 @@ datasets: {
         tables:      raw
     }
     goodSeeing_makeSkyMap_config: {
-        template:      "goodSeeingCoadd/config.py"
+        template:      "config/goodSeeing_makeSkyMap.py"
         python:        "lsst.pipe.tasks.makeSkyMap.MakeSkyMapTask.ConfigClass"
         persistable:   "Config"
         storage:       "ConfigStorage"
         tables:        raw
     }
     goodSeeing_makeSkyMap_metadata: {
-        template:      "goodSeeingCoadd/metadata.py"
+        template:      "goodSeeing_makeSkyMap_metadata.boost"
         python:        "lsst.daf.base.PropertySet"
         persistable:   "PropertySet"
         storage:       "BoostStorage"
         tables:        raw
     }
     goodSeeing_assembleCoadd_config: {
-        template:      "goodSeeing_assembleCoadd_config/%(filter)s/%(tract)d/%(patch)s.py"
+        template:      "config/goodSeeing_assembleCoadd.py"
         python:        "lsst.pipe.tasks.baseCoadd.BaseCoaddConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
@@ -721,7 +721,7 @@ datasets: {
         tables:        raw_skyTile
     }
     goodSeeing_coadd_config: {
-        template:      "goodSeeing_coadd_config/%(filter)s/%(tract)d/%(patch)s.py"
+        template:      "config/goodSeeing_coadd.py"
         python:        "lsst.pipe.tasks.baseCoadd.BaseCoaddConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
@@ -809,7 +809,7 @@ datasets: {
         tables:        raw_skyTile
     }
     goodSeeing_makeCoaddTempExp_config: {
-        template:      "goodSeeing_makeCoaddTempExp_config/%(filter)s/%(tract)d/%(patch)s_config.py"
+        template:      "config/goodSeeing_makeCoaddTempExp.py"
         python:        "lsst.pipe.tasks.baseCoadd.BaseCoaddConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
@@ -825,7 +825,7 @@ datasets: {
         tables:        raw_skyTile
     }
     goodSeeing_processCoadd_config: {
-        template:      "goodSeeing_processCoadd_config/%(filter)s/%(tract)d/%(patch)s/config-%(filter)s-%(tract)d-%(patch)s.py"
+        template:      "config/goodSeeing_processCoadd.py"
         python:        "lsst.pipe.tasks.processCoadd.ProcessCoaddConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
@@ -841,7 +841,7 @@ datasets: {
         tables:        raw_skyTile
     }
     goodSeeingDiff_config: {
-        template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/config-S%(sensor)s.py"
+        template:      "config/goodSeeingDiff.py"
         python:        "lsst.pex.config.Config"
         persistable:      "Config"
         storage:    "ConfigStorage"
@@ -872,21 +872,21 @@ datasets: {
         tables:      raw
     }
     chiSquared_makeSkyMap_config: {
-        template:      "chiSquaredCoadd/config.py"
+        template:      "config/chiSquared_makeSkyMap.py"
         python:        "lsst.pipe.tasks.makeSkyMap.MakeSkyMapTask.ConfigClass"
         persistable:   "Config"
         storage:       "ConfigStorage"
         tables:        raw
     }
     chiSquared_makeSkyMap_metadata: {
-        template:      "chiSquaredCoadd/metadata.py"
+        template:      "chiSquared_makeSkyMap_metadata.boost"
         python:        "lsst.daf.base.PropertySet"
         persistable:   "PropertySet"
         storage:       "BoostStorage"
         tables:        raw
     }
     chiSquared_coadd_config: {
-        template:      "chiSquared_coadd_config/%(tract)d/%(patch)s.py"
+        template:      "config/chiSquared_coadd.py"
         python:        "lsst.pipe.tasks.chiSquaredCoadd.ChiSquaredCoaddConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
@@ -942,7 +942,7 @@ datasets: {
         tables:        raw_skyTile
     }
     chiSquared_processCoadd_config: {
-        template:      "chiSquared_processCoadd_config/%(tract)d/%(patch)s/config-%(tract)d-%(patch)s.py"
+        template:      "config/chiSquared_processCoadd.py"
         python:        "lsst.pipe.tasks.processCoadd.ProcessCoaddConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
