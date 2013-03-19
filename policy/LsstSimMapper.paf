@@ -566,7 +566,7 @@ datasets: {
         tables:        raw
     }
     deep_makeSkyMap_metadata: {
-        template:      "deep_makeSkyMap_metadata.boost"
+        template:      "metadata/deep_makeSkyMap.boost"
         python:        "lsst.daf.base.PropertySet"
         persistable:   "PropertySet"
         storage:       "BoostStorage"
@@ -778,7 +778,7 @@ datasets: {
         tables:        raw
     }
     goodSeeing_makeSkyMap_metadata: {
-        template:      "goodSeeing_makeSkyMap_metadata.boost"
+        template:      "metadata/goodSeeing_makeSkyMap.boost"
         python:        "lsst.daf.base.PropertySet"
         persistable:   "PropertySet"
         storage:       "BoostStorage"
@@ -983,7 +983,7 @@ datasets: {
         tables:        raw
     }
     chiSquared_makeSkyMap_metadata: {
-        template:      "chiSquared_makeSkyMap_metadata.boost"
+        template:      "metadata/chiSquared_makeSkyMap.boost"
         python:        "lsst.daf.base.PropertySet"
         persistable:   "PropertySet"
         storage:       "BoostStorage"
