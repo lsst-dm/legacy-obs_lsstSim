@@ -21,7 +21,6 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 import MySQLdb
-import os
 
 import lsst.pex.config as pexConfig
 from lsst.afw.coord import IcrsCoord
@@ -106,8 +105,8 @@ class SelectLsstSimFluxMag0Task(pipeBase.Task):
         """
         
         kwargs = dict(
-        user = DbAuth.username(self.config.host, str(self.config.port)),
-        passwd = DbAuth.password(self.config.host, str(self.config.port)),
+            user = DbAuth.username(self.config.host, str(self.config.port)),
+            passwd = DbAuth.password(self.config.host, str(self.config.port)),
         )
             
         if self._display:    
@@ -123,8 +122,6 @@ class SelectLsstSimFluxMag0Task(pipeBase.Task):
         cursor = db.cursor()
         
         columnNames = tuple(FluxMagInfo.getColumnNames())
-        if not columnNames:
-            raise RuntimeError("Bug: no column names")
        
         queryStr = "select %s from %s where " % (", ".join(columnNames), self.config.table)
         dataTuple = () # tuple(columnNames)
@@ -150,7 +147,7 @@ class SelectLsstSimFluxMag0Task(pipeBase.Task):
             fluxMagInfoList = exposureInfoList,
         )
 
-    def _runArgDictFromDataId(self, dataId):
+    def runArgDictFromDataId(self, dataId):
         """Extract keyword arguments for visit (other than coordList) from a data ID
         
         @param[in] dataId: a data ID dict

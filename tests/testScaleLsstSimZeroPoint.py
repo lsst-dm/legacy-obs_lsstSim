@@ -33,10 +33,6 @@ import lsst.afw.image as afwImage
 import lsst.afw.math as afwMath
 
 import lsst.utils.tests as utilsTests
-import lsst.pex.exceptions as pexExcept
-import lsst.pex.logging as pexLog
-import lsst.coadd.utils as coaddUtils
-
 from lsst.daf.persistence import DbAuth
 from lsst.obs.lsstSim.scaleLsstSimZeroPoint import ScaleLsstSimZeroPointTask
 
@@ -46,34 +42,39 @@ from lsst.obs.lsstSim.scaleLsstSimZeroPoint import ScaleLsstSimZeroPointTask
 class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
     """A test case for ScaleLsstSimZeroPointTask
     """
-    def setUp(self):
-        #Create an LsstSim Wcs
-        self.metadata = lsst.daf.base.PropertySet()
-        self.metadata.set("NAXIS", 2)
-        self.metadata.set("RADECSYS", "ICRS")
-        self.metadata.set("EQUINOX", 2000.)
-        self.metadata.setDouble("CRVAL1", 60.000000000000)
-        self.metadata.setDouble("CRVAL2", 10.812316963572)
-        self.metadata.setDouble("CRPIX1", 700000.00000000)
-        self.metadata.setDouble("CRPIX2", 601345.00000000)
-        self.metadata.set("CTYPE1", "RA---STG")
-        self.metadata.set("CTYPE2", "DEC--STG")
-        self.metadata.setDouble("CD1_1", -5.5555555555556e-05)
-        self.metadata.setDouble("CD1_2", 0.0000000000000)
-        self.metadata.setDouble("CD2_2", 5.5555555555556e-05)
-        self.metadata.setDouble("CD2_1", 0.0000000000000)
-        self.metadata.set("CUNIT1", "deg")
-        self.metadata.set("CUNIT2", "deg")
-        
-        self.sctrl = afwMath.StatisticsControl()
-        self.sctrl.setNanSafe(True)
-
-                
-    def tearDown(self):
-        del self.metadata
+    def makeTestExposure(self, xNumPix, yNumPix):
+        """
+        Create and return an exposure that is completely covered by the database: test_select_lsst_images
+        """
+        metadata = lsst.daf.base.PropertySet()
+        metadata.set("NAXIS", 2)
+        metadata.set("RADECSYS", "ICRS")
+        metadata.set("EQUINOX", 2000.)
+        metadata.setDouble("CRVAL1", 60.000000000000)
+        metadata.setDouble("CRVAL2", 10.812316963572)
+        metadata.setDouble("CRPIX1", 700000.00000000)
+        metadata.setDouble("CRPIX2", 601345.00000000)
+        metadata.set("CTYPE1", "RA---STG")
+        metadata.set("CTYPE2", "DEC--STG")
+        metadata.setDouble("CD1_1", -5.5555555555556e-05)
+        metadata.setDouble("CD1_2", 0.0000000000000)
+        metadata.setDouble("CD2_2", 5.5555555555556e-05)
+        metadata.setDouble("CD2_1", 0.0000000000000)
+        metadata.set("CUNIT1", "deg")
+        metadata.set("CUNIT2", "deg")
+        #exposure needs a wcs and a bbox
+        wcs = afwImage.makeWcs(metadata)
+        bbox = afwGeom.Box2I(afwGeom.Point2I(327750, 235750), afwGeom.Extent2I(xNumPix, yNumPix))
+        exposure = afwImage.ExposureF(bbox, wcs)
+        mi = exposure.getMaskedImage()
+        mi.set(1.0)
+        mi.getVariance().set(1.0)        
+        return exposure
     
     def testBasics(self):
         ZEROPOINT = 27
+        self.sctrl = afwMath.StatisticsControl()
+        self.sctrl.setNanSafe(True)        
         config = ScaleLsstSimZeroPointTask.ConfigClass()
         config.zeroPoint = ZEROPOINT
         config.interpStyle = "CONSTANT"
@@ -81,20 +82,13 @@ class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
         zpScaler = ScaleLsstSimZeroPointTask(config=config)
         outCalib = zpScaler.getCalib()
         self.assertAlmostEqual(outCalib.getMagnitude(1.0), ZEROPOINT)
-
-        #exposure needs a wcs and a bbox
-        wcs = afwImage.makeWcs(self.metadata)
-        bbox = afwGeom.Box2I(afwGeom.Point2I(327750, 235750), afwGeom.Extent2I(10, 10))
-        exposure = afwImage.ExposureF(bbox, wcs)
-        mi = exposure.getMaskedImage()
-        mi.set(1.0)
-        mi.getVariance().set(1.0)
-
+        
+        exposure = self.makeTestExposure(10,10)
         exposureId = {'ignore_fake_key': 1234, 'visit': 882820621}
 
         #test methods: computeImageScale(), scaleMaskedImage(), getInterpImage()
         imageScaler = zpScaler.computeImageScaler(exposure,exposureId)
-        scaleFactorIm = imageScaler.getInterpImage(bbox)
+        scaleFactorIm = imageScaler.getInterpImage(exposure.getBBox())
         predScale = numpy.mean(imageScaler._scaleList) #0.011125492863357
         
         self.assertAlmostEqual(afwMath.makeStatistics(scaleFactorIm, afwMath.VARIANCE, self.sctrl).getValue(),
@@ -102,6 +96,7 @@ class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
         self.assertAlmostEqual(afwMath.makeStatistics(scaleFactorIm, afwMath.MEAN, self.sctrl).getValue(),
                                predScale)
 
+        mi = exposure.getMaskedImage()
         imageScaler.scaleMaskedImage(mi)
         self.assertAlmostEqual(mi.get(1,1)[0], predScale) #check image plane scaled
         self.assertAlmostEqual(mi.get(1,1)[2], predScale**2) #check variance plane scaled
