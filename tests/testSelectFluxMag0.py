@@ -22,7 +22,7 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-"""Test lsst.obs.lsstSim.ScaleLsstSimZeroPointTask
+"""Test lsst.obs.lsstSim.selectFluxMag0 and integration with coadd.utils.scaleZeroPoint
 """
 import numpy
 import unittest
@@ -34,7 +34,8 @@ import lsst.afw.math as afwMath
 
 import lsst.utils.tests as utilsTests
 from lsst.daf.persistence import DbAuth
-from lsst.obs.lsstSim.scaleLsstSimZeroPoint import ScaleLsstSimZeroPointTask
+from lsst.coadd.utils.scaleZeroPoint import ScaleZeroPointTask
+from lsst.obs.lsstSim.selectFluxMag0 import SelectLsstSimFluxMag0Task
 
     
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -70,20 +71,47 @@ class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
         mi.set(1.0)
         mi.getVariance().set(1.0)        
         return exposure
-    
-    def testBasics(self):
+
+    def testSelectFluxMag0(self): 
+        """Test SelectFluxMag0"""
+        config = SelectLsstSimFluxMag0Task.ConfigClass()
+        config.database = "test_select_lsst_images"
+        visit = 865990051
+        task = SelectLsstSimFluxMag0Task(config=config)
+        fmInfoStruct = task.run(visit)
+        fmInfoList = fmInfoStruct.fluxMagInfoList
+        self.assertEqual(len([fmInfo for fmInfo in fmInfoList if fmInfo.dataId['visit'] == visit]), len(fmInfoList))
+        
+        
+    def testScaleZeroPoint(self):
+        """Test integration of coadd.utils.scaleZeroPoint and obs.lsstSim.selectFluxMag0"""
+
         ZEROPOINT = 27
         self.sctrl = afwMath.StatisticsControl()
-        self.sctrl.setNanSafe(True)        
-        config = ScaleLsstSimZeroPointTask.ConfigClass()
+        self.sctrl.setNanSafe(True)
+        
+        config = ScaleZeroPointTask.ConfigClass()
+        config.doInterpScale = True
         config.zeroPoint = ZEROPOINT
         config.interpStyle = "CONSTANT"
+        config.selectFluxMag0.retarget(SelectLsstSimFluxMag0Task) 
         config.selectFluxMag0.database = "test_select_lsst_images"
-        zpScaler = ScaleLsstSimZeroPointTask(config=config)
+        zpScaler = ScaleZeroPointTask(config=config)
+
+        """ Note: this order does not properly retarget
+        zpScaler = ScaleZeroPointTask()
+        zpScaler.config.doInterpScale = True
+        zpScaler.config.zeroPoint = ZEROPOINT
+        zpScaler.config.interpStyle = "CONSTANT"
+        zpScaler.config.selectFluxMag0.retarget(SelectLsstSimFluxMag0Task)  
+        zpScaler.config.selectFluxMag0.database = "test_select_lsst_images"
+        """
+        
         outCalib = zpScaler.getCalib()
         self.assertAlmostEqual(outCalib.getMagnitude(1.0), ZEROPOINT)
         
         exposure = self.makeTestExposure(10,10)
+        #create dataId for exposure. Visit is only field needed. Others ignored. 
         exposureId = {'ignore_fake_key': 1234, 'visit': 882820621}
 
         #test methods: computeImageScale(), scaleMaskedImage(), getInterpImage()
@@ -127,15 +155,18 @@ def suite():
 
 def run(shouldExit=False):
     """Run the tests"""
-    config =  ScaleLsstSimZeroPointTask.ConfigClass()
+    
+    config = ScaleZeroPointTask.ConfigClass()
+    config.selectFluxMag0.retarget(SelectLsstSimFluxMag0Task)
+    print config
     try:
         user = DbAuth.username(config.selectFluxMag0.host, str(config.selectFluxMag0.port)),
     except Exception, e:
         print "Warning: did not find host=%s, port=%s in your db-auth file; or %s " \
-              "skipping SelectLsstImagesTask unit tests" % \
+              "skipping unit tests" % \
             (config.selectFluxMag0.host, str(config.selectFluxMag0.port), e)
         return
-
+    
     utilsTests.run(suite(), shouldExit)
 
 

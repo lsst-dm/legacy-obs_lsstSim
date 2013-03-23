@@ -27,12 +27,14 @@ from lsst.afw.coord import IcrsCoord
 import lsst.afw.geom as afwGeom
 from lsst.daf.persistence import DbAuth
 import lsst.pipe.base as pipeBase
-from lsst.pipe.tasks.selectImages import SelectImagesConfig, BaseExposureInfo
-
+from lsst.coadd.utils.selectFluxMag0 import SelectFluxMag0Config, BaseSelectFluxMag0Task, BaseFluxMagInfo
+from lsst.pipe.tasks.selectImages import BaseExposureInfo
 
 __all__ = ["SelectLsstSimFluxMag0Task"]
 
-class SelectLsstSimFluxMag0Config(SelectImagesConfig):
+class SelectLsstSimFluxMag0Config(BaseSelectFluxMag0Task.ConfigClass):
+    """Config for SelectLsstImagesTask
+    """
     table = pexConfig.Field(
         doc = "Name of database table",
         dtype = str,
@@ -40,13 +42,13 @@ class SelectLsstSimFluxMag0Config(SelectImagesConfig):
     )
 
     def setDefaults(self):
-        SelectImagesConfig.setDefaults(self)
+        BaseSelectFluxMag0Task.ConfigClass.setDefaults(self)
         self.database = "krughoff_deepTemplate"
         self.host = "lsst-db.ncsa.illinois.edu"
         self.port = 3306
 
 
-class FluxMagInfo(BaseExposureInfo):
+class FluxMagInfo(BaseFluxMagInfo):
     """Data about a selected exposure
     
     Data includes:
@@ -58,7 +60,7 @@ class FluxMagInfo(BaseExposureInfo):
     def __init__(self, result):
         """Set exposure information based on a query result from a db connection
         """
-        BaseExposureInfo.__init__(self)
+        BaseFluxMagInfo.__init__(self,result)
         self.dataId = dict(
            visit =  result[self._nextInd],
            raft = result[self._nextInd],
@@ -89,10 +91,11 @@ class FluxMagInfo(BaseExposureInfo):
             "fluxMag0 fluxMag0Sigma".split()
         )
 
-class SelectLsstSimFluxMag0Task(pipeBase.Task):
+class SelectLsstSimFluxMag0Task(BaseSelectFluxMag0Task):
     """Select LsstSim data suitable for computing fluxMag0
     """
     ConfigClass = SelectLsstSimFluxMag0Config
+    _DefaultName= "selectFluxMag0"
 
     @pipeBase.timeMethod
     def run(self, visit):
@@ -134,17 +137,19 @@ class SelectLsstSimFluxMag0Task(pipeBase.Task):
         queryStr += " and ".join(wd[0] for wd in whereDataList)
         dataTuple += tuple(wd[1] for wd in whereDataList)
         
+        self._display=True
+        
         if self._display: 
             self.log.info("queryStr=%r; dataTuple=%s" % (queryStr, dataTuple))
         
         cursor.execute(queryStr, dataTuple)
-        exposureInfoList = [FluxMagInfo(result) for result in cursor]        
+        fluxMagInfoList = [FluxMagInfo(result) for result in cursor]        
         if self._display: 
             self.log.info("Found %d exposures" % \
-                      (len(exposureInfoList)))
+                      (len(fluxMagInfoList)))
         
         return pipeBase.Struct(
-            fluxMagInfoList = exposureInfoList,
+            fluxMagInfoList = fluxMagInfoList,
         )
 
     def runArgDictFromDataId(self, dataId):
