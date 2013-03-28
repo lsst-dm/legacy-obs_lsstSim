@@ -117,6 +117,20 @@ class LsstSimMapper(CameraMapper):
     def _extractDetectorName(self, dataId):
         return "R:%(raft)s S:%(sensor)s" % dataId
 
+    #  routine which must be defined on each mapper to create a dataId from a
+    #  frameId and ccdId.  A frameId is the meas_mosaic term for an integer 
+    #  or long identifier for a visit.  A ccdId is essentially a ccd.getId().getSerial() 
+    def _getDataId(self, frameId, ccdId, filter=None):
+        x = str(ccdId)
+        if len(x) < 4:
+            x = '0' + x
+        raft = x[0] + ',' + x[1]
+        sensor  = x[2] + ',' + x[3]
+        dataId = {'visit': frameId, 'raft': raft, 'sensor': sensor}
+        if not filter == None:
+            dataId['filter'] = filter;
+        return dataId
+
     def _extractAmpId(self, dataId):
         m = re.match(r'(\d),(\d)', dataId['channel'])
         # Note that indices are swapped in the camera geometry vs. official

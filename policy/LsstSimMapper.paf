@@ -187,6 +187,27 @@ exposures: {
         tables:        raw
         tables:        raw_skyTile
     }
+    wcs: {
+        template:      "wcs/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.wcs.fits"
+        python:        "lsst.afw.image.ExposureI"
+        persistable:        "ExposureI"
+        storage:    "FitsStorage"
+        level:        "Ccd"
+        tables:        "raw"
+        tables:        "raw_visit"
+        tables:        "raw_skyTile"
+    }
+
+    fcr: {
+        template:      "fcr/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fcr.fits"
+        python:        "lsst.afw.image.ExposureI"
+        persistable:        "ExposureI"
+        storage:    "FitsStorage"
+        level:        "Ccd"
+        tables:        "raw"
+        tables:        "raw_visit"
+        tables:        "raw_skyTile"
+    }
 }
 
 calibrations: {
