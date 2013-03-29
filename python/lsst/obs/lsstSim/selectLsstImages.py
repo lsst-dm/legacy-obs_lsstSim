@@ -74,7 +74,7 @@ class ExposureInfo(BaseExposureInfo):
                 )
             )
         self.fwhm = result[self._nextInd]
-        BaseExposureInfo.__init__(self, dataId, coordList)
+        DataBaseExposureInfo.__init__(self, dataId, coordList)
 
     @property
     def _nextInd(self):
