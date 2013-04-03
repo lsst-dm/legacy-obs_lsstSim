@@ -28,7 +28,7 @@ import lsst.afw.geom as afwGeom
 from lsst.daf.persistence import DbAuth
 import lsst.pex.config as pexConfig
 import lsst.pipe.base as pipeBase
-from lsst.pipe.tasks.selectImages import DatabaseSelectImagesConfig, BaseExposureInfo
+from lsst.pipe.tasks.selectImages import BaseSelectImagesTask, DatabaseSelectImagesConfig, BaseExposureInfo
 
 __all__ = ["SelectLsstImagesTask"]
 
@@ -42,7 +42,7 @@ class SelectLsstImagesConfig(DatabaseSelectImagesConfig):
     )
     
     def setDefaults(self):
-        BaseSelectImagesTask.ConfigClass.setDefaults(self)
+        super(SelectLsstImagesConfig, self).setDefaults()
         self.host = "lsst-db.ncsa.illinois.edu"
         self.port = 3306
 
@@ -74,7 +74,7 @@ class ExposureInfo(BaseExposureInfo):
                 )
             )
         self.fwhm = result[self._nextInd]
-        DataBaseExposureInfo.__init__(self, dataId, coordList)
+        BaseExposureInfo.__init__(self, dataId, coordList)
 
     @property
     def _nextInd(self):
