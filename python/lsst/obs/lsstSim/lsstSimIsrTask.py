@@ -48,9 +48,9 @@ class LsstSimIsrConfig(IsrTask.ConfigClass):
     def setDefaults(self):
         IsrTask.ConfigClass.setDefaults(self)
         self.doDark = False # LSSTSims do not include darks at this time
-        self.snapCombine.keysToAverage = ("TAI", "MJD-OBS", "AIRMASS", "AZIMUTH", "ZENITH",
+        self.snapCombine.averageKeys = ("TAI", "MJD-OBS", "AIRMASS", "AZIMUTH", "ZENITH",
             "ROTANG", "SPIDANG", "ROTRATE")
-        self.snapCombine.keysToSum = ("EXPTIME", "CREXPTM", "DARKTIME")
+        self.snapCombine.sumKeys = ("EXPTIME", "CREXPTM", "DARKTIME")
 
 
 class LsstSimIsrTask(IsrTask):
