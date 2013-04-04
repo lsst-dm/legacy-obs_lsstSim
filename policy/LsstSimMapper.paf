@@ -335,9 +335,9 @@ datasets: {
     }
     calexpBackground: {
         template:      "calexp/v%(visit)d-f%(filter)s/R%(raft)s/bkgd-S%(sensor)s.fits"
-        python:        "lsst.afw.image.ImageF"
-        persistable:        "ImageF"
-        storage:    "FitsStorage"
+        python:        "lsst.afw.math.BackgroundList"
+        persistable:   "PurePythonClass"
+        storage:       "FitsCatalogStorage"
         tables:        raw
         tables:        raw_skyTile
     }
@@ -683,9 +683,9 @@ datasets: {
     }
     deepCoadd_calexpBackground: {
         template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/bkgd-%(filter)s-%(tract)d-%(patch)s.fits"
-        python:        "lsst.afw.image.ImageF"
-        persistable:        "ImageF"
-        storage:    "FitsStorage"
+        python:        "lsst.afw.math.BackgroundList"
+        persistable:   "PurePythonClass"
+        storage:       "FitsCatalogStorage"
         tables:        raw
         tables:        raw_skyTile
     }
@@ -895,9 +895,9 @@ datasets: {
     }
     goodSeeingCoadd_calexpBackground: {
         template:      "goodSeeingCoadd-results/%(filter)s/%(tract)d/%(patch)s/bkgd-%(filter)s-%(tract)d-%(patch)s.fits"
-        python:        "lsst.afw.image.ImageF"
-        persistable:        "ImageF"
-        storage:    "FitsStorage"
+        python:        "lsst.afw.math.BackgroundList"
+        persistable:   "PurePythonClass"
+        storage:       "FitsCatalogStorage"
         tables:        raw
         tables:        raw_skyTile
     }
