@@ -117,6 +117,15 @@ class LsstSimMapper(CameraMapper):
     def _extractDetectorName(self, dataId):
         return "R:%(raft)s S:%(sensor)s" % dataId
 
+    def _getDataId(self, frameId, ccdId):
+        x = str(ccdId)
+        if len(x) < 4:
+            x = '0' + x
+        raft = x[0] + ',' + x[1]
+        sensor  = x[2] + ',' + x[3]
+        dataId = {'visit': long(frameId), 'raft': raft, 'sensor': sensor}
+        return dataId
+
     def _extractAmpId(self, dataId):
         m = re.match(r'(\d),(\d)', dataId['channel'])
         # Note that indices are swapped in the camera geometry vs. official
