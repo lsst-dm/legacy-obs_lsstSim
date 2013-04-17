@@ -50,7 +50,7 @@ class SelectLsstSimFluxMag0Config(BaseSelectFluxMag0Task.ConfigClass):
 
 class FluxMagInfo(BaseFluxMagInfo):
     """Data about a selected exposure
-    
+
     Data includes:
     - dataId: data ID of exposure (a dict)
     - coordList: a list of corner coordinates of the exposure (list of IcrsCoord)
@@ -77,11 +77,11 @@ class FluxMagInfo(BaseFluxMagInfo):
             )
         self.fluxMag0 = result[self._nextInd]
         self.fluxMag0Sigma = result[self._nextInd]
-                
+
     @staticmethod
     def getColumnNames():
         """Get database columns to retrieve, in a format useful to the database interface
-        
+
         @return database column names as list of strings
         """
         return (
@@ -101,21 +101,21 @@ class SelectLsstSimFluxMag0Task(BaseSelectFluxMag0Task):
     def run(self, visit):
         """Select flugMag0's of LsstSim images for a particular visit
 
-        @param[in] visit: visit id 
-        
+        @param[in] visit: visit id
+
         @return a pipeBase Struct containing:
         - fluxMagInfoList: a list of FluxMagInfo objects
         """
-        
+
         kwargs = dict(
             user = DbAuth.username(self.config.host, str(self.config.port)),
             passwd = DbAuth.password(self.config.host, str(self.config.port)),
         )
-            
-        if self._display:    
-            self.log.info(self.config.table)    
+
+        if self._display:
+            self.log.info(self.config.table)
             self.log.info(self.config.database)
-        
+
         db = MySQLdb.connect(
             host = self.config.host,
             port = self.config.port,
@@ -123,38 +123,38 @@ class SelectLsstSimFluxMag0Task(BaseSelectFluxMag0Task):
             **kwargs
         )
         cursor = db.cursor()
-        
+
         columnNames = tuple(FluxMagInfo.getColumnNames())
-       
+
         queryStr = "select %s from %s where " % (", ".join(columnNames), self.config.table)
         dataTuple = () # tuple(columnNames)
-      
+
         # compute where clauses as a list of (clause, data)
         whereDataList = [
             ("visit = %s", visit),
         ]
-        
+
         queryStr += " and ".join(wd[0] for wd in whereDataList)
         dataTuple += tuple(wd[1] for wd in whereDataList)
-        
+
         self._display=True
-        
-        if self._display: 
+
+        if self._display:
             self.log.info("queryStr=%r; dataTuple=%s" % (queryStr, dataTuple))
-        
+
         cursor.execute(queryStr, dataTuple)
-        fluxMagInfoList = [FluxMagInfo(result) for result in cursor]        
-        if self._display: 
+        fluxMagInfoList = [FluxMagInfo(result) for result in cursor]
+        if self._display:
             self.log.info("Found %d exposures" % \
                       (len(fluxMagInfoList)))
-        
+
         return pipeBase.Struct(
             fluxMagInfoList = fluxMagInfoList,
         )
 
     def runArgDictFromDataId(self, dataId):
         """Extract keyword arguments for visit (other than coordList) from a data ID
-        
+
         @param[in] dataId: a data ID dict
         @return keyword arguments for visit (other than coordList), as a dict
         """

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -11,12 +11,12 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the LSST License Statement and 
 # the GNU General Public License along with this program.  If not, 
 # see <http://www.lsstcorp.org/LegalNotices/>.
@@ -37,7 +37,7 @@ from lsst.daf.persistence import DbAuth
 from lsst.coadd.utils.scaleZeroPoint import ScaleZeroPointTask
 from lsst.obs.lsstSim.selectFluxMag0 import SelectLsstSimFluxMag0Task
 
-    
+
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
@@ -69,10 +69,10 @@ class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
         exposure = afwImage.ExposureF(bbox, wcs)
         mi = exposure.getMaskedImage()
         mi.set(1.0)
-        mi.getVariance().set(1.0)        
+        mi.getVariance().set(1.0)
         return exposure
 
-    def testSelectFluxMag0(self): 
+    def testSelectFluxMag0(self):
         """Test SelectFluxMag0"""
         config = SelectLsstSimFluxMag0Task.ConfigClass()
         config.database = "test_select_lsst_images"
@@ -80,21 +80,22 @@ class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
         task = SelectLsstSimFluxMag0Task(config=config)
         fmInfoStruct = task.run(visit)
         fmInfoList = fmInfoStruct.fluxMagInfoList
-        self.assertEqual(len([fmInfo for fmInfo in fmInfoList if fmInfo.dataId['visit'] == visit]), len(fmInfoList))
-        
-        
+        self.assertEqual(len([fmInfo for fmInfo in fmInfoList if fmInfo.dataId['visit'] == visit]),
+                         len(fmInfoList))
+
+
     def testScaleZeroPoint(self):
         """Test integration of coadd.utils.scaleZeroPoint and obs.lsstSim.selectFluxMag0"""
 
         ZEROPOINT = 27
         self.sctrl = afwMath.StatisticsControl()
         self.sctrl.setNanSafe(True)
-        
+
         config = ScaleZeroPointTask.ConfigClass()
         config.doInterpScale = True
         config.zeroPoint = ZEROPOINT
         config.interpStyle = "CONSTANT"
-        config.selectFluxMag0.retarget(SelectLsstSimFluxMag0Task) 
+        config.selectFluxMag0.retarget(SelectLsstSimFluxMag0Task)
         config.selectFluxMag0.database = "test_select_lsst_images"
         zpScaler = ScaleZeroPointTask(config=config)
 
@@ -103,22 +104,22 @@ class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
         zpScaler.config.doInterpScale = True
         zpScaler.config.zeroPoint = ZEROPOINT
         zpScaler.config.interpStyle = "CONSTANT"
-        zpScaler.config.selectFluxMag0.retarget(SelectLsstSimFluxMag0Task)  
+        zpScaler.config.selectFluxMag0.retarget(SelectLsstSimFluxMag0Task)
         zpScaler.config.selectFluxMag0.database = "test_select_lsst_images"
         """
-        
+
         outCalib = zpScaler.getCalib()
         self.assertAlmostEqual(outCalib.getMagnitude(1.0), ZEROPOINT)
-        
+
         exposure = self.makeTestExposure(10,10)
-        #create dataId for exposure. Visit is only field needed. Others ignored. 
+        #create dataId for exposure. Visit is only field needed. Others ignored.
         exposureId = {'ignore_fake_key': 1234, 'visit': 882820621}
 
         #test methods: computeImageScale(), scaleMaskedImage(), getInterpImage()
         imageScaler = zpScaler.computeImageScaler(exposure,exposureId)
         scaleFactorIm = imageScaler.getInterpImage(exposure.getBBox())
         predScale = numpy.mean(imageScaler._scaleList) #0.011125492863357
-        
+
         self.assertAlmostEqual(afwMath.makeStatistics(scaleFactorIm, afwMath.VARIANCE, self.sctrl).getValue(),
                                0.0)
         self.assertAlmostEqual(afwMath.makeStatistics(scaleFactorIm, afwMath.MEAN, self.sctrl).getValue(),
@@ -129,10 +130,10 @@ class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
         self.assertAlmostEqual(mi.get(1,1)[0], predScale) #check image plane scaled
         self.assertAlmostEqual(mi.get(1,1)[2], predScale**2) #check variance plane scaled
 
-        exposure.setCalib(zpScaler.getCalib())    
+        exposure.setCalib(zpScaler.getCalib())
         self.assertAlmostEqual(exposure.getCalib().getFlux(ZEROPOINT), 1.0)
 
-                                
+
     def makeCalib(self, zeroPoint):
         calib = afwImage.Calib()
         fluxMag0 = 10**(0.4 * zeroPoint)
@@ -155,7 +156,7 @@ def suite():
 
 def run(shouldExit=False):
     """Run the tests"""
-    
+
     config = ScaleZeroPointTask.ConfigClass()
     config.selectFluxMag0.retarget(SelectLsstSimFluxMag0Task)
     print config
@@ -166,7 +167,7 @@ def run(shouldExit=False):
               "skipping unit tests" % \
             (config.selectFluxMag0.host, str(config.selectFluxMag0.port), e)
         return
-    
+
     utilsTests.run(suite(), shouldExit)
 
 
