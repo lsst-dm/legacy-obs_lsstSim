@@ -80,7 +80,7 @@ class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
         task = SelectLsstSimFluxMag0Task(config=config)
         fmInfoStruct = task.run(visit)
         fmInfoList = fmInfoStruct.fluxMagInfoList
-        self.assertEqual(len([fmInfo for fmInfo in fmInfoList if fmInfo.dataId['visit'] == visit]),
+        self.assertEqual(sum([1 for fmInfo in fmInfoList if fmInfo.dataId['visit'] == visit]),
                          len(fmInfoList))
 
 
