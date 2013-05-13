@@ -28,11 +28,11 @@ import lsst.afw.geom as afwGeom
 from lsst.daf.persistence import DbAuth
 import lsst.pex.config as pexConfig
 import lsst.pipe.base as pipeBase
-from lsst.pipe.tasks.selectImages import BaseSelectImagesTask, BaseExposureInfo
+from lsst.pipe.tasks.selectImages import BaseSelectImagesTask, DatabaseSelectImagesConfig, BaseExposureInfo
 
 __all__ = ["SelectLsstImagesTask"]
 
-class SelectLsstImagesConfig(BaseSelectImagesTask.ConfigClass):
+class SelectLsstImagesConfig(DatabaseSelectImagesConfig):
     """Config for SelectLsstImagesTask
     """
     maxFwhm = pexConfig.Field(
@@ -42,7 +42,7 @@ class SelectLsstImagesConfig(BaseSelectImagesTask.ConfigClass):
     )
     
     def setDefaults(self):
-        BaseSelectImagesTask.ConfigClass.setDefaults(self)
+        super(SelectLsstImagesConfig, self).setDefaults()
         self.host = "lsst-db.ncsa.illinois.edu"
         self.port = 3306
 
@@ -58,22 +58,37 @@ class ExposureInfo(BaseExposureInfo):
     def __init__(self, result):
         """Set exposure information based on a query result from a db connection
         """
-        BaseExposureInfo.__init__(self)
-        self.dataId = dict(
+        self._ind = -1
+        dataId = dict(
             raft = result[self._nextInd],
             visit = result[self._nextInd],
             sensor = result[self._nextInd],
             filter = result[self._nextInd]
         )
-        self.coordList = []
+        coordList = []
         for i in range(4):
-            self.coordList.append(
+            coordList.append(
                 IcrsCoord(
                     afwGeom.Angle(result[self._nextInd], afwGeom.degrees),
                     afwGeom.Angle(result[self._nextInd], afwGeom.degrees),
                 )
             )
         self.fwhm = result[self._nextInd]
+        BaseExposureInfo.__init__(self, dataId, coordList)
+
+    @property
+    def _nextInd(self):
+        """Return the next index
+
+        This allows one to progress through returned database columns,
+        repeatedly using _nextInd, e.g.:
+           {raft = result[self._nextInd],
+            visit = result[self._nextInd],
+            sensor = result[self._nextInd],
+            filter = result[self._nextInd]}
+        """
+        self._ind += 1
+        return self._ind
 
     @staticmethod
     def getColumnNames():
