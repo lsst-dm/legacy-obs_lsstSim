@@ -34,7 +34,7 @@ import lsst.afw.math as afwMath
 
 import lsst.utils.tests as utilsTests
 from lsst.daf.persistence import DbAuth
-from lsst.coadd.utils.scaleZeroPoint import ScaleZeroPointTask
+from lsst.coadd.utils.scaleZeroPoint import SpatialScaleZeroPointTask
 from lsst.obs.lsstSim.selectFluxMag0 import SelectLsstSimFluxMag0Task
 
 
@@ -76,9 +76,10 @@ class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
         """Test SelectFluxMag0"""
         config = SelectLsstSimFluxMag0Task.ConfigClass()
         config.database = "test_select_lsst_images"
-        visit = 865990051
         task = SelectLsstSimFluxMag0Task(config=config)
-        fmInfoStruct = task.run(visit)
+        visit = 865990051
+        dataId = {'visit': visit}
+        fmInfoStruct = task.run(dataId)
         fmInfoList = fmInfoStruct.fluxMagInfoList
         self.assertEqual(sum([1 for fmInfo in fmInfoList if fmInfo.dataId['visit'] == visit]),
                          len(fmInfoList))
@@ -91,13 +92,12 @@ class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
         self.sctrl = afwMath.StatisticsControl()
         self.sctrl.setNanSafe(True)
 
-        config = ScaleZeroPointTask.ConfigClass()
-        config.doInterpScale = True
+        config = SpatialScaleZeroPointTask.ConfigClass()
         config.zeroPoint = ZEROPOINT
         config.interpStyle = "CONSTANT"
         config.selectFluxMag0.retarget(SelectLsstSimFluxMag0Task)
         config.selectFluxMag0.database = "test_select_lsst_images"
-        zpScaler = ScaleZeroPointTask(config=config)
+        zpScaler = SpatialScaleZeroPointTask(config=config)
 
         """ Note: this order does not properly retarget
         zpScaler = ScaleZeroPointTask()
@@ -157,7 +157,7 @@ def suite():
 def run(shouldExit=False):
     """Run the tests"""
 
-    config = ScaleZeroPointTask.ConfigClass()
+    config = SpatialScaleZeroPointTask.ConfigClass()
     config.selectFluxMag0.retarget(SelectLsstSimFluxMag0Task)
     print config
     try:

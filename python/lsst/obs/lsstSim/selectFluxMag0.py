@@ -28,55 +28,47 @@ import lsst.afw.geom as afwGeom
 from lsst.daf.persistence import DbAuth
 import lsst.pipe.base as pipeBase
 from lsst.coadd.utils.selectFluxMag0 import SelectFluxMag0Config, BaseSelectFluxMag0Task, BaseFluxMagInfo
-from lsst.pipe.tasks.selectImages import BaseExposureInfo
+from lsst.pipe.tasks.selectImages import BaseExposureInfo,  DatabaseSelectImagesConfig
 
 __all__ = ["SelectLsstSimFluxMag0Task"]
 
-class SelectLsstSimFluxMag0Config(BaseSelectFluxMag0Task.ConfigClass):
+class SelectLsstSimFluxMag0Config(DatabaseSelectImagesConfig):
     """Config for SelectLsstImagesTask
     """
-    table = pexConfig.Field(
-        doc = "Name of database table",
-        dtype = str,
-        default = "Science_Ccd_Exposure",
-    )
 
     def setDefaults(self):
-        BaseSelectFluxMag0Task.ConfigClass.setDefaults(self)
+        super(SelectLsstSimFluxMag0Config,self).setDefaults()
         self.database = "krughoff_deepTemplate"
         self.host = "lsst-db.ncsa.illinois.edu"
         self.port = 3306
 
 
-class FluxMagInfo(BaseFluxMagInfo):
+class FluxMagInfo(BaseExposureInfo):
     """Data about a selected exposure
 
     Data includes:
     - dataId: data ID of exposure (a dict)
     - coordList: a list of corner coordinates of the exposure (list of IcrsCoord)
-    - fluxMag0: float 
+    - fluxMag0: float
     - fluxMag0Sigma: float
     """
     def __init__(self, result):
         """Set exposure information based on a query result from a db connection
         """
-        BaseFluxMagInfo.__init__(self,result)
-        self.dataId = dict(
-           visit =  result[self._nextInd],
-           raft = result[self._nextInd],
-           ccd = result[self._nextInd],
-           filter = result[self._nextInd],
+        result = [r for r in result]
+        dataId = dict(
+            visit = result.pop(0),
+            raft = result.pop(0),
+            ccd = result.pop(0),
+            filter = result.pop(0),
         )
-        self.coordList = []
-        for i in range(4):
-            self.coordList.append(
-                IcrsCoord(
-                    afwGeom.Angle(result[self._nextInd], afwGeom.degrees),
-                    afwGeom.Angle(result[self._nextInd], afwGeom.degrees),
-                )
-            )
-        self.fluxMag0 = result[self._nextInd]
-        self.fluxMag0Sigma = result[self._nextInd]
+
+        coordList = [IcrsCoord(afwGeom.Angle(result.pop(0), afwGeom.degrees),
+                                    afwGeom.Angle(result.pop(0), afwGeom.degrees)) for i in range(4)]
+
+        BaseExposureInfo.__init__(self, dataId=dataId, coordList=coordList)
+        self.fluxMag0 = result.pop(0)
+        self.fluxMag0Sigma = result.pop(0)
 
     @staticmethod
     def getColumnNames():
@@ -91,14 +83,14 @@ class FluxMagInfo(BaseFluxMagInfo):
             "fluxMag0 fluxMag0Sigma".split()
         )
 
-class SelectLsstSimFluxMag0Task(BaseSelectFluxMag0Task):
+class SelectLsstSimFluxMag0Task(pipeBase.Task):
     """Select LsstSim data suitable for computing fluxMag0
     """
     ConfigClass = SelectLsstSimFluxMag0Config
     _DefaultName= "selectFluxMag0"
 
     @pipeBase.timeMethod
-    def run(self, visit):
+    def run(self, dataId):
         """Select flugMag0's of LsstSim images for a particular visit
 
         @param[in] visit: visit id
@@ -106,28 +98,28 @@ class SelectLsstSimFluxMag0Task(BaseSelectFluxMag0Task):
         @return a pipeBase Struct containing:
         - fluxMagInfoList: a list of FluxMagInfo objects
         """
-
-        kwargs = dict(
-            user = DbAuth.username(self.config.host, str(self.config.port)),
-            passwd = DbAuth.password(self.config.host, str(self.config.port)),
-        )
+        try:
+            runArgDict = self.runArgDictFromDataId(dataId)
+            visit = runArgDict["visit"]
+        except Exception, e:
+            self.log.fatal("dataId does not contain mandatory visit key: dataId: %s"%dataId)
 
         if self._display:
-            self.log.info(self.config.table)
             self.log.info(self.config.database)
 
         db = MySQLdb.connect(
             host = self.config.host,
             port = self.config.port,
             db = self.config.database,
-            **kwargs
+            user = DbAuth.username(self.config.host, str(self.config.port)),
+            passwd = DbAuth.password(self.config.host, str(self.config.port)),
         )
         cursor = db.cursor()
 
         columnNames = tuple(FluxMagInfo.getColumnNames())
 
-        queryStr = "select %s from %s where " % (", ".join(columnNames), self.config.table)
-        dataTuple = () # tuple(columnNames)
+        queryStr = "select %s from Science_Ccd_Exposure where "%(", ".join(columnNames))
+        dataTuple = ()
 
         # compute where clauses as a list of (clause, data)
         whereDataList = [
@@ -137,13 +129,12 @@ class SelectLsstSimFluxMag0Task(BaseSelectFluxMag0Task):
         queryStr += " and ".join(wd[0] for wd in whereDataList)
         dataTuple += tuple(wd[1] for wd in whereDataList)
 
-        self._display=True
-
         if self._display:
             self.log.info("queryStr=%r; dataTuple=%s" % (queryStr, dataTuple))
 
         cursor.execute(queryStr, dataTuple)
-        fluxMagInfoList = [FluxMagInfo(result) for result in cursor]
+        result = cursor.fetchall()
+        fluxMagInfoList = [FluxMagInfo(r) for r in result]
         if self._display:
             self.log.info("Found %d exposures" % \
                       (len(fluxMagInfoList)))
