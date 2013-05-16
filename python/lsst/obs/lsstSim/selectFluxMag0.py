@@ -38,7 +38,6 @@ class SelectLsstSimFluxMag0Config(DatabaseSelectImagesConfig):
 
     def setDefaults(self):
         super(SelectLsstSimFluxMag0Config,self).setDefaults()
-        self.database = "krughoff_deepTemplate"
         self.host = "lsst-db.ncsa.illinois.edu"
         self.port = 3306
 
