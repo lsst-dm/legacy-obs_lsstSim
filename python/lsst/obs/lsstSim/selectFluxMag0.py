@@ -22,12 +22,10 @@
 #
 import MySQLdb
 
-import lsst.pex.config as pexConfig
 from lsst.afw.coord import IcrsCoord
 import lsst.afw.geom as afwGeom
 from lsst.daf.persistence import DbAuth
 import lsst.pipe.base as pipeBase
-from lsst.coadd.utils.selectFluxMag0 import SelectFluxMag0Config, BaseSelectFluxMag0Task, BaseFluxMagInfo
 from lsst.pipe.tasks.selectImages import BaseExposureInfo,  DatabaseSelectImagesConfig
 
 __all__ = ["SelectLsstSimFluxMag0Task"]
