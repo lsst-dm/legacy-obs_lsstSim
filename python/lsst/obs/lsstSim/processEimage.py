@@ -26,9 +26,12 @@ import lsst.afw.image as afwImage
 import lsst.afw.table as afwTable
 import lsst.pex.config as pexConfig
 import lsst.pipe.base as pipeBase
+import numpy
 
 class ProcessEimageConfig(ProcessImageTask.ConfigClass):
     """Config for ProcessCcd"""
+    doAddNoise = pexConfig.Field(dtype=bool, default=False, doc="Add a flat Poisson noise background to the eimage?")
+    noiseValue = pexConfig.Field(dtype=int, default=1000, doc="Mean of the Poisson distribution in counts")
     doSetVariance = pexConfig.Field(dtype=bool, default=True, doc = "Set the variance plane in the eimage?")
     varianceType = pexConfig.ChoiceField(dtype=str, default="image", 
                                          allowed={"image":"set variance from image plane", 
@@ -73,6 +76,8 @@ class ProcessEimageTask(ProcessImageTask):
         self.log.info("Processing %s" % (sensorRef.dataId))
 
         inputExposure = sensorRef.get(self.dataPrefix + "eimage")
+        if self.config.doAddNoise:
+            self.addNoise(inputExposure)
 
         if self.config.doSetVariance:
             self.setVariance(inputExposure)
@@ -91,6 +96,15 @@ class ProcessEimageTask(ProcessImageTask):
         
         # delegate most of the work to ProcessImageTask
         return self.process(sensorRef, inputExposure)
+
+    def addNoise(self, inputExposure):
+        mi = inputExposure.getMaskedImage()
+        (x,y) = mi.getDimensions()
+        noiseArr = numpy.random.poisson(self.config.noiseValue, size=x*y).reshape(y,x)
+        noiseArr = noiseArr.astype(numpy.float32)
+        noiseImage = afwImage.makeImageFromArray(noiseArr)
+        print noiseImage
+        mi += noiseImage
 
     def setVariance(self, inputExposure):
         if self.config.varianceType == 'value':
