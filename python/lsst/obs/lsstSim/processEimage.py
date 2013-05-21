@@ -131,4 +131,6 @@ class ProcessEimageTask(ProcessImageTask):
 
         Subclasses may wish to override, e.g. to change the dataset type or data ref level
         """
-        return ArgumentParser(name=cls._DefaultName, datasetType="eimage")
+        parser = ArgumentParser(name=cls._DefaultName)
+        parser.add_id_argument("--id", "eimage", "data ID, e.g. visit=1 raft=2,2 sensor=1,1 snap=0")
+        return parser
