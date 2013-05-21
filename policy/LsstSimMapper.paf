@@ -413,6 +413,22 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
+    modelfits: {
+        template:      "modelfits/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
+        python:        "lsst.meas.multifit.ModelFitCatalog"
+        persistable:        "ModelFitCatalog"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    modelfits_schema: {
+        template:      "schema/modelfits.fits"
+        python:        "lsst.meas.multifit.ModelFitCatalog"
+        persistable:        "ModelFitCatalog"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
     sourceHist: {
         template:      "results/st%(skyTile)d/sourceHist.fits"
         python:        "lsst.afw.image.DecoratedImageU"
@@ -519,6 +535,22 @@ datasets: {
     }
     processEimage_metadata: {
         template:      "processEimage_metadata/v%(visit)d-f%(filter)s/s%(snap)i/R%(raft)s/S%(sensor)s.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
+        storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    measureCcd_config: {
+        template:      "config/measureCcd.py"
+        python:        "lsst.meas.multifit.measureCcd.MeasureCcdConfig"
+        persistable:      "Config"
+        storage:    "ConfigStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    measureCcd_metadata: {
+        template:      "measureCcd_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
         python:        "lsst.daf.base.PropertySet"
         persistable:        "PropertySet"
         storage:    "BoostStorage"
