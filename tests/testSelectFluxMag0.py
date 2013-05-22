@@ -40,6 +40,12 @@ from lsst.obs.lsstSim.selectFluxMag0 import SelectLsstSimFluxMag0Task
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+class WrapDataId():
+    """A container for dataId that looks like dataRef to computeImageScaler()
+    """
+    def __init__(self, dataId):
+        self.dataId = dataId
+
 class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
     """A test case for ScaleLsstSimZeroPointTask
     """
@@ -115,8 +121,10 @@ class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
         #create dataId for exposure. Visit is only field needed. Others ignored.
         exposureId = {'ignore_fake_key': 1234, 'visit': 882820621}
 
+        #API for computImageScale() takes a dataRef not a dataId.
+        exposureFakeDataRef = WrapDataId(exposureId)
         #test methods: computeImageScale(), scaleMaskedImage(), getInterpImage()
-        imageScaler = zpScaler.computeImageScaler(exposure,exposureId)
+        imageScaler = zpScaler.computeImageScaler(exposure,exposureFakeDataRef)
         scaleFactorIm = imageScaler.getInterpImage(exposure.getBBox())
         predScale = numpy.mean(imageScaler._scaleList) #0.011125492863357
 
