@@ -7,3 +7,7 @@ root.select.retarget(SelectLsstImagesTask)
 root.scaleZeroPoint.retarget(SpatialScaleZeroPointTask)
 root.scaleZeroPoint.selectFluxMag0.retarget(SelectLsstSimFluxMag0Task)
 
+#to retarget back to the spatially invariant version,
+#put the following two lines in your config file:
+#from lsst.coadd.utils.scaleZeroPoint import ScaleZeroPointTask
+#root.scaleZeroPoint.retarget(ScaleZeroPointTask)
