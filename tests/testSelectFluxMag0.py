@@ -22,7 +22,7 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-"""Test lsst.obs.lsstSim.selectFluxMag0 and integration with coadd.utils.scaleZeroPoint
+"""Test lsst.obs.lsstSim.selectFluxMag0 and integration with pipe.tasks.scaleZeroPoint
 """
 import numpy
 import unittest
@@ -34,7 +34,7 @@ import lsst.afw.math as afwMath
 
 import lsst.utils.tests as utilsTests
 from lsst.daf.persistence import DbAuth
-from lsst.coadd.utils.scaleZeroPoint import SpatialScaleZeroPointTask
+from lsst.pipe.tasks.scaleZeroPoint import SpatialScaleZeroPointTask
 from lsst.obs.lsstSim.selectFluxMag0 import SelectLsstSimFluxMag0Task
 
 
@@ -92,7 +92,7 @@ class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
 
 
     def testScaleZeroPoint(self):
-        """Test integration of coadd.utils.scaleZeroPoint and obs.lsstSim.selectFluxMag0"""
+        """Test integration of pipe.tasks.scaleZeroPoint and obs.lsstSim.selectFluxMag0"""
 
         ZEROPOINT = 27
         self.sctrl = afwMath.StatisticsControl()
