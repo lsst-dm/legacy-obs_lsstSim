@@ -1180,4 +1180,12 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
+    refcat: {
+        template:      "refcat.fits"
+        python:        "lsst.afw.table.SimpleCatalog"
+        persistable:        "SimpleCatalog"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
 }
