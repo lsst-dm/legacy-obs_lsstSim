@@ -968,7 +968,7 @@ datasets: {
     }
     goodSeeing_makeCoaddTempExp_config: {
         template:      "config/goodSeeing_makeCoaddTempExp.py"
-        python:        "lsst.pipe.tasks.baseCoadd.BaseCoaddConfig"
+        python:        "lsst.pipe.tasks.makeCoaddTempExp.MakeCoaddTempExpConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
@@ -1132,22 +1132,6 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
-    chiSquaredCoadd_srcMatch: {
-        template:      "chiSquaredCoadd-results/%(filter)s/%(tract)d/%(patch)s/srcMatch-%(filter)s-%(tract)d-%(patch)s.fits"
-        python:        "lsst.afw.table.BaseCatalog"
-        persistable:        "ignored"
-        storage:    "FitsCatalogStorage"
-        tables:        raw
-        tables:        raw_skyTile
-    }
-    chiSquaredCoadd_calexpBackground: {
-        template:      "chiSquaredCoadd-results/%(filter)s/%(tract)d/%(patch)s/bkgd-%(filter)s-%(tract)d-%(patch)s.fits"
-        python:        "lsst.afw.math.BackgroundList"
-        persistable:   "PurePythonClass"
-        storage:       "FitsCatalogStorage"
-        tables:        raw
-        tables:        raw_skyTile
-    }
     chiSquared_processCoadd_config: {
         template:      "config/chiSquared_processCoadd.py"
         python:        "lsst.pipe.tasks.processCoadd.ProcessCoaddConfig"
@@ -1161,14 +1145,6 @@ datasets: {
         python:        "lsst.daf.base.PropertySet"
         persistable:        "PropertySet"
         storage:    "BoostStorage"
-        tables:        raw
-        tables:        raw_skyTile
-    }
-    Mosaic_config: {
-        template:      "config/mosaic.py"
-        python:        "lsst.meas.mosaic.MosaicConfig"
-        persistable:   "Config"
-        storage:       "ConfigStorage"
         tables:        raw
         tables:        raw_skyTile
     }
