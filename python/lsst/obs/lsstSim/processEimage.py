@@ -40,6 +40,14 @@ class ProcessEimageConfig(ProcessImageTask.ConfigClass):
     varianceValue = pexConfig.Field(dtype=float, default=0.01, doc = "Value to use in the variance plane.")
     maskEdgeBorder = pexConfig.Field(dtype=int, default=0, doc = "Set mask to EDGE for a border of x pixels")
 
+    def setDefaults(self):
+        self.calibrate.repair.doInterpolate = False
+        self.calibrate.repair.doCosmicRay = False
+        self.calibrate.measurePsf.psfDeterminer['pca'].reducedChi2ForPsfCandidates=3.0
+        self.calibrate.measurePsf.psfDeterminer['pca'].spatialReject=2.0
+        self.calibrate.measurePsf.psfDeterminer['pca'].nIterForPsf=0
+        self.calibrate.measurePsf.psfDeterminer['pca'].tolerance=0.01
+
 class ProcessEimageTask(ProcessImageTask):
     """Process an Eimage CCD
     
