@@ -103,7 +103,6 @@ class ProcessEimageTask(ProcessImageTask):
         noiseArr = numpy.random.poisson(self.config.noiseValue, size=x*y).reshape(y,x)
         noiseArr = noiseArr.astype(numpy.float32)
         noiseImage = afwImage.makeImageFromArray(noiseArr)
-        print noiseImage
         mi += noiseImage
 
     def setVariance(self, inputExposure):
