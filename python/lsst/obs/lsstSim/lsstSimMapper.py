@@ -35,6 +35,8 @@ from lsst.daf.butlerUtils import CameraMapper
 import lsst.meas.algorithms as measAlgo
 
 class LsstSimMapper(CameraMapper):
+    filterIdMap = {'u': 0, 'g': 1, 'r': 2, 'i': 3, 'z': 4, 'y': 5, 'i2': 5}
+
     def __init__(self, inputPolicy=None, **kwargs):
         policyFile = pexPolicy.DefaultPolicyFile("obs_lsstSim", "LsstSimMapper.paf", "policy")
         policy = pexPolicy.Policy(policyFile)
@@ -48,8 +50,6 @@ class LsstSimMapper(CameraMapper):
                     kwargs[kw] = inputPolicy.get(kw)
 
         super(LsstSimMapper, self).__init__(policy, policyFile.getRepositoryPath(), **kwargs)
-        self.filterIdMap = {
-                'u': 0, 'g': 1, 'r': 2, 'i': 3, 'z': 4, 'y': 5, 'i2': 5}
 
         #The LSST Filters from L. Jones 04/07/10
         afwImageUtils.defineFilter('u', 364.59)
@@ -62,7 +62,8 @@ class LsstSimMapper(CameraMapper):
         # modify the schema appropriately
         #afwImageUtils.defineFilter('y3', 1002.44) # candidate y-band
 
-    def _transformId(self, dataId):
+    @classmethod
+    def _transformId(cls, dataId):
         actualId = dataId.copy()
         if actualId.has_key("sensorName"):
             m = re.search(r'R:(\d),(\d) S:(\d),(\d)', actualId['sensorName'])
@@ -100,7 +101,8 @@ class LsstSimMapper(CameraMapper):
 
         return actualId
 
-    def validate(self, dataId):
+    @classmethod
+    def validate(cls, dataId):
         for component in ("raft", "sensor", "channel"):
             if component not in dataId:
                 continue
@@ -114,10 +116,12 @@ class LsstSimMapper(CameraMapper):
                         "Invalid %s identifier: %s" % (component, repr(id))
         return dataId
 
-    def _extractDetectorName(self, dataId):
+    @classmethod
+    def _extractDetectorName(cls, dataId):
         return "R:%(raft)s S:%(sensor)s" % dataId
 
-    def getDataId(self, visit, ccdId):
+    @classmethod
+    def getDataId(cls, visit, ccdId):
         """get dataId dict from visit and ccd identifier
 
         @param visit 32 or 64-bit depending on camera
@@ -130,22 +134,46 @@ class LsstSimMapper(CameraMapper):
         sensor  = x[2] + ',' + x[3]
         dataId = {'visit': long(visit), 'raft': raft, 'sensor': sensor}
         return dataId
+    
+    @classmethod
+    def getDataIdFromCcdExposureId(cls, ccdExposureId):
+        """Compute a data ID dict from a CCD exposure ID
+        
+        @param[in] ccdExposureId: CCD exposure ID, as computed by _computeCcdExposureId
+        @return a data ID dict with keys visit, raft, sensor
+        """
+        visit = ccdExposureId >> 9
+        rsId = ccdExposureId & 0b111111111
+        sensorId = rsId % 10
+        s2 = sensorId % 3
+        s1 = (sensorId - s2) / 3
+        
+        raftId = (rsId - sensorId) / 10
+        r2 = raftId % 5
+        r1 = (raftId - r2) / 5
+        return dict(
+            visit = visit,
+            sensor = "%d,%d" % (s1, s2),
+            raft = "%d,%d" % (r1, r2),
+        )
 
-    def _extractAmpId(self, dataId):
+    @classmethod
+    def _extractAmpId(cls, dataId):
         m = re.match(r'(\d),(\d)', dataId['channel'])
         # Note that indices are swapped in the camera geometry vs. official
         # channel specification.
-        return (self._extractDetectorName(dataId),
+        return (cls._extractDetectorName(dataId),
                 int(m.group(1)), int(m.group(2)))
 
-    def _computeAmpExposureId(self, dataId):
+    @classmethod
+    def _computeAmpExposureId(cls, dataId):
         #visit, snap, raft, sensor, channel):
         """Compute the 64-bit (long) identifier for an amp exposure.
 
         @param dataId (dict) Data identifier with visit, snap, raft, sensor, channel
         """
 
-        pathId = self._transformId(dataId)
+        pathId = cls._transformId(dataId)
         visit = pathId['visit']
         snap = pathId['snap']
         raft = pathId['raft'] # "xy" e.g. "20"
@@ -160,13 +188,14 @@ class LsstSimMapper(CameraMapper):
                 (long(s1) * 3 + long(s2)) * 16 + \
                 (long(c1) * 8 + long(c2))
 
-    def _computeCcdExposureId(self, dataId):
+    @classmethod
+    def _computeCcdExposureId(cls, dataId):
         """Compute the 64-bit (long) identifier for a CCD exposure.
 
         @param dataId (dict) Data identifier with visit, raft, sensor
         """
 
-        pathId = self._transformId(dataId)
+        pathId = cls._transformId(dataId)
         visit = pathId['visit']
         raft = pathId['raft'] # "xy" e.g. "20"
         sensor = pathId['sensor'] # "xy" e.g. "11"
@@ -177,7 +206,8 @@ class LsstSimMapper(CameraMapper):
                 (long(r1) * 5 + long(r2)) * 10 + \
                 (long(s1) * 3 + long(s2))
 
-    def _computeCoaddExposureId(self, dataId, singleFilter):
+    @classmethod
+    def _computeCoaddExposureId(cls, dataId, singleFilter):
         """Compute the 64-bit (long) identifier for a coadd.
 
         @param dataId (dict)       Data identifier with tract and patch.
@@ -194,15 +224,17 @@ class LsstSimMapper(CameraMapper):
                 raise RuntimeError('patch component not in range [0, 8192)')
         id = (tract * 2**13 + patchX) * 2**13 + patchY
         if singleFilter:
-            return id * 8 + self.filterIdMap[dataId['filter']]
+            return id * 8 + cls.filterIdMap[dataId['filter']]
         return id
 
-    def _setAmpExposureId(self, propertyList, dataId):
-        propertyList.set("Computed_ampExposureId", self._computeAmpExposureId(dataId))
+    @classmethod
+    def _setAmpExposureId(cls, propertyList, dataId):
+        propertyList.set("Computed_ampExposureId", cls._computeAmpExposureId(dataId))
         return propertyList
 
-    def _setCcdExposureId(self, propertyList, dataId):
-        propertyList.set("Computed_ccdExposureId", self._computeCcdExposureId(dataId))
+    @classmethod
+    def _setCcdExposureId(cls, propertyList, dataId):
+        propertyList.set("Computed_ccdExposureId", cls._computeCcdExposureId(dataId))
         return propertyList
 
 ###############################################################################
@@ -231,27 +263,35 @@ class LsstSimMapper(CameraMapper):
 
 ###############################################################################
 
-    def bypass_ampExposureId(self, datasetType, pythonType, location, dataId):
-        return self._computeAmpExposureId(dataId)
-    def bypass_ampExposureId_bits(self, datasetType, pythonType, location, dataId):
+    @classmethod
+    def bypass_ampExposureId(cls, datasetType, pythonType, location, dataId):
+        return cls._computeAmpExposureId(dataId)
+    @classmethod
+    def bypass_ampExposureId_bits(cls, datasetType, pythonType, location, dataId):
         return 45
-    def bypass_ccdExposureId(self, datasetType, pythonType, location, dataId):
-        return self._computeCcdExposureId(dataId)
-    def bypass_ccdExposureId_bits(self, datasetType, pythonType, location, dataId):
+    @classmethod
+    def bypass_ccdExposureId(cls, datasetType, pythonType, location, dataId):
+        return cls._computeCcdExposureId(dataId)
+    @classmethod
+    def bypass_ccdExposureId_bits(cls, datasetType, pythonType, location, dataId):
         return 41
 
-    def bypass_goodSeeingCoaddId(self, datasetType, pythonType, location, dataId):
-        return self._computeCoaddExposureId(dataId, True)
-    def bypass_goodSeeingCoaddId_bits(self, datasetType, pythonType, location, dataId):
+    @classmethod
+    def bypass_goodSeeingCoaddId(cls, datasetType, pythonType, location, dataId):
+        return cls._computeCoaddExposureId(dataId, True)
+    @classmethod
+    def bypass_goodSeeingCoaddId_bits(cls, datasetType, pythonType, location, dataId):
         return 1 + 7 + 13*2 + 3
 
     # Deep coadds use tract, patch, and filter just like good-seeing coadds
     bypass_deepCoaddId = bypass_goodSeeingCoaddId
     bypass_deepCoaddId_bits = bypass_goodSeeingCoaddId_bits
 
-    def bypass_chiSquaredCoaddId(self, datasetType, pythonType, location, dataId):
-        return self._computeCoaddExposureId(dataId, False)
-    def bypass_chiSquaredCoaddId_bits(self, datasetType, pythonType, location, dataId):
+    @classmethod
+    def bypass_chiSquaredCoaddId(cls, datasetType, pythonType, location, dataId):
+        return cls._computeCoaddExposureId(dataId, False)
+    @classmethod
+    def bypass_chiSquaredCoaddId_bits(cls, datasetType, pythonType, location, dataId):
         return 1 + 7 + 13*2
 
 ###############################################################################
