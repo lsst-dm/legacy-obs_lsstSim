@@ -264,27 +264,6 @@ class LsstSimMapper(CameraMapper):
         ccdExposureId = self._computeCcdExposureId(dataId)
         return {"ccdExposureId": ccdExposureId, "sdqaRatingScope": "CCD"}
 
-    def _addSources(self, dataId):
-        """Generic 'add' function to add ampExposureId and filterId"""
-        # Note that sources are identified by what is called an ampExposureId,
-        # but in this case all we have is a CCD.
-        ampExposureId = self._computeCcdExposureId(dataId)
-        pathId = self._transformId(dataId)
-        filterId = self.filterIdMap[pathId['filter']]
-        ad = dict(ampExposureId=ampExposureId, filterId=filterId)
-        if self.doFootprints:
-            ad["doFootprints"] = True
-        return ad
-
-    def _addSkytile(self, dataId):
-        """Generic 'add' function to add skyTileId"""
-        return {"skyTileId": dataId['skyTile']}
-
-for dsType in ("icSrc", "src"):
-    setattr(LsstSimMapper, "add_" + dsType, LsstSimMapper._addSources)
-for dsType in ("source", "badSource", "invalidSource", "object"):
-    setattr(LsstSimMapper, "add_" + dsType, LsstSimMapper._addSkytile)
-
 ###############################################################################
 
 for dsType in ("raw", "postISR"):
