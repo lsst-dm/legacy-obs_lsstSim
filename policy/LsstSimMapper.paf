@@ -525,6 +525,22 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
+    Mosaic_config: {
+        template:      "config/mosaic.py"
+        python:        "lsst.meas.mosaic.mosaicTask.MosaicConfig"
+        persistable:      "Config"
+        storage:    "ConfigStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    Mosaic_metadata: {
+        template:      "metadata/Mosaic.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
+        storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
     processCcd_config: {
         template:      "config/processCcd.py"
         python:        "lsst.pipe.tasks.processCcd.ProcessCcdConfig"
