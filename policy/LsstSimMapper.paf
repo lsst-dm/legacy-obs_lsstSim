@@ -559,7 +559,7 @@ datasets: {
     }
     processEimage_config: {
         template:      "config/processEimage.py"
-        python:        "lsst.pipe.tasks.processCcd.ProcessCcdConfig"
+        python:        "lsst.obs.lsstSim.processEimage.ProcessEimageConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
