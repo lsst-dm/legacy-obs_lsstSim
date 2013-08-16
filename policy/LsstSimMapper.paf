@@ -445,6 +445,22 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
+    deepCoadd_multiModelfits: {
+        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/multiModelfits-%(filter)s-%(tract)d-%(patch)s.fits"
+        python:        "lsst.meas.multifit.ModelFitCatalog"
+        persistable:        "ModelFitCatalog"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    deepCoadd_multiModelfits_schema: {
+        template:      "schema/deepCoadd_multiModelfits.fits"
+        python:        "lsst.meas.multifit.ModelFitCatalog"
+        persistable:        "ModelFitCatalog"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
     sourceHist: {
         template:      "results/st%(skyTile)d/sourceHist.fits"
         python:        "lsst.afw.image.DecoratedImageU"
@@ -599,6 +615,22 @@ datasets: {
     }
     deep_measureCoadd_metadata: {
         template:      "deep_measureCoadd_metadata/%(filter)s/%(tract)d/%(patch)s/metadata-%(filter)s-%(tract)d-%(patch)s.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
+        storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    deep_measureMulti_config: {
+        template:      "config/deep_measureMulti.py"
+        python:        "lsst.meas.multifit.measureMulti.MeasureMultiConfig"
+        persistable:      "Config"
+        storage:    "ConfigStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    deep_measureMulti_metadata: {
+        template:      "deep_measureMulti_metadata/%(filter)s/%(tract)d/%(patch)s/metadata-%(filter)s-%(tract)d-%(patch)s.boost"
         python:        "lsst.daf.base.PropertySet"
         persistable:        "PropertySet"
         storage:    "BoostStorage"
