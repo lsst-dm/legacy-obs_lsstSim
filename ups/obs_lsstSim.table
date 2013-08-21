@@ -8,4 +8,5 @@ setupRequired(ip_isr)
 setupRequired(pipe_tasks)
 setupRequired(mysqlpython)
 
-envAppend(PYTHONPATH, ${PRODUCT_DIR}/python)
+envPrepend(PYTHONPATH, ${PRODUCT_DIR}/python)
+envPrepend(PATH, ${PRODUCT_DIR}/bin)
