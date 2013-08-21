@@ -30,7 +30,11 @@ import numpy
 
 class ProcessEimageConfig(ProcessImageTask.ConfigClass):
     """Config for ProcessCcd"""
-    doAddNoise = pexConfig.Field(dtype=bool, default=False, doc="Add a flat Poisson noise background to the eimage?")
+    doAddNoise = pexConfig.Field(dtype=bool, default=False,
+                                 doc="Add a flat Poisson noise background to the eimage?")
+    rngSeed = pexConfig.Field(dtype=int, default=None, optional=True,
+                              doc=("Random number seed used when adding noise (passed directly"
+                                   " to numpy at task initialization)"))
     noiseValue = pexConfig.Field(dtype=int, default=1000, doc="Mean of the Poisson distribution in counts")
     doSetVariance = pexConfig.Field(dtype=bool, default=True, doc = "Set the variance plane in the eimage?")
     varianceType = pexConfig.ChoiceField(dtype=str, default="image", 
@@ -62,6 +66,7 @@ class ProcessEimageTask(ProcessImageTask):
 
     def __init__(self, **kwargs):
         ProcessImageTask.__init__(self, **kwargs)
+        numpy.random.seed(self.config.rngSeed)
 
     def makeIdFactory(self, sensorRef):
         expBits = sensorRef.get("ccdExposureId_bits")
