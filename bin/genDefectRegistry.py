@@ -23,7 +23,11 @@
 import glob
 import os
 import re
-import sqlite as sqlite3
+try:
+    import sqlite3
+except ImportError:
+    # try external pysqlite package; deprecated
+    import sqlite as sqlite3
 import sys
 
 if os.path.exists("defectRegistry.sqlite3"):
