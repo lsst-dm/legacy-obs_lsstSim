@@ -557,6 +557,14 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
+    forced_src: {
+        template:      "forced_src/%(tract)d/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "SourceCatalog"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
     processCcd_config: {
         template:      "config/processCcd.py"
         python:        "lsst.pipe.tasks.processCcd.ProcessCcdConfig"
@@ -804,6 +812,14 @@ datasets: {
     deepCoadd_srcMatch: {
         template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/srcMatch-%(filter)s-%(tract)d-%(patch)s.fits"
         python:        "lsst.afw.table.BaseCatalog"
+        persistable:        "ignored"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    deepCoadd_forced_src: {
+        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/src-%(filter)s-%(tract)d-%(patch)s.forced.fits"
+        python:        "lsst.afw.table.SourceCatalog"
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
