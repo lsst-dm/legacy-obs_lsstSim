@@ -397,6 +397,14 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
+    forced_src: {
+        template:      "forced_src/%(tract)d/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "SourceCatalog"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
     src_schema: {
         template:      "schema/src.fits"
         python:        "lsst.afw.table.SourceCatalog"
@@ -764,6 +772,14 @@ datasets: {
     }
     deepCoadd_src_schema: {
         template:      "schema/deepCoadd_src.fits"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "ignored"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+        tables:        raw_skyTile
+    }
+    deepCoadd_forced_src: {
+        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/forcedsrc-%(filter)s-%(tract)d-%(patch)s.fits"
         python:        "lsst.afw.table.SourceCatalog"
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
