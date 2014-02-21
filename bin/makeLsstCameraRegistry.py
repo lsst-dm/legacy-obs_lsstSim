@@ -135,7 +135,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("DetectorLayoutFile", help="Path to detector layout file")
     parser.add_argument("SegmentsFile", help="Path to amp segments file")
-    parser.add_argument("OutputRepository", help="Path to dump configs and AmpInfo Tables"
+    parser.add_argument("OutputRepository", help="Path to dump configs and AmpInfo Tables")
     args = parser.parse_args()
     ampTableDict = makeAmpTables(args.SegmentsFile)
     detectorConfigList = makeDetectorConfigs(args.DetectorLayoutFile)
@@ -145,15 +145,15 @@ if __name__ == "__main__":
     camConfig.detectorList = dict([(i,detectorConfigList[i]) for i in xrange(len(detectorConfigList))])
     camConfig.name = 'LSST'
     camConfig.plateScale = 20.0
+    camConfig.pincushion = 0.925
+    camConfig.boresiteOffset_x = 0.
+    camConfig.boresiteOffset_y = 0.
     tConfig = afwGeom.TransformConfig()
-    tConfig.transform.name = 'radial'
-    #Should this be in the config?
-    pincushion = 0.925
-    #convert to degrees
-    pscale = camConfig.plateScale/3600.
-    #TODO check this.  I'm not sure it's right.
-    tConfig.transform.active.coeffs = [0., 1./pscale, pincushion/pscale**2]
-
+    tConfig.transform.name = 'pupil'
+    tConfig.transform.active.pincushion = camConfig.pincushion
+    tConfig.transform.active.plateScale = camConfig.plateScale
+    tConfig.transform.active.boresiteOffset_x = camConfig.boresiteOffset_x
+    tConfig.transform.active.boresiteOffset_y = camConfig.boresiteOffset_y
     tmc = afwGeom.TransformMapConfig()
     tmc.nativeSys = FOCAL_PLANE.getSysName()
     tmc.transforms = {PUPIL.getSysName():tConfig}
