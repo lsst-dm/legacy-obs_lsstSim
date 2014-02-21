@@ -246,6 +246,27 @@ calibrations: {
 }
 
 datasets: {
+    ampInfo: {
+        template:      "ampInfo/R%(raft)s/S%(sensor)s/C%(channel).fits"
+        python:        "lsst.afw.table.AmpInfoCatalog"
+        persistable:   "AmpInfoCatalog"
+        storage:       "FitsCatalogStorage"
+        tables:        raw
+    }
+    ampInfo_schema: {
+        template:      "schema/ampInfo.fits"
+        python:        "lsst.afw.table.AmpInfoCatalog"
+        persistable:   "AmpInfoCatalog"
+        storage:       "FitsCatalogStorage"
+        tables:        raw
+    }
+    camera_config: {
+        template:      "camera/camera.py"
+        python:        "lsst.afw.cameraGeom.CameraFactoryTask.ConfigClass"
+        persistable:   "Config"
+        storage:       "ConfigStorage"
+        tables:        raw
+    }
     eimage: {
         template:   "eimage/v%(visit)d-f%(filter)s/E%(snap)03d/R%(raft)s/eimage_%(visit)d_R%(raft)s_S%(sensor)s_E%(snap)03d.fits.gz"
         python:     "lsst.afw.image.ExposureF"

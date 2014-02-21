@@ -1,9 +1,31 @@
-from __future__ import with_statement
+#!/usr/bin/env python2
+# 
+# LSST Data Management System
+# Copyright 2014 LSST Corporation.
+# 
+# This product includes software developed by the
+# LSST Project (http://www.lsst.org/).
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the LSST License Statement and 
+# the GNU General Public License along with this program.  If not, 
+# see <http://www.lsstcorp.org/LegalNotices/>.
+#
+from __future__ import absolute_import, division
 import argparse
 import lsst.afw.geom as afwGeom
 import lsst.afw.table as afwTable
 from lsst.afw.cameraGeom import (DetectorConfig, CameraFactoryTask, CameraConfig, 
-                                PUPIL, FOCAL_PLANE, PIXELS)
+    PUPIL, FOCAL_PLANE, PIXELS)
 
 def makeAmpTables(segmentsFile):
     """
@@ -129,7 +151,7 @@ if __name__ == "__main__":
     """
     Create the configs for building a camera.  This runs on the files distributed with PhoSim.
     For example:
-    DetectorLayoutFile -- https://dev.lsstcorp.org/cgit/LSST/sims/phosim.git/tree/data/lsst/focalplanelayout.txt?h=dev
+    DetectorLayoutFile -- https://dev.lsstcorp.org/cgit/LSST/sims/phosim.git/plain/data/lsst/focalplanelayout.txt?h=dev
     SegmentsFile -- https://dev.lsstcorp.org/cgit/LSST/sims/phosim.git/plain/data/lsst/segmentation.txt?h=dev
     """
     parser = argparse.ArgumentParser()
