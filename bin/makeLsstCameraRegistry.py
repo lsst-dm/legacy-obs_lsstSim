@@ -170,15 +170,18 @@ if __name__ == "__main__":
     camConfig.detectorList = dict([(i,detectorConfigList[i]) for i in xrange(len(detectorConfigList))])
     camConfig.name = 'LSST'
     camConfig.plateScale = 20.0
-    camConfig.pincushion = 0.925
-    camConfig.boresiteOffset_x = 0.
-    camConfig.boresiteOffset_y = 0.
+    pScaleRad = afwGeom.arcsecToRad(camConfig.plateScale)
+    pincushion = 0.925
+    # Don't have this yet ticket/3155
+    #camConfig.boresiteOffset_x = 0.
+    #camConfig.boresiteOffset_y = 0.
     tConfig = afwGeom.TransformConfig()
-    tConfig.transform.name = 'pupil'
-    tConfig.transform.active.pincushion = camConfig.pincushion
-    tConfig.transform.active.plateScale = camConfig.plateScale
-    tConfig.transform.active.boresiteOffset_x = camConfig.boresiteOffset_x
-    tConfig.transform.active.boresiteOffset_y = camConfig.boresiteOffset_y
+    tConfig.transform.name = 'radial'
+    # According to Dave M. the simulated LSST transform is well approximated (1/3 pix) 
+    # by a scale and a pincusion.
+    tConfig.transform.active.coeffs = [0., 1./pScaleRad, 0., pincushion/pScaleRad]
+    #tConfig.transform.active.boresiteOffset_x = camConfig.boresiteOffset_x
+    #tConfig.transform.active.boresiteOffset_y = camConfig.boresiteOffset_y
     tmc = afwGeom.TransformMapConfig()
     tmc.nativeSys = FOCAL_PLANE.getSysName()
     tmc.transforms = {PUPIL.getSysName():tConfig}
