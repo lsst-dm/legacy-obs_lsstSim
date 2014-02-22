@@ -247,7 +247,7 @@ calibrations: {
 
 datasets: {
     ampInfo: {
-        template:      "ampInfo/R%(raft)s/S%(sensor)s/C%(channel).fits"
+        template:      "ampInfo/R%(raft)s/S%(sensor)s.fits"
         python:        "lsst.afw.table.AmpInfoCatalog"
         persistable:   "AmpInfoCatalog"
         storage:       "FitsCatalogStorage"

@@ -154,6 +154,9 @@ if __name__ == "__main__":
     DetectorLayoutFile -- https://dev.lsstcorp.org/cgit/LSST/sims/phosim.git/plain/data/lsst/focalplanelayout.txt?h=dev
     SegmentsFile -- https://dev.lsstcorp.org/cgit/LSST/sims/phosim.git/plain/data/lsst/segmentation.txt?h=dev
     """
+    import os
+    import re
+
     parser = argparse.ArgumentParser()
     parser.add_argument("DetectorLayoutFile", help="Path to detector layout file")
     parser.add_argument("SegmentsFile", help="Path to amp segments file")
@@ -180,6 +183,37 @@ if __name__ == "__main__":
     tmc.nativeSys = FOCAL_PLANE.getSysName()
     tmc.transforms = {PUPIL.getSysName():tConfig}
     camConfig.transformDict = tmc
-    cameraTask = CameraFactoryTask(camConfig, ampTableDict)
-    #TODO output to the output repository
-    camera = cameraTask.run()
+
+    # create camera -- not something we normally do here
+    # cameraTask = CameraFactoryTask(camConfig, ampTableDict)
+    # camera = cameraTask.run()
+
+    # write data products
+    repoDir = args.OutputRepository
+    if os.path.exists(repoDir):
+        raise RuntimeError("%r exists" % (repoDir,))
+    else:
+        print "Creating %r" % (repoDir,)
+        os.makedirs(repoDir)
+
+    camDir = os.path.join(repoDir, "camera")
+    os.mkdir(camDir)
+    ampInfoBaseDir = os.path.join(repoDir, "ampInfo")
+    os.mkdir(ampInfoBaseDir)
+
+    camConfigPath = os.path.join(camDir, "camera.py")
+    camConfig.save(camConfigPath)
+
+    nameRe = re.compile(r"^R(\d\d)_S(\d\d)$")
+    for detName, ampTable in ampTableDict.iteritems():
+        nameMatch = nameRe.match(detName)
+        if nameMatch is None:
+            print "Skipping wavefront sensor (I can't deal with the name yet):", detName
+            continue
+
+        raft, sensor = nameMatch.groups()
+        ampInfoDir = os.path.join(ampInfoBaseDir, "R%s" % (raft,))
+        if not os.path.exists(ampInfoDir):
+            os.mkdir(ampInfoDir)
+        ampInfoPath = os.path.join(ampInfoDir, "S%s.fits" % (sensor,))
+        ampTable.writeFits(ampInfoPath)
