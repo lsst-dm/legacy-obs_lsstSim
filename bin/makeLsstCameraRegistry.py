@@ -161,7 +161,7 @@ def loadCamera(repoDir):
         els = detName.split("_")
         if len(els) > 2:
             continue
-    ampInfoPath = os.path.join(repoDir, "ampInfo")
+    ampInfoPath = os.path.join(repoDir, 'camera' )
     cameraTask = CameraFactoryTask()
     return cameraTask.run(camConfig, ampInfoPath)
 
