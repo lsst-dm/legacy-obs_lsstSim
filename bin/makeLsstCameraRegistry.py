@@ -173,12 +173,14 @@ if __name__ == "__main__":
     SegmentsFile -- https://dev.lsstcorp.org/cgit/LSST/sims/phosim.git/plain/data/lsst/segmentation.txt?h=dev
     """
     import os
-    import re
+    import shutil
 
     parser = argparse.ArgumentParser()
     parser.add_argument("DetectorLayoutFile", help="Path to detector layout file")
     parser.add_argument("SegmentsFile", help="Path to amp segments file")
     parser.add_argument("OutputRepository", help="Path to dump configs and AmpInfo Tables")
+    parser.add_argument("--clobber", action="store_true", dest="clobber", default=False,
+        help=("remove and re-create the output directory if it already exists?"))
     args = parser.parse_args()
     ampTableDict = makeAmpTables(args.SegmentsFile)
     detectorConfigList = makeDetectorConfigs(args.DetectorLayoutFile)
@@ -209,32 +211,46 @@ if __name__ == "__main__":
     # cameraTask = CameraFactoryTask(camConfig, ampTableDict)
     # camera = cameraTask.run()
 
+    def makeDir(dirPath, doClobber=False):
+        """Make a directory; if it exists then clobber or fail, depending on doClobber
+
+        @param[in] dirPath: path of directory to create
+        @param[in] doClobber: what to do if dirPath already exists:
+            if True and dirPath is a dir, then delete it and recreate it, else raise an exception
+        @throw RuntimeError if dirPath exists and doClobber False
+        """
+        if os.path.exists(dirPath):
+            if doClobber and os.path.isdir(dirPath):
+                print "Clobbering directory %r" % (dirPath,)
+                shutil.rmtree(dirPath)
+            else:
+                raise RuntimeError("Directory %r exists" % (dirPath,))
+        print "Creating directory %r" % (dirPath,)
+        os.makedirs(dirPath)
+
+    def makeDirIfNeeded(dirPath):
+        """Make a directory if it doesn't exist; if it exists then make sure it is a directory
+
+        @param[in] dirPath: path of directory to create
+        @throw RuntimeError if dirPath exists and is not a directory
+        """
+        if os.path.exists(dirPath):
+            if not os.path.isdir(dirPath):
+                raise RuntimeError("Path %r exists but is not a directory" % (dirPath,))
+        else:
+            print "Creating directory %r" % (dirPath,)
+            os.makedirs(dirPath)
+
     # write data products
     repoDir = args.OutputRepository
-    if os.path.exists(repoDir):
-        raise RuntimeError("%r exists" % (repoDir,))
-    else:
-        print "Creating %r" % (repoDir,)
-        os.makedirs(repoDir)
+    makeDirIfNeeded(repoDir)
 
     camDir = os.path.join(repoDir, "camera")
-    os.mkdir(camDir)
-    ampInfoBaseDir = os.path.join(repoDir, "ampInfo")
-    os.mkdir(ampInfoBaseDir)
+    makeDir(dirPath=camDir, doClobber=args.clobber)
 
     camConfigPath = os.path.join(camDir, "camera.py")
     camConfig.save(camConfigPath)
 
-    nameRe = re.compile(r"^R(\d\d)_S(\d\d)$")
-    for detName, ampTable in ampTableDict.iteritems():
-        nameMatch = nameRe.match(detName)
-        if nameMatch is None:
-            print "Skipping wavefront sensor (I can't deal with the name yet):", detName
-            continue
-
-        raft, sensor = nameMatch.groups()
-        ampInfoDir = os.path.join(ampInfoBaseDir, "R%s" % (raft,))
-        if not os.path.exists(ampInfoDir):
-            os.mkdir(ampInfoDir)
-        ampInfoPath = os.path.join(ampInfoDir, "S%s.fits" % (sensor,))
+    for detectorName, ampTable in ampTableDict.iteritems():
+        ampInfoPath = os.path.join(camDir, detectorName + ".fits")
         ampTable.writeFits(ampInfoPath)
