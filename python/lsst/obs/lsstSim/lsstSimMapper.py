@@ -62,41 +62,73 @@ class LsstSimMapper(CameraMapper):
         # modify the schema appropriately
         #afwImageUtils.defineFilter('y3', 1002.44) # candidate y-band
 
-    def _transformId(self, dataId):
-        actualId = dataId.copy()
-        if actualId.has_key("sensorName"):
-            m = re.search(r'R:(\d),(\d) S:(\d),(\d)', actualId['sensorName'])
-            actualId['raft'] = m.group(1) + "," + m.group(2)
-            actualId['sensor'] = m.group(3) + "," + m.group(4)
-        if actualId.has_key("ccdName"):
-            m = re.search(r'R:(\d),(\d) S:(\d),(\d)', actualId['ccdName'])
-            actualId['raft'] = m.group(1) + "," + m.group(2)
-            actualId['sensor'] = m.group(3) + "," + m.group(4)
-        if actualId.has_key("channelName"):
-            m = re.search(r'ID(\d+)', actualId['channelName'])
-            channelNumber = int(m.group(1))
-            channelX = channelNumber % 8
-            channelY = channelNumber // 8
-            actualId['channel'] = str(channelX) + "," + str(channelY)
-        if actualId.has_key("ampName"):
-            m = re.search(r'ID(\d+)', actualId['ampName'])
-            channelNumber = int(m.group(1))
-            channelX = channelNumber % 8
-            channelY = channelNumber // 8
-            actualId['channel'] = str(channelX) + "," + str(channelY)
-        if actualId.has_key("exposure"):
-            actualId['snap'] = actualId['exposure']
-        if actualId.has_key("ccd"):
-            actualId['sensor'] = actualId['ccd']
-        if actualId.has_key("amp"):
-            actualId['channel'] = actualId['amp']
+    def _raftSensorFromCcdName(self, ccdName):
+        """Parse a ccd name and return raft and sensor
 
-        if actualId.has_key("raft"):
+        @param[in] ccdName: detector name, as a string in the form Rxx_Sxx (e.g. "R02_S11")
+        @return (raft, sensor), each as a string in the form x,y (e.g. "0,2")
+        @raise RuntimeError if ccdName cannot be parsed
+        """
+        m = re.match(r'R(\d)(\d)_S(\d)(\d)', ccdName)
+        if m is None:
+            raise RuntimeError("Cannot parse ccdName=%r" % (ccdName,))
+        raft = m.group(1) + "," + m.group(2)
+        sensor = m.group(3) + "," + m.group(4)
+        return (raft, sensor)
+
+    def _transformId(self, dataId):
+        """Generate a standard ID dict from a camera-specific ID dict.
+
+        Canonical keys include:
+        - amp: amplifier name
+        - ccd: CCD name (in LSST this is a combination of raft and sensor)
+        The names preferred by LSST are:
+        - channel: identical to amp
+        - raft, sensor: in the form <digit>,<digit> (note the comma separator)
+        ccd = R<digit><digit>_S<digit><digit> (no commas!)
+
+        Warning: wavefront sensors are named Rxx_Sxx_Cx, which cannot be generated
+        from raft and sensor. Thus the supplied value of "ccd" is left alone, if provided.
+
+        @param dataId[in] (dict) Dataset identifier; this must not be modified
+        @return (dict) Transformed dataset identifier"""
+
+        # note: amp and ccd are the canonical names used by CameraMapper
+        # but channel, sensor and raft are the names preferred by LSST:
+        # channel = amp
+        # ccd = R<raft>_S<sensor>
+        actualId = dataId.copy()
+        for ccdAlias in ("sensorName", "ccdName"):
+            if ccdAlias in actualId:
+                actualId["ccd"] = actualId[ccdAlias]
+                break
+        if "ccd" in actualId:
+            m = re.match(r'R(\d)(\d)_S(\d)(\d)', actualId['ccd'])
+            actualId['raft'], actualId['sensor'] = self._raftSensorFromCcdName(actualId['ccd'])
+        for ampAlias in ("channel", "channelName", "amp", "ampName"):
+            if ampAlias in actualId:
+                ampName = re.sub(r'(\d),(\d)', r'\1\2', actualId[ampAlias])
+                actualId["amp"] = actualId["channel"] = ampName
+                break
+        if "ampNum" in actualId:
+            m = re.match(r'ID(\d+)', actualId['amp'])
+            channelNumber = int(m.group(1))
+            channelX = channelNumber % 8
+            channelY = channelNumber // 8
+            ampName = str(channelX) + "," + str(channelY)
+            actualId['amp'] = actualId['channel'] = ampName
+        if "exposure" in actualId:
+            actualId['snap'] = actualId['exposure']
+
+        if "raft" in actualId:
             actualId['raft'] = re.sub(r'(\d),(\d)', r'\1\2', actualId['raft'])
-        if actualId.has_key("sensor"):
+        if "sensor" in actualId:
             actualId['sensor'] = re.sub(r'(\d),(\d)', r'\1\2', actualId['sensor'])
-        if actualId.has_key("channel"):
-            actualId['channel'] = re.sub(r'(\d),(\d)', r'\1\2', actualId['channel'])
+            if "raft" in actualId and "ccd" not in actualId:
+                raft = actualId["raft"]
+                sensor = actualId["sensor"]
+                # "ccd" is the canonical term for the detector name
+                actualId["ccd"] = "R%s%s_S%s%s" % (raft[1], raft[3], sensor[1], sensor[3])
 
         return actualId
 
@@ -114,29 +146,15 @@ class LsstSimMapper(CameraMapper):
                         "Invalid %s identifier: %s" % (component, repr(id))
         return dataId
 
-    def _extractDetectorName(self, dataId):
-        return "R:%(raft)s S:%(sensor)s" % dataId
-
     def getDataId(self, visit, ccdId):
         """get dataId dict from visit and ccd identifier
 
         @param visit 32 or 64-bit depending on camera
-        @param ccdId same as ccd.getId().getSerial()
+        @param ccdId detector name: same as detector.getName()
         """
-        x = str(ccdId)
-        while len(x) < 4:
-            x = '0' + x
-        raft = x[0] + ',' + x[1]
-        sensor  = x[2] + ',' + x[3]
-        dataId = {'visit': long(visit), 'raft': raft, 'sensor': sensor}
+        dataId = {'visit': long(visit)}
+        dataId['raft'], dataId['sensor'] = self._raftSensorFromCcdName(ccdId)
         return dataId
-
-    def _extractAmpId(self, dataId):
-        m = re.match(r'(\d),(\d)', dataId['channel'])
-        # Note that indices are swapped in the camera geometry vs. official
-        # channel specification.
-        return (self._extractDetectorName(dataId),
-                int(m.group(1)), int(m.group(2)))
 
     def _computeAmpExposureId(self, dataId):
         #visit, snap, raft, sensor, channel):
@@ -196,6 +214,24 @@ class LsstSimMapper(CameraMapper):
         if singleFilter:
             return id * 8 + self.filterIdMap[dataId['filter']]
         return id
+
+    @staticmethod
+    def getShortCcdName(self, ccdName):
+        """Convert a CCD name to a form useful as a filename
+
+        This LSST version converts spaces to underscores and elides colons and commas.
+        """
+        return ccdName.replace(" ", "_").replace(":", "").replace(",", "")
+
+    def _getCcdSerial(self, dataId):
+        """Return value of ccdSerial field in defects registry based on data ID
+
+        The LSST uses an integer made from <raftX><raftY><sensorX><sensorY>,
+        e.g. detector R02_S11 has ccdSerial 211
+        """
+        raft = dataId["raft"]
+        sensor = dataId["sensor"]
+        return int("%d%d%d%d" % (raft[0], raft[2], sensor[0], sensor[2]))
 
     def _setAmpExposureId(self, propertyList, dataId):
         propertyList.set("Computed_ampExposureId", self._computeAmpExposureId(dataId))

@@ -22,10 +22,25 @@
 #
 from __future__ import absolute_import, division
 import argparse
+import re
 import lsst.afw.geom as afwGeom
 import lsst.afw.table as afwTable
-from lsst.afw.cameraGeom import (DetectorConfig, CameraFactoryTask, CameraConfig, 
-    PUPIL, FOCAL_PLANE, PIXELS)
+from lsst.afw.cameraGeom import (DetectorConfig, CameraConfig, PUPIL, FOCAL_PLANE, PIXELS)
+from lsst.obs.lsstSim import LsstSimMapper
+
+def expandDetectorName(abbrevName):
+    """Convert a detector name of the form Rxy_Sxy[_Ci] to canonical form: R:x,y S:x,y[,c]
+
+    C0 -> A, C1 -> B
+    """
+    m = re.match(r"R(\d)(\d)_S(\d)(\d)(?:_C([0,1]))?", abbrevName)
+    if m is None:
+        raise RuntimeError("Cannot parse abbreviated name %r" % (abbrevName,))
+    fullName = "R:%s,%s S:%s,%s" % tuple(m.groups()[0:4])
+    subSensor = m.groups()[4]
+    if subSensor is not None:
+        fullName  = fullName + "," + {"0": "A", "1": "B"}[subSensor]
+    return fullName
 
 def makeAmpTables(segmentsFile):
     """
@@ -47,8 +62,7 @@ def makeAmpTables(segmentsFile):
             if len(els) == 4:
                 if ampCatalog is not None:
                     returnDict[detectorName] = ampCatalog
-                detectorName = els[0]
-                numy = int(els[2])
+                detectorName = expandDetectorName(els[0])
                 numx = int(els[3])
                 schema = afwTable.AmpInfoTable.makeMinimalSchema()
                 ampCatalog = afwTable.AmpInfoCatalog(schema)
@@ -156,11 +170,17 @@ if __name__ == "__main__":
     """
     import os
     import shutil
+    import eups
+    baseDir = eups.productDir("obs_lsstSim")
+    defaultOutDir = os.path.join(os.path.normpath(baseDir), "description", "camera")
 
     parser = argparse.ArgumentParser()
     parser.add_argument("DetectorLayoutFile", help="Path to detector layout file")
     parser.add_argument("SegmentsFile", help="Path to amp segments file")
-    parser.add_argument("OutputRepository", help="Path to dump configs and AmpInfo Tables")
+    parser.add_argument("OutputDir",
+        help = "Path to dump configs and AmpInfo Tables; defaults to %r" % (defaultOutDir,),
+        default = defaultOutDir,
+    )
     parser.add_argument("--clobber", action="store_true", dest="clobber", default=False,
         help=("remove and re-create the output directory if it already exists?"))
     args = parser.parse_args()
@@ -210,29 +230,14 @@ if __name__ == "__main__":
         print "Creating directory %r" % (dirPath,)
         os.makedirs(dirPath)
 
-    def makeDirIfNeeded(dirPath):
-        """Make a directory if it doesn't exist; if it exists then make sure it is a directory
-
-        @param[in] dirPath: path of directory to create
-        @throw RuntimeError if dirPath exists and is not a directory
-        """
-        if os.path.exists(dirPath):
-            if not os.path.isdir(dirPath):
-                raise RuntimeError("Path %r exists but is not a directory" % (dirPath,))
-        else:
-            print "Creating directory %r" % (dirPath,)
-            os.makedirs(dirPath)
-
     # write data products
-    repoDir = args.OutputRepository
-    makeDirIfNeeded(repoDir)
+    outDir = args.OutputDir
+    makeDir(dirPath=outDir, doClobber=args.clobber)
 
-    camDir = os.path.join(repoDir, "camera")
-    makeDir(dirPath=camDir, doClobber=args.clobber)
-
-    camConfigPath = os.path.join(camDir, "camera.py")
+    camConfigPath = os.path.join(outDir, "camera.py")
     camConfig.save(camConfigPath)
 
     for detectorName, ampTable in ampTableDict.iteritems():
-        ampInfoPath = os.path.join(camDir, detectorName + ".fits")
+        shortDetectorName = LsstSimMapper.getShortCcdName(detectorName)
+        ampInfoPath = os.path.join(outDir, shortDetectorName + ".fits")
         ampTable.writeFits(ampInfoPath)
