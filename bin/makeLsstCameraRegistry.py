@@ -164,21 +164,6 @@ def makeDetectorConfigs(detectorLayoutFile):
             detectorConfigs.append(detConfig)
     return detectorConfigs
 
-def loadCamera(repoDir):
-    import os
-    ampTableDict = {}
-    camConfigPath = os.path.join(repoDir, "camera", "camera.py")
-    camConfig = CameraConfig()
-    camConfig.load(camConfigPath)
-    for det in camConfig.detectorList: 
-        detName = camConfig.detectorList[det].name
-        els = detName.split("_")
-        if len(els) > 2:
-            continue
-    ampInfoPath = os.path.join(repoDir, 'camera' )
-    cameraTask = CameraFactoryTask()
-    return cameraTask.run(camConfig, ampInfoPath)
-
 if __name__ == "__main__":
     """
     Create the configs for building a camera.  This runs on the files distributed with PhoSim.
@@ -226,10 +211,6 @@ if __name__ == "__main__":
     tmc.nativeSys = FOCAL_PLANE.getSysName()
     tmc.transforms = {PUPIL.getSysName():tConfig}
     camConfig.transformDict = tmc
-
-    # create camera -- not something we normally do here
-    # cameraTask = CameraFactoryTask(camConfig, ampTableDict)
-    # camera = cameraTask.run()
 
     def makeDir(dirPath, doClobber=False):
         """Make a directory; if it exists then clobber or fail, depending on doClobber
