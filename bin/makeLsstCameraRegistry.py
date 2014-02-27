@@ -183,6 +183,7 @@ if __name__ == "__main__":
     parser.add_argument("SegmentsFile", help="Path to amp segments file")
     parser.add_argument("OutputDir",
         help = "Path to dump configs and AmpInfo Tables; defaults to %r" % (defaultOutDir,),
+        nargs = "?",
         default = defaultOutDir,
     )
     parser.add_argument("--clobber", action="store_true", dest="clobber", default=False,

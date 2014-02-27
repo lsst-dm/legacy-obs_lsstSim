@@ -216,7 +216,7 @@ class LsstSimMapper(CameraMapper):
         return id
 
     @staticmethod
-    def getShortCcdName(self, ccdName):
+    def getShortCcdName(ccdName):
         """Convert a CCD name to a form useful as a filename
 
         This LSST version converts spaces to underscores and elides colons and commas.
