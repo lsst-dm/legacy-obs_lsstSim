@@ -37,6 +37,8 @@ def makeAmpTables(segmentsFile):
     #how to get this information.
     linearityCoeffs = (0.,1.,0.,0.)
     linearityType = "Polynomial"
+    #TODO, this should come from the cameraGeom package when it's implemented
+    readoutMap = {'LL':0, 'LR':1, 'UR':2, 'UL':3}
     ampCatalog = None
     with open(segmentsFile) as fh:
         for l in fh:
@@ -75,6 +77,11 @@ def makeAmpTables(segmentsFile):
                 flipy = False 
             else: 
                 flipy = True
+            
+            #Since the amps are stored in amp coordinates, the readout is the same
+            #for all amps
+            readCorner = readoutMap['LL']
+
             ndatax = x1 - x0 + 1
             ndatay = y1 - y0 + 1
             prescan = int(els[15])
@@ -87,9 +94,14 @@ def makeAmpTables(segmentsFile):
             rawVerticalOverscanBBox = afwGeom.Box2I(afwGeom.Point2I(extended, prescan+ndatay), afwGeom.Extent2I(ndatax, voverscan))
             rawPrescanBBox = afwGeom.Box2I(afwGeom.Point2I(extended, 0), afwGeom.Extent2I(ndatax, prescan))
 
+            extraRawX = extended + hoverscan
+            extraRawY = prescan + voverscan
+            rawx0 = x0 + extraRawX*(x0//ndatax)
+            rawy0 = y0 + extraRawY*(y0//ndatay)
             #Set the elements of the record for this amp
             record.setBBox(bbox)
             record.setName(name)
+            record.setReadoutCorner(readCorner)
             record.setGain(gain)
             record.setReadNoise(readnoise)
             record.setLinearityCoeffs(linearityCoeffs)
@@ -98,13 +110,29 @@ def makeAmpTables(segmentsFile):
             record.setRawFlipX(flipx)
             record.setRawFlipY(flipy)
             record.setRawBBox(rawBBox)
-            record.setRawXYOffset(afwGeom.Extent2I(x0, y0))
+            record.setRawXYOffset(afwGeom.Extent2I(rawx0, rawy0))
             record.setRawDataBBox(rawDataBBox)
             record.setRawHorizontalOverscanBBox(rawHorizontalOverscanBBox)
             record.setRawVerticalOverscanBBox(rawVerticalOverscanBBox)
             record.setRawPrescanBBox(rawPrescanBBox)
     returnDict[detectorName] = ampCatalog
     return returnDict
+
+def makeLongName(shortName):
+    """
+    Make the long name from the PhoSim short name
+    @param shortName -- string name like R??_S??[_C??] to parse
+    """
+    parts = shortName.split("_")
+    if len(parts) == 2:
+        return " ".join(["%s:%s"%(el[0], ",".join(el[1:])) for el in parts])
+    elif len(parts) == 3:
+        #This must be a wavefront sensor
+        wsPartMap = {'S':{'C0':'A', 'C1':'B'},
+                     'R':{'C0':'', 'C1':''}}
+        return " ".join(["%s:%s"%(el[0], ",".join(el[1:]+wsPartMap[el[0]][parts[-1]])) for el in parts[:-1]])
+    else:
+        raise ValueError("Could not parse %s: has %i parts"%(shortName, len(parts)))
    
 def makeDetectorConfigs(detectorLayoutFile):
     """
@@ -121,7 +149,7 @@ def makeDetectorConfigs(detectorLayoutFile):
                 continue
             detConfig = DetectorConfig()
             els = l.rstrip().split()
-            detConfig.name = els[0]
+            detConfig.name = makeLongName(els[0])
             detConfig.bbox_x0 = 0
             detConfig.bbox_y0 = 0
             detConfig.bbox_x1 = int(els[5]) - 1
@@ -156,11 +184,6 @@ def loadCamera(repoDir):
     camConfigPath = os.path.join(repoDir, "camera", "camera.py")
     camConfig = CameraConfig()
     camConfig.load(camConfigPath)
-    for det in camConfig.detectorList: 
-        detName = camConfig.detectorList[det].name
-        els = detName.split("_")
-        if len(els) > 2:
-            continue
     ampInfoPath = os.path.join(repoDir, 'camera' )
     cameraTask = CameraFactoryTask()
     return cameraTask.run(camConfig, ampInfoPath)
