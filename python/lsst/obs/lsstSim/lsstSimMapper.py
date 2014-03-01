@@ -81,11 +81,10 @@ class LsstSimMapper(CameraMapper):
 
         Canonical keys include:
         - amp: amplifier name
-        - ccd: CCD name (in LSST this is a combination of raft and sensor)
-        The names preferred by LSST are:
+        - ccd: CCD name; LSST format is: R:<x>,<y> S:<x>,<y>[,<c>]
+            where <x> and <y> are single digits and <c> is A or B
         - channel: identical to amp
-        - raft, sensor: in the form <digit>,<digit> (note the comma separator)
-        ccd = R<digit><digit>_S<digit><digit> (no commas!)
+        - raft, sensor: in the form <x>,<y> (note the comma separator)
 
         Warning: wavefront sensors are named Rxx_Sxx_Cx, which cannot be generated
         from raft and sensor. Thus the supplied value of "ccd" is left alone, if provided.

@@ -24,32 +24,52 @@ from __future__ import absolute_import, division
 import glob
 import os
 import re
-try:
-    import sqlite3
-except ImportError:
-    # try external pysqlite package; deprecated
-    import sqlite as sqlite3
+import sqlite3
 import sys
 
-if os.path.exists("defectRegistry.sqlite3"):
-    os.unlink("defectRegistry.sqlite3")
-conn = sqlite3.connect("defectRegistry.sqlite3")
+import pyfits
 
-cmd = "create table defect (id integer primary key autoincrement"
-cmd += ", path text, version int, ccdSerial int"
-cmd += ", validStart text, validEnd text)"
+import eups
+
+baseDir = eups.productDir("obs_lsstSim")
+registryDir = os.path.join(os.path.normpath(baseDir), "description", "defects")
+registryPath = os.path.join(registryDir, "defectRegistry.sqlite3")
+
+# create new database
+if os.path.exists(registryPath):
+    print "Deleting existing %r" % (registryPath,)
+    os.unlink(registryPath)
+print "Creating %r" % (registryPath,)
+conn = sqlite3.connect(registryPath)
+
+# create "defect" table
+cmd = "create table defect (id integer primary key autoincrement" + \
+    ", path text, version int, ccd text" + \
+    ", validStart text, validEnd text)"
 conn.execute(cmd)
 conn.commit()
 
+# fill table
 cmd = "INSERT INTO defect VALUES (NULL, ?, ?, ?, ?, ?)"
-
-for f in glob.glob("rev_*/defects*.fits"):
-    m = re.search(r'rev_(\d+)/defects(\d+)\.fits', f)
+numEntries = 0
+for filePath in glob.glob(os.path.join(registryDir, "rev_*", "defects*.fits")):
+    m = re.search(r'rev_(\d+)/defects(\d+)\.fits', filePath)
     if not m:
-        print >>sys.stderr, "Unrecognized file: %s" % (f,)
+        sys.stderr.write("Skipping file with invalid name: %r\n" % (filePath,))
         continue
-    print f
-    conn.execute(cmd, (f, int(m.group(1)), int(m.group(2)),
-        "1970-01-01", "2037-12-31"))
+    print "Processing %r" % (filePath,)
+
+    fitsTable = pyfits.open(filePath)
+    ccd = fitsTable[1].header["NAME"]
+    conn.execute(cmd, (
+        filePath,
+        int(m.group(1)),
+        ccd,
+        "1970-01-01",
+        "2037-12-31",
+    ))
+    numEntries += 1
 conn.commit()
+print "Added %d entries" % (numEntries)
+
 conn.close()
