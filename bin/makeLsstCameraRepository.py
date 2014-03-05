@@ -22,10 +22,29 @@
 #
 from __future__ import absolute_import, division
 import argparse
+import os
+import re
+import shutil
+
+import eups
 import lsst.afw.geom as afwGeom
 import lsst.afw.table as afwTable
-from lsst.afw.cameraGeom import (DetectorConfig, CameraFactoryTask, CameraConfig, 
-    PUPIL, FOCAL_PLANE, PIXELS)
+from lsst.afw.cameraGeom import (DetectorConfig, CameraConfig, PUPIL, FOCAL_PLANE, PIXELS)
+from lsst.obs.lsstSim import LsstSimMapper
+
+def expandDetectorName(abbrevName):
+    """Convert a detector name of the form Rxy_Sxy[_Ci] to canonical form: R:x,y S:x,y[,c]
+
+    C0 -> A, C1 -> B
+    """
+    m = re.match(r"R(\d)(\d)_S(\d)(\d)(?:_C([0,1]))?", abbrevName)
+    if m is None:
+        raise RuntimeError("Cannot parse abbreviated name %r" % (abbrevName,))
+    fullName = "R:%s,%s S:%s,%s" % tuple(m.groups()[0:4])
+    subSensor = m.groups()[4]
+    if subSensor is not None:
+        fullName  = fullName + "," + {"0": "A", "1": "B"}[subSensor]
+    return fullName
 
 def makeAmpTables(segmentsFile):
     """
@@ -49,14 +68,14 @@ def makeAmpTables(segmentsFile):
             if len(els) == 4:
                 if ampCatalog is not None:
                     returnDict[detectorName] = ampCatalog
-                detectorName = els[0]
-                numy = int(els[2])
+                detectorName = expandDetectorName(els[0])
                 numx = int(els[3])
                 schema = afwTable.AmpInfoTable.makeMinimalSchema()
                 ampCatalog = afwTable.AmpInfoCatalog(schema)
                 continue
             record = ampCatalog.addNew()
             name = els[0].split("_")[-1]
+            name = '%s:%s,%s'%(name[0], name[1], name[2]) 
             #Because of the camera coordinate system, we choose an
             #image coordinate system such that a transpose and reflection
             #about y is necessary to get the correct pixel positions from the
@@ -178,16 +197,6 @@ def makeDetectorConfigs(detectorLayoutFile):
             detectorConfigs.append(detConfig)
     return detectorConfigs
 
-def loadCamera(repoDir):
-    import os
-    ampTableDict = {}
-    camConfigPath = os.path.join(repoDir, "camera", "camera.py")
-    camConfig = CameraConfig()
-    camConfig.load(camConfigPath)
-    ampInfoPath = os.path.join(repoDir, 'camera' )
-    cameraTask = CameraFactoryTask()
-    return cameraTask.run(camConfig, ampInfoPath)
-
 if __name__ == "__main__":
     """
     Create the configs for building a camera.  This runs on the files distributed with PhoSim.
@@ -195,13 +204,17 @@ if __name__ == "__main__":
     DetectorLayoutFile -- https://dev.lsstcorp.org/cgit/LSST/sims/phosim.git/plain/data/lsst/focalplanelayout.txt?h=dev
     SegmentsFile -- https://dev.lsstcorp.org/cgit/LSST/sims/phosim.git/plain/data/lsst/segmentation.txt?h=dev
     """
-    import os
-    import shutil
+    baseDir = eups.productDir("obs_lsstSim")
+    defaultOutDir = os.path.join(os.path.normpath(baseDir), "description", "camera")
 
     parser = argparse.ArgumentParser()
     parser.add_argument("DetectorLayoutFile", help="Path to detector layout file")
     parser.add_argument("SegmentsFile", help="Path to amp segments file")
-    parser.add_argument("OutputRepository", help="Path to dump configs and AmpInfo Tables")
+    parser.add_argument("OutputDir",
+        help = "Path to dump configs and AmpInfo Tables; defaults to %r" % (defaultOutDir,),
+        nargs = "?",
+        default = defaultOutDir,
+    )
     parser.add_argument("--clobber", action="store_true", dest="clobber", default=False,
         help=("remove and re-create the output directory if it already exists?"))
     args = parser.parse_args()
@@ -230,10 +243,6 @@ if __name__ == "__main__":
     tmc.transforms = {PUPIL.getSysName():tConfig}
     camConfig.transformDict = tmc
 
-    # create camera -- not something we normally do here
-    # cameraTask = CameraFactoryTask(camConfig, ampTableDict)
-    # camera = cameraTask.run()
-
     def makeDir(dirPath, doClobber=False):
         """Make a directory; if it exists then clobber or fail, depending on doClobber
 
@@ -251,29 +260,14 @@ if __name__ == "__main__":
         print "Creating directory %r" % (dirPath,)
         os.makedirs(dirPath)
 
-    def makeDirIfNeeded(dirPath):
-        """Make a directory if it doesn't exist; if it exists then make sure it is a directory
-
-        @param[in] dirPath: path of directory to create
-        @throw RuntimeError if dirPath exists and is not a directory
-        """
-        if os.path.exists(dirPath):
-            if not os.path.isdir(dirPath):
-                raise RuntimeError("Path %r exists but is not a directory" % (dirPath,))
-        else:
-            print "Creating directory %r" % (dirPath,)
-            os.makedirs(dirPath)
-
     # write data products
-    repoDir = args.OutputRepository
-    makeDirIfNeeded(repoDir)
+    outDir = args.OutputDir
+    makeDir(dirPath=outDir, doClobber=args.clobber)
 
-    camDir = os.path.join(repoDir, "camera")
-    makeDir(dirPath=camDir, doClobber=args.clobber)
-
-    camConfigPath = os.path.join(camDir, "camera.py")
+    camConfigPath = os.path.join(outDir, "camera.py")
     camConfig.save(camConfigPath)
 
     for detectorName, ampTable in ampTableDict.iteritems():
-        ampInfoPath = os.path.join(camDir, detectorName + ".fits")
+        shortDetectorName = LsstSimMapper.getShortCcdName(detectorName)
+        ampInfoPath = os.path.join(outDir, shortDetectorName + ".fits")
         ampTable.writeFits(ampInfoPath)
