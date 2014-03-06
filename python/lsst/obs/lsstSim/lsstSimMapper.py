@@ -65,15 +65,18 @@ class LsstSimMapper(CameraMapper):
     def _raftSensorFromCcdName(self, ccdName):
         """Parse a ccd name and return raft and sensor
 
-        @param[in] ccdName: detector name, as a string in the form Rxx_Sxx (e.g. "R02_S11")
-        @return (raft, sensor), each as a string in the form x,y (e.g. "0,2")
+        @param[in] ccdName: detector name, as a string in the form R:x,x Sx,x[,c]
+            where c is A or B (e.g. "R02_S11")
+        @return (raft, sensor), each as a string in the form x,y[,c] (e.g. "02");
         @raise RuntimeError if ccdName cannot be parsed
         """
-        m = re.match(r'R(\d)(\d)_S(\d)(\d)', ccdName)
+        m = re.match(r"R:(\d),(\d) S(\d),(\d)(,[aAbB])?", ccdName)
         if m is None:
             raise RuntimeError("Cannot parse ccdName=%r" % (ccdName,))
-        raft = m.group(1) + "," + m.group(2)
-        sensor = m.group(3) + "," + m.group(4)
+        raft = m.group(1) + m.group(2)
+        sensor = m.group(3) + m.group(4)
+        if m.group(5) is not None:
+            sensor += "," + m.group(5)
         return (raft, sensor)
 
     def _transformId(self, dataId):
@@ -102,8 +105,21 @@ class LsstSimMapper(CameraMapper):
                 actualId["ccd"] = actualId[ccdAlias]
                 break
         if "ccd" in actualId:
-            m = re.match(r'R(\d)(\d)_S(\d)(\d)', actualId['ccd'])
-            actualId['raft'], actualId['sensor'] = self._raftSensorFromCcdName(actualId['ccd'])
+            ccdName = actualId["ccd"]
+            m = re.match(r'R(\d)(\d)_S(\d)(\d)([aAbB])?', ccdName)
+            if m is not None:
+                # short name was provided; expand to full name
+                tempName = "R:%s,%s S:%s,%s" % (m.group(1), m.group(2), m.group(3), m.group(4))
+                if m.group(5) is not None:
+                    tempName += "," + m.group(5)
+                ccdName = tempName
+            else:
+                longMatch = re.match(r"R:\d,\d S:\d,\d(,[aAbB])?", ccdName)
+                if longMatch is None:
+                    raise RuntimeError("Invalid ccd name: %r" % (ccdName,))
+                ccdName = ccdName.upper()
+            actualId["ccdName"] = ccdName
+            actualId['raft'], actualId['sensor'] = self._raftSensorFromCcdName(ccdName)
         for ampAlias in ("channel", "channelName", "amp", "ampName"):
             if ampAlias in actualId:
                 ampName = re.sub(r'(\d),(\d)', r'\1\2', actualId[ampAlias])
@@ -122,13 +138,16 @@ class LsstSimMapper(CameraMapper):
         if "raft" in actualId:
             actualId['raft'] = re.sub(r'(\d),(\d)', r'\1\2', actualId['raft'])
         if "sensor" in actualId:
-            actualId['sensor'] = re.sub(r'(\d),(\d)', r'\1\2', actualId['sensor'])
+            actualId['sensor'] = re.sub(r'(\d),(\d)', r'\1\2', actualId['sensor']).upper()
             if "raft" in actualId and "ccd" not in actualId:
+                # ccd not specified; construct it
                 raft = actualId["raft"]
                 sensor = actualId["sensor"]
                 # "ccd" is the canonical term for the detector name
-                actualId["ccd"] = "R%s%s_S%s%s" % (raft[1], raft[3], sensor[1], sensor[3])
-
+                ccdName = "R:%s,%s S:%s,%s" % (raft[0], raft[1], sensor[0], sensor[1])
+                if len(sensor) > 2:
+                    ccdName += "," + sensor[2].upper()
+                actualId["ccd"] = ccdName
         return actualId
 
     def validate(self, dataId):
