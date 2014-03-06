@@ -173,7 +173,7 @@ def makeDetectorConfigs(detectorLayoutFile):
                 continue
             detConfig = DetectorConfig()
             els = l.rstrip().split()
-            detConfig.name = makeLongName(els[0])
+            detConfig.name = expandDetectorName(els[0])
             detConfig.bbox_x0 = 0
             detConfig.bbox_y0 = 0
             detConfig.bbox_x1 = int(els[5]) - 1

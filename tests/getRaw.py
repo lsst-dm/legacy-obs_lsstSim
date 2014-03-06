@@ -45,9 +45,8 @@ class GetRawTestCase(unittest.TestCase):
         self.assertEqual(raw.getWidth(), 513)
         self.assertEqual(raw.getHeight(), 2001)
         self.assertEqual(raw.getFilter().getFilterProperty().getName(), "y")
-        self.assertEqual(raw.getDetector().getId().getName(), "ID9")
-        self.assertEqual(raw.getDetector().getParent().getId().getName(),
-                "R:0,3 S:0,1")
+#        self.assertEqual(raw.getDetector().getName(), "ID9")
+        self.assertEqual(raw.getDetector().getName(), "R:0,3 S:0,1")
         origin = raw.getWcs().getSkyOrigin()
         self.assertAlmostEqual(
             origin.getLongitude().asDegrees(), 0.005865, 6)
