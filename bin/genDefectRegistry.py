@@ -26,11 +26,16 @@ import os
 import re
 import sqlite3
 import sys
+from lsst.obs.lsstSim import LsstSimMapper
 
 import pyfits
 
 import eups
 
+if len(sys.argv) < 2:
+    raise RuntimeError("Must provide a phosim version against which these defects are valid")
+
+phosimVersion = sys.argv[1]
 baseDir = eups.productDir("obs_lsstSim")
 registryDir = os.path.join(os.path.normpath(baseDir), "description", "defects")
 registryPath = os.path.join(registryDir, "defectRegistry.sqlite3")
@@ -44,13 +49,13 @@ conn = sqlite3.connect(registryPath)
 
 # create "defect" table
 cmd = "create table defect (id integer primary key autoincrement" + \
-    ", path text, version int, ccd text" + \
+    ", path text, version int, ccd text, ccdSerial text" + \
     ", validStart text, validEnd text)"
 conn.execute(cmd)
 conn.commit()
 
 # fill table
-cmd = "INSERT INTO defect VALUES (NULL, ?, ?, ?, ?, ?)"
+cmd = "INSERT INTO defect VALUES (NULL, ?, ?, ?, ?, ?, ?)"
 numEntries = 0
 for filePath in glob.glob(os.path.join(registryDir, "rev_*", "defects*.fits")):
     m = re.search(r'rev_(\d+)/defects(\d+)\.fits', filePath)
@@ -61,10 +66,12 @@ for filePath in glob.glob(os.path.join(registryDir, "rev_*", "defects*.fits")):
 
     fitsTable = pyfits.open(filePath)
     ccd = fitsTable[1].header["NAME"]
+    serial = LsstSimMapper.getShortCcdName(ccd)+"_"+phosimVersion
     conn.execute(cmd, (
         filePath,
         int(m.group(1)),
         ccd,
+        serial,
         "1970-01-01",
         "2037-12-31",
     ))

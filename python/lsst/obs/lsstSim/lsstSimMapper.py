@@ -228,16 +228,6 @@ class LsstSimMapper(CameraMapper):
         """
         return ccdName.replace(" ", "_").replace(":", "").replace(",", "")
 
-    def _getCcdSerial(self, dataId):
-        """Return value of ccdSerial field in defects registry based on data ID
-
-        The LSST uses an integer made from <raftX><raftY><sensorX><sensorY>,
-        e.g. detector R02_S11 has ccdSerial 211
-        """
-        raft = dataId["raft"]
-        sensor = dataId["sensor"]
-        return int("%d%d%d%d" % (raft[0], raft[2], sensor[0], sensor[2]))
-
     def _setAmpExposureId(self, propertyList, dataId):
         propertyList.set("Computed_ampExposureId", self._computeAmpExposureId(dataId))
         return propertyList
