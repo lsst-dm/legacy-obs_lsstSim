@@ -25,10 +25,7 @@ import os.path
 import unittest
 
 import lsst.utils.tests as utilsTests
-from lsst.pex.policy import Policy
 import lsst.daf.persistence as dafPersist
-import lsst.afw.coord as afwCoord
-import lsst.daf.base as dafBase
 
 class GetIdTestCase(unittest.TestCase):
     """Testing butler exposure id retrieval"""

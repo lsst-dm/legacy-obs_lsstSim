@@ -25,7 +25,6 @@ import os.path
 import unittest
 
 import lsst.utils.tests as utilsTests
-from lsst.pex.policy import Policy
 import lsst.daf.persistence as dafPersist
 
 class GetFlatTestCase(unittest.TestCase):
@@ -45,8 +44,8 @@ class GetFlatTestCase(unittest.TestCase):
         self.assertEqual(raw.getWidth(), 513)
         self.assertEqual(raw.getHeight(), 2001)
         self.assertEqual(raw.getFilter().getName(), "y")
-        self.assertEqual(raw.getDetector().getId().getName(), "ID9")
-        self.assertEqual(raw.getDetector().getParent().getId().getName(),
+        self.assertEqual(raw.getDetector().getName(), "ID9")
+        self.assertEqual(raw.getDetector().getParent().getName(),
                 "R:0,3 S:0,1")
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
