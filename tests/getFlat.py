@@ -44,9 +44,7 @@ class GetFlatTestCase(unittest.TestCase):
         self.assertEqual(raw.getWidth(), 513)
         self.assertEqual(raw.getHeight(), 2001)
         self.assertEqual(raw.getFilter().getName(), "y")
-        self.assertEqual(raw.getDetector().getName(), "ID9")
-        self.assertEqual(raw.getDetector().getParent().getName(),
-                "R:0,3 S:0,1")
+        self.assertEqual(raw.getDetector().getName(), "R:0,3 S:0,1")
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
