@@ -37,7 +37,7 @@ def expandDetectorName(abbrevName):
 
     C0 -> A, C1 -> B
     """
-    m = re.match(r"R(\d)(\d)_S(\d)(\d)(?:_C([0,1]))?", abbrevName)
+    m = re.match(r"R(\d)(\d)_S(\d)(\d)(?:_C([0,1]))?$", abbrevName)
     if m is None:
         raise RuntimeError("Cannot parse abbreviated name %r" % (abbrevName,))
     fullName = "R:%s,%s S:%s,%s" % tuple(m.groups()[0:4])
@@ -45,6 +45,19 @@ def expandDetectorName(abbrevName):
     if subSensor is not None:
         fullName  = fullName + "," + {"0": "A", "1": "B"}[subSensor]
     return fullName
+
+def detectorIdFromAbbrevName(abbrevName):
+    """Compute detector ID from an abbreviated detector name of the form Rxy_Sxy_Ci
+
+    value = digits in this order: ci+1 rx ry sx sy
+    """
+    m = re.match(r"R(\d)(\d)_S(\d)(\d)(?:_C([0,1]))?$", abbrevName)
+    if m is None:
+        raise RuntimeError("Cannot parse abbreviated name %r" % (abbrevName,))
+    detectorId = int("".join(m.groups()[0:4]))
+    if m.group(5) is not None:
+        detectorId += 10000 * (1 + int(m.group(5)))
+    return detectorId
 
 def makeAmpTables(segmentsFile):
     """
@@ -90,7 +103,6 @@ def makeAmpTables(segmentsFile):
             y1 = int(els[2])
             #Another quirk of the phosim file is that one of the wavefront sensor
             #chips has an offset of 2000 pix in y.  It's always the 'C1' chip.
-            print correctY0
             if correctY0:
                 if y0 > 0:
                     y1 -= y0
@@ -186,6 +198,7 @@ def makeDetectorConfigs(detectorLayoutFile):
             detConfig = DetectorConfig()
             els = l.rstrip().split()
             detConfig.name = expandDetectorName(els[0])
+            detConfig.id = detectorIdFromAbbrevName(els[0])
             detConfig.bbox_x0 = 0
             detConfig.bbox_y0 = 0
             detConfig.bbox_x1 = int(els[5]) - 1
