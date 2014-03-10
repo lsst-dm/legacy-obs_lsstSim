@@ -25,7 +25,6 @@ import os.path
 import unittest
 
 import lsst.utils.tests as utilsTests
-from lsst.pex.policy import Policy
 import lsst.daf.persistence as dafPersist
 
 class MetadataTestCase(unittest.TestCase):

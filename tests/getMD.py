@@ -26,7 +26,6 @@ import unittest
 
 import lsst.utils.tests as utilsTests
 import lsst.daf.persistence as dafPersist
-import lsst.afw.coord as afwCoord
 
 class GetRawMetadataTestCase(unittest.TestCase):
     """Testing butler raw image retrieval"""
