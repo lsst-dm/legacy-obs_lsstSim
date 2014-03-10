@@ -45,7 +45,7 @@ class GetFlatTestCase(unittest.TestCase):
         self.assertEqual(raw.getHeight(), 2001)
         self.assertEqual(raw.getFilter().getName(), "y")
         self.assertEqual(raw.getDetector().getName(), "R:0,3 S:0,1")
-
+        self.assertEqual(raw.getDetector()['1,0'].getName(), '1,0')
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 def suite():

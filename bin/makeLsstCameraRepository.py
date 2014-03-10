@@ -60,6 +60,7 @@ def makeAmpTables(segmentsFile):
     readoutMap = {'LL':0, 'LR':1, 'UR':2, 'UL':3}
     ampCatalog = None
     detectorName = [] # set to a value that is an invalid dict key, to catch bugs
+    correctY0 = False
     with open(segmentsFile) as fh:
         for l in fh:
             if l.startswith("#"):
@@ -73,16 +74,27 @@ def makeAmpTables(segmentsFile):
                 numx = int(els[3])
                 schema = afwTable.AmpInfoTable.makeMinimalSchema()
                 ampCatalog = afwTable.AmpInfoCatalog(schema)
+                if len(els[0].split('_')) == 3:   #wavefront sensor
+                    correctY0 = True
+                else:
+                    correctY0 = False
                 continue
             record = ampCatalog.addNew()
             name = els[0].split("_")[-1]
-            name = '%s:%s,%s'%(name[0], name[1], name[2]) 
+            name = '%s,%s'%(name[1], name[2]) 
             #Because of the camera coordinate system, we choose an
             #image coordinate system such that a transpose and reflection
             #about y is necessary to get the correct pixel positions from the
             #phosim segments file
             y0 = int(els[1])
             y1 = int(els[2])
+            #Another quirk of the phosim file is that one of the wavefront sensor
+            #chips has an offset of 2000 pix in y.  It's always the 'C1' chip.
+            print correctY0
+            if correctY0:
+                if y0 > 0:
+                    y1 -= y0
+                    y0 = 0 
             x0 = numx - 1 - int(els[4])
             x1 = numx - 1 - int(els[3])
             gain = float(els[7])
