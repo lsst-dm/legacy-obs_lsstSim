@@ -58,7 +58,6 @@ class LsstSimIsrTask(IsrTask):
 
     def __init__(self, **kwargs):
         IsrTask.__init__(self, **kwargs)
-        self.transposeForInterpolation = True # temporary hack until LSST data is in proper order
         self.makeSubtask("snapCombine")
 
     def unmaskSatHotPixels(self, exposure):
@@ -97,13 +96,14 @@ class LsstSimIsrTask(IsrTask):
 
             self.log.log(self.log.INFO, "Performing ISR on snap %s" % (snapRef.dataId))
             # perform amp-level ISR
-            ampExposureList = list()
+            ampExposureDict = dict()
             for ampRef in snapRef.subItems(level="channel"):
                 ampExposure = ampRef.get("raw")
-                amp = cameraGeom.cast_Amp(ampExposure.getDetector())
+                ccd = ampExposure.getDetector()
+                amp = ccd[ampRef.dataId['channel']]
 
                 ampExposure = self.convertIntToFloat(ampExposure)
-                ampExpDataView = ampExposure.Factory(ampExposure, amp.getDiskDataSec(), afwImage.PARENT)
+                ampExpDataView = ampExposure.Factory(ampExposure, amp.getRawDataBBox(), afwImage.PARENT)
                 
                 self.saturationDetection(ampExposure, amp)
     
@@ -120,12 +120,13 @@ class LsstSimIsrTask(IsrTask):
                 if self.config.doFlat:
                     self.flatCorrection(ampExpDataView, ampRef)
                 
-                ampExposureList.append(ampExposure)
+                ampExposureDict[amp.getName()] = ampExposure
         
-            ccdExposure = self.assembleCcd.assembleAmpList(ampExposureList)
-            del ampExposureList
+            ccdExposure = self.assembleCcd.assembleCcd(ampExposureDict)
+            del ampExposureDict
 
-            self.maskAndInterpDefect(ccdExposure)
+            defects = snapRef.get("defects")
+            self.maskAndInterpDefect(ccdExposure, defects)
 
             self.unmaskSatHotPixels(ccdExposure)
             

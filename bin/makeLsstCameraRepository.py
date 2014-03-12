@@ -59,11 +59,16 @@ def detectorIdFromAbbrevName(abbrevName):
         detectorId += 10000 * (1 + int(m.group(5)))
     return detectorId
 
-def makeAmpTables(segmentsFile):
+def makeAmpTables(segmentsFile, gainFile):
     """
     Read the segments file from a PhoSim release and produce the appropriate AmpInfo
     @param segmentsFile -- String indicating where the file is located
     """
+    gainDict = {}
+    with open(gainFile) as fh:
+        for l in fh:
+            els = l.rstrip().split()
+            gainDict[els[0]] = {'gain':float(els[1]), 'saturation':int(els[2])} 
     returnDict = {}
     #TODO currently there is no linearity provided, but we should identify
     #how to get this information.
@@ -84,7 +89,7 @@ def makeAmpTables(segmentsFile):
                 if ampCatalog is not None:
                     returnDict[detectorName] = ampCatalog
                 detectorName = expandDetectorName(els[0])
-                numx = int(els[3])
+                numy = int(els[2])
                 schema = afwTable.AmpInfoTable.makeMinimalSchema()
                 ampCatalog = afwTable.AmpInfoCatalog(schema)
                 if len(els[0].split('_')) == 3:   #wavefront sensor
@@ -96,20 +101,26 @@ def makeAmpTables(segmentsFile):
             name = els[0].split("_")[-1]
             name = '%s,%s'%(name[1], name[2]) 
             #Because of the camera coordinate system, we choose an
-            #image coordinate system such that a transpose and reflection
-            #about y is necessary to get the correct pixel positions from the
+            #image coordinate system that requires a -90 rotation to get
+            #the correct pixel positions from the
             #phosim segments file
-            y0 = int(els[1])
-            y1 = int(els[2])
+            y0 = numy - 1 - int(els[2])
+            y1 = numy - 1 - int(els[1])
             #Another quirk of the phosim file is that one of the wavefront sensor
             #chips has an offset of 2000 pix in y.  It's always the 'C1' chip.
             if correctY0:
                 if y0 > 0:
                     y1 -= y0
                     y0 = 0 
-            x0 = numx - 1 - int(els[4])
-            x1 = numx - 1 - int(els[3])
-            gain = float(els[7])
+            x0 = int(els[3])
+            x1 = int(els[4])
+            try:
+                saturation = gainDict[els[0]]['saturation']
+                gain = gainDict[els[0]]['gain']
+            except KeyError:
+                # Set default if no gain exists
+                saturation = 65535
+                gain = float(els[7])
             readnoise = float(els[11])
             bbox = afwGeom.Box2I(afwGeom.Point2I(x0, y0), afwGeom.Point2I(x1, y1))
 
@@ -117,7 +128,7 @@ def makeAmpTables(segmentsFile):
                 flipx = False 
             else: 
                 flipx = True
-            if int(els[6]) == -1: 
+            if int(els[6]) == 1: 
                 flipy = False 
             else: 
                 flipy = True
@@ -128,6 +139,8 @@ def makeAmpTables(segmentsFile):
 
             ndatax = x1 - x0 + 1
             ndatay = y1 - y0 + 1
+            #TODO remove this HACK for supporting 3.3.2 camera
+            '''
             prescan = int(els[15])
             hoverscan = int(els[16])
             extended = int(els[17])
@@ -135,6 +148,16 @@ def makeAmpTables(segmentsFile):
             rawBBox = afwGeom.Box2I(afwGeom.Point2I(0,0), afwGeom.Extent2I(extended+ndatax+hoverscan, prescan+ndatay+voverscan))
             rawDataBBox = afwGeom.Box2I(afwGeom.Point2I(extended, prescan), afwGeom.Extent2I(ndatax, ndatay))
             rawHorizontalOverscanBBox = afwGeom.Box2I(afwGeom.Point2I(extended+ndatax, prescan), afwGeom.Extent2I(hoverscan, ndatay))
+            rawVerticalOverscanBBox = afwGeom.Box2I(afwGeom.Point2I(extended, prescan+ndatay), afwGeom.Extent2I(ndatax, voverscan))
+            rawPrescanBBox = afwGeom.Box2I(afwGeom.Point2I(extended, 0), afwGeom.Extent2I(ndatax, prescan))
+            '''
+            prescan = 1
+            hoverscan = 0
+            extended = 4
+            voverscan = 0
+            rawBBox = afwGeom.Box2I(afwGeom.Point2I(0,0), afwGeom.Extent2I(extended+ndatax+hoverscan, prescan+ndatay+voverscan))
+            rawDataBBox = afwGeom.Box2I(afwGeom.Point2I(extended, prescan), afwGeom.Extent2I(ndatax, ndatay))
+            rawHorizontalOverscanBBox = afwGeom.Box2I(afwGeom.Point2I(0, prescan), afwGeom.Extent2I(extended, ndatay))
             rawVerticalOverscanBBox = afwGeom.Box2I(afwGeom.Point2I(extended, prescan+ndatay), afwGeom.Extent2I(ndatax, voverscan))
             rawPrescanBBox = afwGeom.Box2I(afwGeom.Point2I(extended, 0), afwGeom.Extent2I(ndatax, prescan))
 
@@ -147,6 +170,7 @@ def makeAmpTables(segmentsFile):
             record.setName(name)
             record.setReadoutCorner(readCorner)
             record.setGain(gain)
+            record.setSaturation(saturation)
             record.setReadNoise(readnoise)
             record.setLinearityCoeffs(linearityCoeffs)
             record.setLinearityType(linearityType)
@@ -190,7 +214,7 @@ def makeDetectorConfigs(detectorLayoutFile):
     detectorConfigs = []
     detTypeMap = {"Group2":2, "Group1":3, "Group0":0}
     #We know we need to rotate 3 times and also apply the yaw perturbation
-    nQuarter = 3
+    nQuarter = 1
     with open(detectorLayoutFile) as fh:
         for l in fh:
             if l.startswith("#"):
@@ -241,6 +265,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("DetectorLayoutFile", help="Path to detector layout file")
     parser.add_argument("SegmentsFile", help="Path to amp segments file")
+    parser.add_argument("GainFile", help="Path to gain and saturation file")
     parser.add_argument("OutputDir",
         help = "Path to dump configs and AmpInfo Tables; defaults to %r" % (defaultOutDir,),
         nargs = "?",
@@ -249,7 +274,7 @@ if __name__ == "__main__":
     parser.add_argument("--clobber", action="store_true", dest="clobber", default=False,
         help=("remove and re-create the output directory if it already exists?"))
     args = parser.parse_args()
-    ampTableDict = makeAmpTables(args.SegmentsFile)
+    ampTableDict = makeAmpTables(args.SegmentsFile, args.GainFile)
     detectorConfigList = makeDetectorConfigs(args.DetectorLayoutFile)
 
     #Build the camera config.
