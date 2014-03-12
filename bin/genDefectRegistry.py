@@ -57,7 +57,7 @@ conn.commit()
 # fill table
 cmd = "INSERT INTO defect VALUES (NULL, ?, ?, ?, ?, ?, ?)"
 numEntries = 0
-#os.chdir(baseDir)
+os.chdir(baseDir)
 for filePath in glob.glob(os.path.join(registryDir, "rev_*", "defects*.fits")):
     m = re.search(r'rev_(\d+)/defects(\d+)[AB]*\.fits', filePath)
     if not m:

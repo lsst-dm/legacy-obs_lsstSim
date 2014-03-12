@@ -26,9 +26,10 @@ import unittest
 
 import lsst.utils.tests as utilsTests
 import lsst.daf.persistence as dafPersist
+from lsst.afw.image import DefectBase
 
-class GetFlatTestCase(unittest.TestCase):
-    """Testing butler flat image retrieval"""
+class GetDefectsTestCase(unittest.TestCase):
+    """Testing butler defects retrieval"""
 
     def setUp(self):
         self.butler = dafPersist.Butler(root=os.path.join(os.path.dirname(__file__), "data"))
@@ -36,16 +37,11 @@ class GetFlatTestCase(unittest.TestCase):
     def tearDown(self):
         del self.butler
 
-    def testFlat(self):
-        """Test retrieval of flat image"""
-        # Note: no filter!
-        raw = self.butler.get("flat", visit=85471048, snap=0, raft='0,3',
-                sensor='0,1', channel='1,0', immediate=True)
-        self.assertEqual(raw.getWidth(), 513)
-        self.assertEqual(raw.getHeight(), 2001)
-        self.assertEqual(raw.getFilter().getName(), "y")
-        self.assertEqual(raw.getDetector().getName(), "R:0,3 S:0,1")
-        self.assertEqual(raw.getDetector()['1,0'].getName(), '1,0')
+    def testDefects(self):
+        """Test retrieval of defects"""
+        defects = self.butler.get("defects", visit=85471048, raft='0,3', sensor='0,1', immediate=True)
+        self.assertTrue(isinstance(defects[0], DefectBase))
+
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 def suite():
@@ -54,7 +50,7 @@ def suite():
     utilsTests.init()
 
     suites = []
-    suites += unittest.makeSuite(GetFlatTestCase)
+    suites += unittest.makeSuite(GetDefectsTestCase)
     suites += unittest.makeSuite(utilsTests.MemoryTestCase)
     return unittest.TestSuite(suites)
 
