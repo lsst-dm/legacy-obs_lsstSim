@@ -88,7 +88,7 @@ class LsstSimMapper(CameraMapper):
         for ccdAlias in ("ccdName", "sensorName"):
             if ccdAlias in actualId:
                 ccdName = actualId[ccdAlias].upper()
-                m = re.match(r'R:(\d,\d) S:(\d,\d(?:,[AB])?)$', ccdName)
+                m = self._CcdNameRe.match(ccdName)
                 if m is None:
                     raise RuntimeError("Invalid value for %s: %r" % (ccdAlias, ccdName))
                 actualId.setdefault("raft", m.group(1))
@@ -148,7 +148,6 @@ class LsstSimMapper(CameraMapper):
         m = self._CcdNameRe.match(ccdId)
         if m is None:
             raise RuntimeError("Cannot parse ccdId=%r" % (ccdId,))
-        return m.groups()
         dataId['raft'] = m.group(0)
         dataId['sensor'] = m.group(1)
         return dataId

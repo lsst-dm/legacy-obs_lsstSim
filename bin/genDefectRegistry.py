@@ -57,7 +57,8 @@ conn.commit()
 # fill table
 cmd = "INSERT INTO defect VALUES (NULL, ?, ?, ?, ?, ?, ?)"
 numEntries = 0
-for filePath in glob.glob(os.path.join(registryDir, "rev_*", "defects*.fits")):
+os.chdir(registryDir)
+for filePath in glob.glob(os.path.join("rev_*", "defects*.fits")):
     m = re.search(r'rev_(\d+)/defects(\d+)\.fits', filePath)
     if not m:
         sys.stderr.write("Skipping file with invalid name: %r\n" % (filePath,))
