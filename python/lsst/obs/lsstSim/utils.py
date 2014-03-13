@@ -1,5 +1,5 @@
 import os
-from lsst.afw.cameraGeom import CameraFactoryTask, CameraConfig
+from lsst.afw.cameraGeom import makeCameraFromPath, CameraConfig
 from .lsstSimMapper import LsstSimMapper
 
 __ALL__ = ['loadCamera']
@@ -9,6 +9,5 @@ def loadCamera(repoDir):
     camConfigPath = os.path.join(inputPath, "camera.py")
     camConfig = CameraConfig()
     camConfig.load(camConfigPath)
-    cameraTask = CameraFactoryTask()
     lsstSimMapper = LsstSimMapper
-    return cameraTask.run(camConfig, inputPath, lsstSimMapper.getShortCcdName)
+    return makeCameraFromPath(camConfig, inputPath, lsstSimMapper.getShortCcdName)
