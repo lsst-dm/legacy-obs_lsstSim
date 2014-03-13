@@ -25,7 +25,6 @@
 import unittest
 import lsst.utils.tests as utilsTests
 
-import os
 from lsst.daf.persistence import DbAuth
 import lsst.afw.coord as afwCoord
 import lsst.afw.geom as afwGeom

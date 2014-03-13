@@ -25,7 +25,6 @@ import os.path
 import unittest
 
 import lsst.utils.tests as utilsTests
-from lsst.pex.policy import Policy
 import lsst.daf.persistence as dafPersist
 
 class GetFlatTestCase(unittest.TestCase):
@@ -41,14 +40,12 @@ class GetFlatTestCase(unittest.TestCase):
         """Test retrieval of flat image"""
         # Note: no filter!
         raw = self.butler.get("flat", visit=85471048, snap=0, raft='0,3',
-                sensor='0,1', channel='1,0')
+                sensor='0,1', channel='1,0', immediate=True)
         self.assertEqual(raw.getWidth(), 513)
         self.assertEqual(raw.getHeight(), 2001)
         self.assertEqual(raw.getFilter().getName(), "y")
-        self.assertEqual(raw.getDetector().getId().getName(), "ID9")
-        self.assertEqual(raw.getDetector().getParent().getId().getName(),
-                "R:0,3 S:0,1")
-
+        self.assertEqual(raw.getDetector().getName(), "R:0,3 S:0,1")
+        self.assertEqual(raw.getDetector()['1,0'].getName(), '1,0')
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 def suite():

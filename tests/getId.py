@@ -25,10 +25,7 @@ import os.path
 import unittest
 
 import lsst.utils.tests as utilsTests
-from lsst.pex.policy import Policy
 import lsst.daf.persistence as dafPersist
-import lsst.afw.coord as afwCoord
-import lsst.daf.base as dafBase
 
 class GetIdTestCase(unittest.TestCase):
     """Testing butler exposure id retrieval"""
@@ -41,9 +38,10 @@ class GetIdTestCase(unittest.TestCase):
 
     def testId(self):
         """Test retrieval of exposure ids"""
-        bits = self.butler.get("ampExposureId_bits")
+        bits = self.butler.get("ampExposureId_bits", immediate=True)
         self.assertEqual(bits, 45)
-        id = self.butler.get("ampExposureId", visit=85471048, snap=0, raft='0,3', sensor='0,1', channel='1,0')
+        id = self.butler.get("ampExposureId", visit=85471048, snap=0, raft='0,3', sensor='0,1',
+            channel='1,0', immediate=True)
         self.assertEqual(id, (85471048 << 13) + 480 + 16 + 8)
 
         dr = self.butler.dataRef("raw", visit=85471048, raft='2,1', sensor='1,2')
@@ -56,14 +54,14 @@ class GetIdTestCase(unittest.TestCase):
         self.assertEqual(bits, 41)
         self.assertEqual(id, (85471048 << 9) + 11*10 + 5)
         dataId = dict(tract=1, patch='2,3', filter='z')
-        bits = self.butler.get("goodSeeingCoaddId_bits", dataId)
-        id = self.butler.get("goodSeeingCoaddId", dataId)
+        bits = self.butler.get("goodSeeingCoaddId_bits", dataId, immediate=True)
+        id = self.butler.get("goodSeeingCoaddId", dataId, immediate=True)
         self.assertEqual(bits, 37)
         self.assertEqual(id, ((((1L * 8192) + 2) * 8192) + 3)*8 + 4)
-        self.assertEqual(self.butler.get("deepCoaddId_bits", dataId), bits)
-        self.assertEqual(self.butler.get("deepCoaddId", dataId), id)
-        bits = self.butler.get("chiSquaredCoaddId_bits", dataId)
-        id = self.butler.get("chiSquaredCoaddId", dataId)
+        self.assertEqual(self.butler.get("deepCoaddId_bits", dataId, immediate=True), bits)
+        self.assertEqual(self.butler.get("deepCoaddId", dataId, immediate=True), id)
+        bits = self.butler.get("chiSquaredCoaddId_bits", dataId, immediate=True)
+        id = self.butler.get("chiSquaredCoaddId", dataId, immediate=True)
         self.assertEqual(bits, 34)
         self.assertEqual(id, (((1L * 8192) + 2) * 8192) + 3)
 

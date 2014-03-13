@@ -1,6 +1,6 @@
 #<?cfg paf policy ?>
 
-camera:        "../description/Full_STA_geom.paf"
+camera:        "../description/camera"
 defects:    "../description/defects"
 
 needCalibRegistry: false
@@ -217,6 +217,11 @@ calibrations: {
         persistable:        "ExposureF"
         storage:    "FitsStorage"
         level:        "Amp"
+        refCols: "raft"
+        refCols: "sensor"
+        refCols: "visit"
+        refCols: "filter"
+        refCols: "channel"
     }
     dark: {
         template:    "dark/v1/R%(raft)s/S%(sensor)s/imsim_1_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
@@ -224,6 +229,11 @@ calibrations: {
         persistable:        "ExposureF"
         storage:    "FitsStorage"
         level:        "Amp"
+        refCols: "raft"
+        refCols: "sensor"
+        refCols: "visit"
+        refCols: "filter"
+        refCols: "channel"
     }
     flat: {
         template:    "flat/v2-f%(filter)s/R%(raft)s/S%(sensor)s/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
@@ -233,6 +243,11 @@ calibrations: {
         level:        "Amp"
         reference:    "raw"
         columns:      "filter"
+        refCols: "raft"
+        refCols: "sensor"
+        refCols: "visit"
+        refCols: "filter"
+        refCols: "channel"
     }
     fringe: {
         template:    "fringe/v2-f%(filter)s/R%(raft)s/S%(sensor)s/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
@@ -242,6 +257,11 @@ calibrations: {
         level:        "Amp"
         reference:    "raw"
         columns:      "filter"
+        refCols: "raft"
+        refCols: "sensor"
+        refCols: "visit"
+        refCols: "filter"
+        refCols: "channel"
     }
 }
 

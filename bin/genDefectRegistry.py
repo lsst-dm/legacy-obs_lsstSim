@@ -1,3 +1,4 @@
+#!/usr/bin/env python2
 # 
 # LSST Data Management System
 # Copyright 2008, 2009, 2010, 2011, 2012, 2013 LSST Corporation.
@@ -19,36 +20,64 @@
 # the GNU General Public License along with this program.  If not, 
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
-
+from __future__ import absolute_import, division
 import glob
 import os
 import re
-try:
-    import sqlite3
-except ImportError:
-    # try external pysqlite package; deprecated
-    import sqlite as sqlite3
+import sqlite3
 import sys
+from lsst.obs.lsstSim import LsstSimMapper
 
-if os.path.exists("defectRegistry.sqlite3"):
-    os.unlink("defectRegistry.sqlite3")
-conn = sqlite3.connect("defectRegistry.sqlite3")
+import pyfits
 
-cmd = "create table defect (id integer primary key autoincrement"
-cmd += ", path text, version int, ccdSerial int"
-cmd += ", validStart text, validEnd text)"
+import eups
+
+if len(sys.argv) < 2:
+    raise RuntimeError("Must provide a phosim version against which these defects are valid")
+
+phosimVersion = sys.argv[1]
+baseDir = eups.productDir("obs_lsstSim")
+registryDir = os.path.join(os.path.normpath(baseDir), "description", "defects")
+registryPath = os.path.join(registryDir, "defectRegistry.sqlite3")
+
+# create new database
+if os.path.exists(registryPath):
+    print "Deleting existing %r" % (registryPath,)
+    os.unlink(registryPath)
+print "Creating %r" % (registryPath,)
+conn = sqlite3.connect(registryPath)
+
+# create "defect" table
+cmd = "create table defect (id integer primary key autoincrement" + \
+    ", path text, version int, ccd text, ccdSerial text" + \
+    ", validStart text, validEnd text)"
 conn.execute(cmd)
 conn.commit()
 
-cmd = "INSERT INTO defect VALUES (NULL, ?, ?, ?, ?, ?)"
-
-for f in glob.glob("rev_*/defects*.fits"):
-    m = re.search(r'rev_(\d+)/defects(\d+)\.fits', f)
+# fill table
+cmd = "INSERT INTO defect VALUES (NULL, ?, ?, ?, ?, ?, ?)"
+numEntries = 0
+os.chdir(registryDir)
+for filePath in glob.glob(os.path.join("rev_*", "defects*.fits")):
+    m = re.search(r'rev_(\d+)/defects(\d+)[AB]*\.fits', filePath)
     if not m:
-        print >>sys.stderr, "Unrecognized file: %s" % (f,)
+        sys.stderr.write("Skipping file with invalid name: %r\n" % (filePath,))
         continue
-    print f
-    conn.execute(cmd, (f, int(m.group(1)), int(m.group(2)),
-        "1970-01-01", "2037-12-31"))
+    print "Processing %r" % (filePath,)
+
+    fitsTable = pyfits.open(filePath)
+    ccd = fitsTable[1].header["NAME"]
+    serial = LsstSimMapper.getShortCcdName(ccd)+"_"+phosimVersion
+    conn.execute(cmd, (
+        filePath,
+        int(m.group(1)),
+        ccd,
+        serial,
+        "1970-01-01",
+        "2037-12-31",
+    ))
+    numEntries += 1
 conn.commit()
+print "Added %d entries" % (numEntries)
+
 conn.close()

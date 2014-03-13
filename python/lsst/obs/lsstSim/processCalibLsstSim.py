@@ -160,7 +160,7 @@ class ProcessCalibLsstSimTask(IsrTask):
         dl = self.transposeDefectList(defectList, dataBbox)
         for d in dl:
             d.shift(-x, -y)
-            if detector.getId().getSerial()>8:
+            if detector.getId()>8:
                 d.shift(0, height - 2*d.getBBox().getMinY()-d.getBBox().getHeight())
         #Should saturation be interpolated as well?
         #sdl = self.isr.getDefectListFromMask(masterFrame, 'SAT', growFootprints=0)

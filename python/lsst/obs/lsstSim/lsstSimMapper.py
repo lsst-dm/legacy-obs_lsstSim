@@ -35,6 +35,7 @@ from lsst.daf.butlerUtils import CameraMapper
 import lsst.meas.algorithms as measAlgo
 
 class LsstSimMapper(CameraMapper):
+    _CcdNameRe = re.compile(r"R:(\d,\d) S:(\d,\d(?:,[AB])?)$")
     def __init__(self, inputPolicy=None, **kwargs):
         policyFile = pexPolicy.DefaultPolicyFile("obs_lsstSim", "LsstSimMapper.paf", "policy")
         policy = pexPolicy.Policy(policyFile)
@@ -63,55 +64,75 @@ class LsstSimMapper(CameraMapper):
         #afwImageUtils.defineFilter('y3', 1002.44) # candidate y-band
 
     def _transformId(self, dataId):
-        actualId = dataId.copy()
-        if actualId.has_key("sensorName"):
-            m = re.search(r'R:(\d),(\d) S:(\d),(\d)', actualId['sensorName'])
-            actualId['raft'] = m.group(1) + "," + m.group(2)
-            actualId['sensor'] = m.group(3) + "," + m.group(4)
-        if actualId.has_key("ccdName"):
-            m = re.search(r'R:(\d),(\d) S:(\d),(\d)', actualId['ccdName'])
-            actualId['raft'] = m.group(1) + "," + m.group(2)
-            actualId['sensor'] = m.group(3) + "," + m.group(4)
-        if actualId.has_key("channelName"):
-            m = re.search(r'ID(\d+)', actualId['channelName'])
-            channelNumber = int(m.group(1))
-            channelX = channelNumber % 8
-            channelY = channelNumber // 8
-            actualId['channel'] = str(channelX) + "," + str(channelY)
-        if actualId.has_key("ampName"):
-            m = re.search(r'ID(\d+)', actualId['ampName'])
-            channelNumber = int(m.group(1))
-            channelX = channelNumber % 8
-            channelY = channelNumber // 8
-            actualId['channel'] = str(channelX) + "," + str(channelY)
-        if actualId.has_key("exposure"):
-            actualId['snap'] = actualId['exposure']
-        if actualId.has_key("ccd"):
-            actualId['sensor'] = actualId['ccd']
-        if actualId.has_key("amp"):
-            actualId['channel'] = actualId['amp']
+        """Transform an ID dict into standard form for LSST
 
+        Standard keys are as follows:
+        - raft: in the form <x>,<y>
+        - sensor: in the form <x>,<y>,<c> where <c> = A or B
+        - channel: in the form <x>,<y>
+        - snap: exposure number
+
+        Other supported keys, which are used to set the above, if not already set:
+        - ccd: an alias for sensor (hence NOT the full ccd name)
+        - ccdName or sensorName: full ccd name in the form R:<x>,<y> S:<x>,<y>[,<c>]
+            if found, used to set raft and sensor, if not already set
+        - channelName, ampName: an alternate way to specify channel, in the form: IDxx
+        - amp: an alias for channel
+        - exposure: an alias for snap
+
+        @param dataId[in] (dict) Dataset identifier; this must not be modified
+        @return (dict) Transformed dataset identifier
+        @raise RuntimeError if a value is not valid
+        """
+        actualId = dataId.copy()
+        for ccdAlias in ("ccdName", "sensorName"):
+            if ccdAlias in actualId:
+                ccdName = actualId[ccdAlias].upper()
+                m = self._CcdNameRe.match(ccdName)
+                if m is None:
+                    raise RuntimeError("Invalid value for %s: %r" % (ccdAlias, ccdName))
+                actualId.setdefault("raft", m.group(1))
+                actualId.setdefault("sensor", m.group(2))
+                break
+        if "ccd" in actualId:
+            actualId.setdefault("sensor", actualId["ccd"])
+        if "amp" in actualId:
+            actualId.setdefault("channel", actualId["amp"])
+        elif "channel" not in actualId:
+            for ampName in ("ampName", "channelName"):
+                if ampName in actualId:
+                    m = re.match(r'ID(\d+)$', actualId[ampName])
+                    channelNumber = int(m.group(1))
+                    channelX = channelNumber % 8
+                    channelY = channelNumber // 8
+                    actualId['channel'] = str(channelX) + "," + str(channelY)
+                    break
+        if "exposure" in actualId:
+            actualId.setdefault("snap", actualId["exposure"])
+
+        # why strip out the commas after carefully adding them?
         if actualId.has_key("raft"):
             actualId['raft'] = re.sub(r'(\d),(\d)', r'\1\2', actualId['raft'])
         if actualId.has_key("sensor"):
-            actualId['sensor'] = re.sub(r'(\d),(\d)', r'\1\2', actualId['sensor'])
+            actualId['sensor'] = actualId['sensor'].replace(",", "")
         if actualId.has_key("channel"):
             actualId['channel'] = re.sub(r'(\d),(\d)', r'\1\2', actualId['channel'])
-
         return actualId
 
     def validate(self, dataId):
         for component in ("raft", "sensor", "channel"):
             if component not in dataId:
                 continue
-            id = dataId[component]
-            if not isinstance(id, str):
-                raise RuntimeError, \
-                        "%s identifier should be type str, not %s: %s" % \
-                        (component.title(), type(id), repr(id))
-            if not re.search(r'^(\d),(\d)$', id):
-                raise RuntimeError, \
-                        "Invalid %s identifier: %s" % (component, repr(id))
+            val = dataId[component]
+            if not isinstance(val, str):
+                raise RuntimeError(
+                    "%s identifier should be type str, not %s: %r" % (component.title(), type(val), val))
+            if component == "sensor":
+                if not re.search(r'^\d,\d(,[AB])?$', val):
+                    raise RuntimeError("Invalid %s identifier: %r" % (component, val))
+            else:
+                if not re.search(r'^(\d),(\d)$', val):
+                    raise RuntimeError("Invalid %s identifier: %r" % (component, val))
         return dataId
 
     def _extractDetectorName(self, dataId):
@@ -121,14 +142,14 @@ class LsstSimMapper(CameraMapper):
         """get dataId dict from visit and ccd identifier
 
         @param visit 32 or 64-bit depending on camera
-        @param ccdId same as ccd.getId().getSerial()
+        @param ccdId detector name: same as detector.getName()
         """
-        x = str(ccdId)
-        while len(x) < 4:
-            x = '0' + x
-        raft = x[0] + ',' + x[1]
-        sensor  = x[2] + ',' + x[3]
-        dataId = {'visit': long(visit), 'raft': raft, 'sensor': sensor}
+        dataId = {'visit': long(visit)}
+        m = self._CcdNameRe.match(ccdId)
+        if m is None:
+            raise RuntimeError("Cannot parse ccdId=%r" % (ccdId,))
+        dataId['raft'] = m.group(0)
+        dataId['sensor'] = m.group(1)
         return dataId
 
     def _extractAmpId(self, dataId):
@@ -196,6 +217,14 @@ class LsstSimMapper(CameraMapper):
         if singleFilter:
             return id * 8 + self.filterIdMap[dataId['filter']]
         return id
+
+    @staticmethod
+    def getShortCcdName(ccdId):
+        """Convert a CCD name to a form useful as a filename
+
+        This LSST version converts spaces to underscores and elides colons and commas.
+        """
+        return re.sub("[:,]", "", ccdId.replace(" ", "_"))
 
     def _setAmpExposureId(self, propertyList, dataId):
         propertyList.set("Computed_ampExposureId", self._computeAmpExposureId(dataId))
