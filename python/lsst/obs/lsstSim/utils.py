@@ -5,6 +5,11 @@ from .lsstSimMapper import LsstSimMapper
 __ALL__ = ['loadCamera']
 
 def loadCamera(repoDir):
+    """Load a camera given the path to the repository (the directory that contains the 
+    description directory).  I use this just in testing from the interpreter prompt.
+    In general, it's probably best to do butler.get('camera')
+    @param repoDir:  path to the root of the camera description tree
+    """
     inputPath = os.path.join(repoDir, "description", "camera")
     camConfigPath = os.path.join(inputPath, "camera.py")
     camConfig = CameraConfig()

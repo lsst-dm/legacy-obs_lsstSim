@@ -8,8 +8,8 @@ root.transformDict.transforms['Pupil'].transform['multi'].transformDict=None
 root.transformDict.transforms['Pupil'].transform['affine'].translation=[0.0, 0.0]
 root.transformDict.transforms['Pupil'].transform['affine'].linear=[1.0, 0.0, 0.0, 1.0]
 root.transformDict.transforms['Pupil'].transform['radial'].coeffs=None
-import lsst.afw.geom.xyTransformRegistry
-root.transformDict.transforms['Pupil'].transform['inverted'].transform.retarget(target=lsst.afw.geom.xyTransformRegistry.makeRadialXYTransform, ConfigClass=lsst.afw.geom.xyTransformRegistry.RadialXYTransformConfig)
+import lsst.afw.geom.xyTransformFactory
+root.transformDict.transforms['Pupil'].transform['inverted'].transform.retarget(target=lsst.afw.geom.xyTransformFactory.makeRadialXYTransform, ConfigClass=lsst.afw.geom.xyTransformFactory.RadialXYTransformConfig)
 root.transformDict.transforms['Pupil'].transform['inverted'].transform.coeffs=[0.0, 10313.240312354817, 0.0, 9539.747288928207]
 root.transformDict.transforms['Pupil'].transform.name='inverted'
 root.detectorList={}
