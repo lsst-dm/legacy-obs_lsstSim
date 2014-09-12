@@ -125,7 +125,7 @@ class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
         exposureFakeDataRef = WrapDataId(exposureId)
         #test methods: computeImageScale(), scaleMaskedImage(), getInterpImage()
         imageScaler = zpScaler.computeImageScaler(exposure,exposureFakeDataRef)
-        scaleFactorIm = imageScaler.getInterpImage(exposure.getBBox(afwImage.PARENT))
+        scaleFactorIm = imageScaler.getInterpImage(exposure.getBBox())
         predScale = numpy.mean(imageScaler._scaleList) #0.011125492863357
 
         self.assertAlmostEqual(afwMath.makeStatistics(scaleFactorIm, afwMath.VARIANCE, self.sctrl).getValue(),
