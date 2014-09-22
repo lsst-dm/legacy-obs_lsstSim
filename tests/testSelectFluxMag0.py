@@ -169,7 +169,7 @@ def run(shouldExit=False):
     config.selectFluxMag0.retarget(SelectLsstSimFluxMag0Task)
     print config
     try:
-        user = DbAuth.username(config.selectFluxMag0.host, str(config.selectFluxMag0.port)),
+        DbAuth.username(config.selectFluxMag0.host, str(config.selectFluxMag0.port)),
     except Exception, e:
         print "Warning: did not find host=%s, port=%s in your db-auth file; or %s " \
               "skipping unit tests" % \

@@ -31,7 +31,8 @@ from lsst.ip.isr import isr
 
 import numpy
 
-__all__ = ["processLsstSimCalibsTask"]
+__all__ = ["ProcessCalibLsstSimTask"]
+
 class ProcessCalibLsstSimConfig(IsrTask.ConfigClass):
     """Config for ProcessCcdLsstSim"""
     sigmaClip = pexConfig.Field(dtype=float, default=3., doc="Sigma level for sigma clipping")
@@ -91,7 +92,7 @@ class ProcessCalibLsstSimTask(IsrTask):
                     ampDetector = cameraGeom.cast_Amp(ampExposure.getDetector())
 
                     ampExposure = self.convertIntToFloat(ampExposure)
-                    ampExpDataView = ampExposure.Factory(ampExposure, ampDetector.getDiskDataSec(), afwImage.PARENT)
+                    ampExpDataView = ampExposure.Factory(ampExposure, ampDetector.getDiskDataSec())
                 
                     self.saturationDetection(ampExposure, ampDetector)
     
@@ -153,7 +154,6 @@ class ProcessCalibLsstSimTask(IsrTask):
         #This should go away when the data from imSim is all in chip coordinates
         y = dataBbox.getMinX()
         x = dataBbox.getMinY()
-        width = dataBbox.getDimensions()[1]
         height = dataBbox.getDimensions()[0]
         #Should when at detector level, there will not be the need to go through the step of getting the parent
         defectList = cameraGeom.cast_Ccd(detector.getParent()).getDefects() 

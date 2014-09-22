@@ -19,11 +19,9 @@
 # the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
-import lsst.afw.cameraGeom as cameraGeom
-import lsst.afw.image as afwImage
 import lsst.pex.config as pexConfig
 import lsst.pipe.base as pipeBase
-from lsst.ip.isr import AssembleCcdTask, IsrTask
+from lsst.ip.isr import IsrTask
 from lsst.pipe.tasks.snapCombine import SnapCombineTask 
 import numpy
 
@@ -103,7 +101,7 @@ class LsstSimIsrTask(IsrTask):
                 amp = ccd[ampRef.dataId['channel']]
 
                 ampExposure = self.convertIntToFloat(ampExposure)
-                ampExpDataView = ampExposure.Factory(ampExposure, amp.getRawDataBBox(), afwImage.PARENT)
+                ampExpDataView = ampExposure.Factory(ampExposure, amp.getRawDataBBox())
                 
                 self.saturationDetection(ampExposure, amp)
     
