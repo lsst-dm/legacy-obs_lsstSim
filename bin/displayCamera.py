@@ -32,6 +32,9 @@ if __name__ == "__main__":
                                           nargs='+')
     parser.add_argument('--showRaft', help='Show a Raft from the mosaic in ds9.  May occur multiple times. '\
                                            'Format like R:Rx,Ry e.g. \"R:2,2\"', type=str, nargs='+')
+    parser.add_argument('--showCamera', help='Show the camera mosaic in ds9.', action='store_true')
+    parser.add_argument('--cameraBinSize', type= int, default=20,
+                        help='Size of binning when displaying the full camera mosaic')
     args = parser.parse_args()
 
     if len(sys.argv) == 1:
@@ -70,3 +73,6 @@ if __name__ == "__main__":
                 tmpCamera = Camera(raftStr, detectorList, camera._transformMap)
                 cameraGeomUtils.showCamera(tmpCamera, frame=frame, binSize=1)
                 frame += 1
+
+    if args.showCamera:
+        cameraGeomUtils.showCamera(camera, frame=frame, binSize=args.cameraBinSize)
