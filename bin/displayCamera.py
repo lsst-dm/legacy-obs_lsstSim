@@ -4,7 +4,11 @@ import lsst.afw.cameraGeom.utils as cameraGeomUtils
 from lsst.afw.cameraGeom import Camera
 
 def checkStr(strVal, level):
-
+    """Check if a string is a valid identifier
+    @param[in] strVal: String containing the identifier
+    @param[in] level: level of identifier: amp, ccd, raft
+    return True if valid
+    """
     if level == 'amp':
         matchStr = '^R:[0-9],[0-9] S:[0-9],[0-9] A:[0-9],[0-9]$'
         if not re.match(matchStr, strVal):
