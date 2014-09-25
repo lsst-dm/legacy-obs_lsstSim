@@ -35,6 +35,8 @@ if __name__ == "__main__":
     parser.add_argument('--showCamera', help='Show the camera mosaic in ds9.', action='store_true')
     parser.add_argument('--cameraBinSize', type= int, default=20,
                         help='Size of binning when displaying the full camera mosaic')
+    parser.add_argument('--plotFocalPlane', action='store_true',
+                        help='Plot the focalplane in an interactive matplotlib window')
     args = parser.parse_args()
 
     if len(sys.argv) == 1:
@@ -76,3 +78,6 @@ if __name__ == "__main__":
 
     if args.showCamera:
         cameraGeomUtils.showCamera(camera, frame=frame, binSize=args.cameraBinSize)
+
+    if args.plotFocalPlane:
+        cameraGeomUtils.plotFocalPlane(camera, 4., 4.)
