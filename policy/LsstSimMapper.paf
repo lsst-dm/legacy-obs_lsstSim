@@ -697,22 +697,6 @@ datasets: {
         tables:        raw
         tables:        raw_skyTile
     }
-    forcedPhot_config: {
-        template:      "config/forcedPhot.py"
-        python:        "lsst.pex.config.Config"
-        persistable:      "Config"
-        storage:    "ConfigStorage"
-        tables:        raw
-        tables:        raw_skyTile
-    }
-    forcedPhot_metadata: {
-        template:      "forcedPhot_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
-        python:        "lsst.daf.base.PropertySet"
-        persistable:        "PropertySet"
-        storage:    "BoostStorage"
-        tables:        raw
-        tables:        raw_skyTile
-    }
 
     deepCoadd_depth: {
         template:    "deepCoadd/%(filter)s/%(tract)d/%(patch)s.depth.fits"
