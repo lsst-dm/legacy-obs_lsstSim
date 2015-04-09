@@ -44,7 +44,7 @@ class LsstSimIsrTaskTestCase(unittest.TestCase):
         del self.butler
         del self.ampRef
 
-    def testApplyToSensorRef(self):
+    def testRunDataRef(self):
         """Test LsstSimIsrTask on amp-sized images in tests/data/
 
         applyToSensorRef is not intended to take single amp-sized exposures, but will
@@ -54,15 +54,14 @@ class LsstSimIsrTaskTestCase(unittest.TestCase):
         config = LsstSimIsrTask.ConfigClass()
         config.doDark = False
         config.doFringe = False
-        config.doAssembleIsrFrames = False
         config.doAssembleCcd = False
         config.doSnapCombine = False
         lsstIsrTask = LsstSimIsrTask(config=config)
-        exposure = lsstIsrTask.applyToSensorRef(self.ampRef).exposure
+        exposure = lsstIsrTask.runDataRef(self.ampRef).exposure
         self.assertAlmostEqual(afwMath.makeStatistics(exposure.getMaskedImage(), afwMath.MEAN).getValue(),
                                2.855780, places = 3)
 
-    def testApply(self):
+    def testRun(self):
         """Test LsstSimIsrTask on amp-sized images in tests/data/
 
         Do not assembleCcd.
@@ -70,13 +69,12 @@ class LsstSimIsrTaskTestCase(unittest.TestCase):
         config = LsstSimIsrTask.ConfigClass()
         config.doDark = False
         config.doFringe = False
-        config.doAssembleIsrFrames = False
         config.doAssembleCcd = False
         config.doSnapCombine = False
         lsstIsrTask = LsstSimIsrTask(config=config)
         ampExp = self.ampRef.get('raw')
         isrData = lsstIsrTask.readIsrData(self.ampRef)
-        postIsrExp = lsstIsrTask.apply(ampExp, **isrData.getDict()).exposure
+        postIsrExp = lsstIsrTask.run(ampExp, **isrData.getDict()).exposure
         self.assertAlmostEqual(ampExp.getMetadata().get('GAIN'), postIsrExp.getMetadata().get('GAIN'))
         self.assertAlmostEqual(ampExp.getDimensions()[0], postIsrExp.getDimensions()[0])
         self.assertAlmostEqual(ampExp.getDimensions()[1], postIsrExp.getDimensions()[1])

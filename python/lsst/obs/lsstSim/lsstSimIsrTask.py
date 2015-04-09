@@ -1,6 +1,6 @@
 #
 # LSST Data Management System
-# Copyright 2008, 2009, 2010, 2011, 2012, 2013 LSST Corporation.
+# Copyright 2008-2015 LSST Corporation.
 #
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
@@ -69,8 +69,20 @@ class LsstSimIsrTask(IsrTask):
         idx = numpy.where((maskarr&orBitmask)==orBitmask)
         maskarr[idx] &= andMask
 
+    def saturationInterpolation(self, ccdExposure):
+        """!Unmask hot pixels and interpolate over saturated pixels, in place
+
+        \param[in,out]  ccdExposure     exposure to process
+
+        \warning:
+        - Call saturationDetection first, so that saturated pixels have been identified in the "SAT" mask.
+        - Call this after CCD assembly, since saturated regions may cross amplifier boundaries
+        """
+        self.unmaskSatHotPixels(ccdExposure)
+        super(LsstSimIsrTask, self).saturationInterpolation(ccdExposure)
+
     @pipeBase.timeMethod
-    def run(self, sensorRef):
+    def runDataRef(self, sensorRef):
         """Do instrument signature removal on an exposure
         
         Correct for saturation, bias, overscan, dark, flat..., perform CCD assembly,
@@ -93,45 +105,9 @@ class LsstSimIsrTask(IsrTask):
                 raise RuntimeError("Unrecognized snapId=%s" % (snapId,))
 
             self.log.log(self.log.INFO, "Performing ISR on snap %s" % (snapRef.dataId))
-            # perform amp-level ISR
-            ampExposureDict = dict()
-            for ampRef in snapRef.subItems(level="channel"):
-                ampExposure = ampRef.get("raw")
-                ccd = ampExposure.getDetector()
-                amp = ccd[ampRef.dataId['channel']]
-
-                ampExposure = self.convertIntToFloat(ampExposure)
-                ampExpDataView = ampExposure.Factory(ampExposure, amp.getRawDataBBox())
-                
-                self.saturationDetection(ampExposure, amp)
-    
-                self.overscanCorrection(ampExposure, amp)
-    
-                if self.config.doBias:
-                    self.biasCorrection(ampExpDataView, ampRef)
-                
-                if self.config.doDark:
-                    self.darkCorrection(ampExpDataView, ampRef)
-                
-                self.updateVariance(ampExpDataView, amp)
-                
-                if self.config.doFlat:
-                    self.flatCorrection(ampExpDataView, ampRef)
-                
-                ampExposureDict[amp.getName()] = ampExposure
-        
-            ccdExposure = self.assembleCcd.assembleCcd(ampExposureDict)
-            del ampExposureDict
-
-            defects = snapRef.get("defects")
-            self.maskAndInterpDefect(ccdExposure, defects)
-
-            self.unmaskSatHotPixels(ccdExposure)
-            
-            self.saturationInterpolation(ccdExposure)
-
-            self.maskAndInterpNan(ccdExposure)
-
+            isrData = self.readIsrData(snapRef)
+            ccdExposure = snapRef.get('raw')
+            ccdExposure = self.run(ccdExposure, **isrData.getDict()).exposure
             snapDict[snapId] = ccdExposure
     
             if self.config.doWriteSnaps:
