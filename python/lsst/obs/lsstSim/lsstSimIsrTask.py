@@ -82,7 +82,7 @@ class LsstSimIsrTask(IsrTask):
         super(LsstSimIsrTask, self).saturationInterpolation(ccdExposure)
 
     @pipeBase.timeMethod
-    def applyToSensorRef(self, sensorRef):
+    def runDataRef(self, sensorRef):
         """Do instrument signature removal on an exposure
         
         Correct for saturation, bias, overscan, dark, flat..., perform CCD assembly,
@@ -107,7 +107,7 @@ class LsstSimIsrTask(IsrTask):
             self.log.log(self.log.INFO, "Performing ISR on snap %s" % (snapRef.dataId))
             isrData = self.readIsrData(snapRef)
             ccdExposure = snapRef.get('raw')
-            ccdExposure = self.apply(ccdExposure, **isrData.getDict()).exposure
+            ccdExposure = self.run(ccdExposure, **isrData.getDict()).exposure
             snapDict[snapId] = ccdExposure
     
             if self.config.doWriteSnaps:
