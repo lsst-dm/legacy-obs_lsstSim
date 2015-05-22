@@ -7,6 +7,7 @@ setupRequired(meas_algorithms)
 setupRequired(ip_isr)
 setupRequired(pipe_tasks)
 setupRequired(mysqlpython)
+setupRequired(utils)
 
 envPrepend(LD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
 envPrepend(DYLD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
