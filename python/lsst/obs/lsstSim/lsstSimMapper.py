@@ -35,9 +35,11 @@ from lsst.daf.butlerUtils import CameraMapper
 import lsst.meas.algorithms as measAlgo
 
 class LsstSimMapper(CameraMapper):
+    packageName = 'obs_lsstSim'
+
     _CcdNameRe = re.compile(r"R:(\d,\d) S:(\d,\d(?:,[AB])?)$")
     def __init__(self, inputPolicy=None, **kwargs):
-        policyFile = pexPolicy.DefaultPolicyFile("obs_lsstSim", "LsstSimMapper.paf", "policy")
+        policyFile = pexPolicy.DefaultPolicyFile(self.packageName, "LsstSimMapper.paf", "policy")
         policy = pexPolicy.Policy(policyFile)
 
         self.doFootprints = False
