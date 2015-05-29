@@ -4,6 +4,7 @@ config.log
 *.o
 *.os
 *.so
+*.dylib
 *.cfgc
 *.pyc
 *_wrap.cc
@@ -13,4 +14,6 @@ doc/*.tag
 doc/*.inc
 doc/doxygen.conf
 tests/.tests
+tests/data/postISRCCD/
+tests/data/snapExp/
 version.py
