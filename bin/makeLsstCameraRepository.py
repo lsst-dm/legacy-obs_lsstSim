@@ -26,7 +26,7 @@ import os
 import re
 import shutil
 
-import eups
+import lsst.utils
 import lsst.afw.geom as afwGeom
 import lsst.afw.table as afwTable
 from lsst.afw.cameraGeom import (DetectorConfig, CameraConfig, PUPIL, FOCAL_PLANE, PIXELS)
@@ -247,7 +247,7 @@ if __name__ == "__main__":
     DetectorLayoutFile -- https://dev.lsstcorp.org/cgit/LSST/sims/phosim.git/plain/data/lsst/focalplanelayout.txt?h=dev
     SegmentsFile -- https://dev.lsstcorp.org/cgit/LSST/sims/phosim.git/plain/data/lsst/segmentation.txt?h=dev
     """
-    baseDir = eups.productDir("obs_lsstSim")
+    baseDir = lsst.utils.getPackageDir('obs_lsstsim')
     defaultOutDir = os.path.join(os.path.normpath(baseDir), "description", "camera")
 
     parser = argparse.ArgumentParser()

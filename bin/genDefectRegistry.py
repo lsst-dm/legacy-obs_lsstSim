@@ -30,13 +30,13 @@ from lsst.obs.lsstSim import LsstSimMapper
 
 import pyfits
 
-import eups
+import lsst.utils
 
 if len(sys.argv) < 2:
     raise RuntimeError("Must provide a phosim version against which these defects are valid")
 
 phosimVersion = sys.argv[1]
-baseDir = eups.productDir("obs_lsstSim")
+baseDir = lsst.utils.getPackageDir('obs_lsstsim')
 registryDir = os.path.join(os.path.normpath(baseDir), "description", "defects")
 registryPath = os.path.join(registryDir, "defectRegistry.sqlite3")
 
