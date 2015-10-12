@@ -61,11 +61,11 @@ class LsstSimIsrTask(IsrTask):
     def unmaskSatHotPixels(self, exposure):
         mi = exposure.getMaskedImage()
         mask = mi.getMask()
-        badBitmask = mask.getPlaneBitMask("BAD")
-        satBitmask = mask.getPlaneBitMask("SAT")
+        maskarr = mask.getArray()
+        badBitmask = numpy.array(mask.getPlaneBitMask("BAD"), dtype=maskarr.dtype)
+        satBitmask = numpy.array(mask.getPlaneBitMask("SAT"), dtype=maskarr.dtype)
         orBitmask = badBitmask|satBitmask
         andMask = ~satBitmask
-        maskarr = mask.getArray()
         idx = numpy.where((maskarr&orBitmask)==orBitmask)
         maskarr[idx] &= andMask
 

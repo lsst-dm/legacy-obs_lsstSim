@@ -98,7 +98,7 @@ class SelectLsstSimFluxMag0Task(pipeBase.Task):
         try:
             runArgDict = self.runArgDictFromDataId(dataId)
             visit = runArgDict["visit"]
-        except Exception, e:
+        except Exception:
             self.log.fatal("dataId does not contain mandatory visit key: dataId: %s"%dataId)
 
         if self._display:
