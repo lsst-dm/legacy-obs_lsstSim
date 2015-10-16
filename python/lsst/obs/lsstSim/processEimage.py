@@ -21,15 +21,14 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 from lsst.pipe.base.argumentParser import ArgumentParser
-from lsst.pipe.tasks.processImage import ProcessImageTask
+from lsst.pipe.tasks.processCcd import ProcessCcdTask
 import lsst.afw.image as afwImage
-import lsst.afw.table as afwTable
 import lsst.pex.config as pexConfig
 import lsst.pipe.base as pipeBase
 import numpy
 
-class ProcessEimageConfig(ProcessImageTask.ConfigClass):
-    """Config for ProcessCcd"""
+class ProcessEimageConfig(ProcessCcdTask.ConfigClass):
+    """Config for ProcessEimage"""
     doAddNoise = pexConfig.Field(dtype=bool, default=False,
                                  doc="Add a flat Poisson noise background to the eimage?")
     rngSeed = pexConfig.Field(dtype=int, default=None, optional=True,
@@ -45,6 +44,8 @@ class ProcessEimageConfig(ProcessImageTask.ConfigClass):
     maskEdgeBorder = pexConfig.Field(dtype=int, default=0, doc = "Set mask to EDGE for a border of x pixels")
 
     def setDefaults(self):
+        ProcessCcdTask.ConfigClass.setDefaults(self)
+        self.doIsr = False
         self.calibrate.repair.doInterpolate = False
         self.calibrate.repair.doCosmicRay = False
         self.calibrate.measurePsf.psfDeterminer['pca'].reducedChi2ForPsfCandidates=3.0
@@ -52,7 +53,7 @@ class ProcessEimageConfig(ProcessImageTask.ConfigClass):
         self.calibrate.measurePsf.psfDeterminer['pca'].nIterForPsf=0
         self.calibrate.measurePsf.psfDeterminer['pca'].tolerance=0.01
 
-class ProcessEimageTask(ProcessImageTask):
+class ProcessEimageTask(ProcessCcdTask):
     """Process an Eimage CCD
     
     Available steps include:
@@ -65,29 +66,26 @@ class ProcessEimageTask(ProcessImageTask):
     dataPrefix = ""
 
     def __init__(self, **kwargs):
-        ProcessImageTask.__init__(self, **kwargs)
+        ProcessCcdTask.__init__(self, **kwargs)
         numpy.random.seed(self.config.rngSeed)
 
-    def makeIdFactory(self, sensorRef):
-        expBits = sensorRef.get("ccdExposureId_bits")
-        expId = long(sensorRef.get("ccdExposureId"))
-        return afwTable.IdFactory.makeSource(expId, 64 - expBits)        
+    @classmethod
+    def _makeArgumentParser(cls):
+        """Create an argument parser
 
-    @pipeBase.timeMethod
-    def run(self, sensorRef):
-        """Process one Eimage
-        
-        @param sensorRef: sensor-level butler data reference
-        @return pipe_base Struct containing these fields:
-        - exposure: calibrated exposure (calexp): as computed if config.doCalibrate,
-            else as upersisted and updated if config.doDetection, else None
-        - calib: object returned by calibration process if config.doCalibrate, else None
-        - apCorr: aperture correction: as computed config.doCalibrate, else as unpersisted
-            if config.doMeasure, else None
-        - sources: detected source if config.doPhotometry, else None
+        Subclasses may wish to override, e.g. to change the dataset type or data ref level
         """
-        self.log.info("Processing %s" % (sensorRef.dataId))
+        parser = ArgumentParser(name=cls._DefaultName)
+        parser.add_id_argument("--id", "eimage", "data ID, e.g. visit=1 raft=2,2 sensor=1,1 snap=0")
+        return parser
 
+    def setPostIsrExposure(self, sensorRef):
+        """Load the post instrument signature removal image
+
+        \param[in]  sensorRef        sensor-level butler data reference
+
+        \return     postIsrExposure  exposure to be passed to processCcdExposure
+        """
         inputExposure = sensorRef.get(self.dataPrefix + "eimage")
         if self.config.doAddNoise:
             self.addNoise(inputExposure)
@@ -106,9 +104,25 @@ class ProcessEimageTask(ProcessImageTask):
         md.add('RDNOISE', 0.)
         md.add('SATURATE', 100000)
         md.add('GAINEFF', 1.)
+        return inputExposure
+
+    @pipeBase.timeMethod
+    def run(self, sensorRef):
+        """Process one Eimage
         
-        # delegate most of the work to ProcessImageTask
-        return self.process(sensorRef, inputExposure)
+        @param sensorRef: sensor-level butler data reference
+        @return pipe_base Struct containing these fields:
+        - exposure: calibrated exposure (calexp): as computed if config.doCalibrate,
+            else as upersisted and updated if config.doDetection, else None
+        - calib: object returned by calibration process if config.doCalibrate, else None
+        - apCorr: aperture correction: as computed config.doCalibrate, else as unpersisted
+            if config.doMeasure, else None
+        - sources: detected source if config.doPhotometry, else None
+        """
+        # delegate most of the work to ProcessCcdTask (which, in turn, delegates to ProcessImageTask)
+        result = ProcessCcdTask.run(self, sensorRef)
+
+        return result
 
     def addNoise(self, inputExposure):
         mi = inputExposure.getMaskedImage()
@@ -137,13 +151,3 @@ class ProcessEimageTask(ProcessImageTask):
         maskArr[ys-npix-1:,:] |= edgeBitMask # Top
         maskArr[npix:ys-npix-1,:npix] |= edgeBitMask # Left
         maskArr[npix:ys-npix-1,xs-npix-1:] |= edgeBitMask # Right
-
-    @classmethod
-    def _makeArgumentParser(cls):
-        """Create an argument parser
-
-        Subclasses may wish to override, e.g. to change the dataset type or data ref level
-        """
-        parser = ArgumentParser(name=cls._DefaultName)
-        parser.add_id_argument("--id", "eimage", "data ID, e.g. visit=1 raft=2,2 sensor=1,1 snap=0")
-        return parser
