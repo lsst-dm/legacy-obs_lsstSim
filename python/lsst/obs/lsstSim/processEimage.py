@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # LSST Data Management System
-# Copyright 2008, 2009, 2010, 2011, 2012, 2013 LSST Corporation.
+# Copyright 2008-2015 AURA/LSST.
 #
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
@@ -13,12 +13,12 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.    See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the LSST License Statement and
 # the GNU General Public License along with this program.  If not,
-# see <http://www.lsstcorp.org/LegalNotices/>.
+# see <https://www.lsstcorp.org/LegalNotices/>.
 #
 from lsst.pipe.base.argumentParser import ArgumentParser
 from lsst.pipe.tasks.processCcd import ProcessCcdTask
@@ -35,13 +35,13 @@ class ProcessEimageConfig(ProcessCcdTask.ConfigClass):
                               doc=("Random number seed used when adding noise (passed directly"
                                    " to numpy at task initialization)"))
     noiseValue = pexConfig.Field(dtype=int, default=1000, doc="Mean of the Poisson distribution in counts")
-    doSetVariance = pexConfig.Field(dtype=bool, default=True, doc = "Set the variance plane in the eimage?")
-    varianceType = pexConfig.ChoiceField(dtype=str, default="image", 
-                                         allowed={"image":"set variance from image plane", 
-                                                  "value":"set variance to a value"}, 
+    doSetVariance = pexConfig.Field(dtype=bool, default=True, doc="Set the variance plane in the eimage?")
+    varianceType = pexConfig.ChoiceField(dtype=str, default="image",
+                                         allowed={"image":"set variance from image plane",
+                                                  "value":"set variance to a value"},
                                          doc="Choose method for setting the variance")
-    varianceValue = pexConfig.Field(dtype=float, default=0.01, doc = "Value to use in the variance plane.")
-    maskEdgeBorder = pexConfig.Field(dtype=int, default=0, doc = "Set mask to EDGE for a border of x pixels")
+    varianceValue = pexConfig.Field(dtype=float, default=0.01, doc="Value to use in the variance plane.")
+    maskEdgeBorder = pexConfig.Field(dtype=int, default=0, doc="Set mask to EDGE for a border of x pixels")
 
     def setDefaults(self):
         ProcessCcdTask.ConfigClass.setDefaults(self)
@@ -55,7 +55,7 @@ class ProcessEimageConfig(ProcessCcdTask.ConfigClass):
 
 class ProcessEimageTask(ProcessCcdTask):
     """Process an Eimage CCD
-    
+
     Available steps include:
     - calibrate
     - detect sources
@@ -109,7 +109,7 @@ class ProcessEimageTask(ProcessCcdTask):
     @pipeBase.timeMethod
     def run(self, sensorRef):
         """Process one Eimage
-        
+
         @param sensorRef: sensor-level butler data reference
         @return pipe_base Struct containing these fields:
         - exposure: calibrated exposure (calexp): as computed if config.doCalibrate,
