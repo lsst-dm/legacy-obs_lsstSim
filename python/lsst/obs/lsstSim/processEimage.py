@@ -124,7 +124,7 @@ class ProcessEimageTask(ProcessImageTask):
             var.set(self.config.varianceValue)
         elif self.config.varianceType == 'image':
             var = inputExposure.getMaskedImage().getVariance()
-            var <<= inputExposure.getMaskedImage().getImage()
+            var[:] = inputExposure.getMaskedImage().getImage()
 
     def maskEdges(self, inputExposure):
         mask = inputExposure.getMaskedImage().getMask()
