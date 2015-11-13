@@ -105,8 +105,8 @@ class LsstSimIsrTask(IsrTask):
                 raise RuntimeError("Unrecognized snapId=%s" % (snapId,))
 
             self.log.log(self.log.INFO, "Performing ISR on snap %s" % (snapRef.dataId))
-            isrData = self.readIsrData(snapRef)
             ccdExposure = snapRef.get('raw')
+            isrData = self.readIsrData(snapRef, ccdExposure)
             ccdExposure = self.run(ccdExposure, **isrData.getDict()).exposure
             snapDict[snapId] = ccdExposure
     
