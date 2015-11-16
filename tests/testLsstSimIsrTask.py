@@ -73,7 +73,7 @@ class LsstSimIsrTaskTestCase(unittest.TestCase):
         config.doSnapCombine = False
         lsstIsrTask = LsstSimIsrTask(config=config)
         ampExp = self.ampRef.get('raw')
-        isrData = lsstIsrTask.readIsrData(self.ampRef)
+        isrData = lsstIsrTask.readIsrData(self.ampRef, ampExp)
         postIsrExp = lsstIsrTask.run(ampExp, **isrData.getDict()).exposure
         self.assertAlmostEqual(ampExp.getMetadata().get('GAIN'), postIsrExp.getMetadata().get('GAIN'))
         self.assertAlmostEqual(ampExp.getDimensions()[0], postIsrExp.getDimensions()[0])
