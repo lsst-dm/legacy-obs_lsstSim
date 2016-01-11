@@ -1,6 +1,6 @@
 #
 # LSST Data Management System
-# Copyright 2008-2015 LSST Corporation.
+# Copyright 2008-2016 AURA/LSST.
 #
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
@@ -21,6 +21,8 @@
 #
 import lsst.pex.config as pexConfig
 import lsst.pipe.base as pipeBase
+from lsstDebug import getDebugFrame
+from lsst.afw.display import getDisplay
 from lsst.ip.isr import IsrTask
 from lsst.pipe.tasks.snapCombine import SnapCombineTask 
 import numpy
@@ -52,6 +54,28 @@ class LsstSimIsrConfig(IsrTask.ConfigClass):
 
 
 class LsstSimIsrTask(IsrTask):
+    """
+    \section obs_lsstSim_isr_Debug Debug variables
+
+    The \link lsst.pipe.base.cmdLineTask.CmdLineTask command line task\endlink interface supports a
+    flag \c --debug, \c -d to import \b debug.py from your \c PYTHONPATH; see <a
+    href="http://lsst-web.ncsa.illinois.edu/~buildbot/doxygen/x_masterDoxyDoc/base_debug.html">
+    Using lsstDebug to control debugging output</a> for more about \b debug.py files.
+
+    The available variables in LsstSimIsrTask are:
+    <DL>
+      <DT> \c display
+      <DD> A dictionary containing debug point names as keys with frame number as value. Valid keys are:
+        <DL>
+          <DT> snapExp0
+          <DD> Display ISR-corrected snap 0
+          <DT> snapExp1
+          <DD> Display ISR-corrected snap 1
+          <DT> postISRCCD
+          <DD> Display final exposure
+        </DL>
+    </DL>
+    """
     ConfigClass = LsstSimIsrConfig
 
     def __init__(self, **kwargs):
@@ -113,7 +137,9 @@ class LsstSimIsrTask(IsrTask):
             if self.config.doWriteSnaps:
                 sensorRef.put(ccdExposure, "snapExp", snap=snapId)
 
-            self.display("snapExp%d" % (snapId,), exposure=ccdExposure)
+            frame = getDebugFrame(self._display, "snapExp%d" % (snapId,))
+            if frame:
+                getDisplay(frame).mtv(ccdExposure)
         
         if self.config.doSnapCombine:
             loadSnapDict(snapDict, snapIdList=(0, 1), sensorRef=sensorRef)
@@ -126,7 +152,9 @@ class LsstSimIsrTask(IsrTask):
         if self.config.doWrite:
             sensorRef.put(postIsrExposure, "postISRCCD")
 
-        self.display("postISRCCD", exposure=postIsrExposure)
+        frame = getDebugFrame(self._display, "postISRCCD")
+        if frame:
+            getDisplay(frame).mtv(postIsrExposure)
                 
         return pipeBase.Struct(
             exposure = postIsrExposure,
