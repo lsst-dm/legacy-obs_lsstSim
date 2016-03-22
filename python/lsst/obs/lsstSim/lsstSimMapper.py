@@ -1,7 +1,7 @@
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010, 2011, 2012, 2013 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -9,14 +9,14 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
@@ -38,7 +38,7 @@ class LsstSimMapper(CameraMapper):
     packageName = 'obs_lsstSim'
 
     _CcdNameRe = re.compile(r"R:(\d,\d) S:(\d,\d(?:,[AB])?)$")
-    def __init__(self, inputPolicy=None, **kwargs):
+    def __init__(self, inputPolicy=None, root=None, **kwargs):
         policyFile = pexPolicy.DefaultPolicyFile(self.packageName, "LsstSimMapper.paf", "policy")
         policy = pexPolicy.Policy(policyFile)
 
@@ -50,7 +50,7 @@ class LsstSimMapper(CameraMapper):
                 else:
                     kwargs[kw] = inputPolicy.get(kw)
 
-        super(LsstSimMapper, self).__init__(policy, policyFile.getRepositoryPath(), **kwargs)
+        super(LsstSimMapper, self).__init__(policy, policyFile.getRepositoryPath(), root=root, **kwargs)
         self.filterIdMap = {
                 'u': 0, 'g': 1, 'r': 2, 'i': 3, 'z': 4, 'y': 5, 'i2': 5}
 
@@ -204,7 +204,7 @@ class LsstSimMapper(CameraMapper):
         """Compute the 64-bit (long) identifier for a coadd.
 
         @param dataId (dict)       Data identifier with tract and patch.
-        @param singleFilter (bool) True means the desired ID is for a single- 
+        @param singleFilter (bool) True means the desired ID is for a single-
                                    filter coadd, in which case dataId
                                    must contain filter.
         """
@@ -257,7 +257,7 @@ class LsstSimMapper(CameraMapper):
             wcs = afwImage.Wcs(crval, wcs.getPixelOrigin(),
                     wcs.getCDMatrix())
             exposure.setWcs(wcs)
-        
+
         return exposure
 
 ###############################################################################
