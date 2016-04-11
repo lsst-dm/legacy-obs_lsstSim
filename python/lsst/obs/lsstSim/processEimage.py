@@ -22,21 +22,24 @@
 #
 import numpy
 
+from lsst.pex.config import Field
 from lsst.pipe.base.argumentParser import ArgumentParser
 from lsst.pipe.tasks.processCcd import ProcessCcdTask
 from .eimageIsr import EimageIsrTask
 
 class ProcessEimageConfig(ProcessCcdTask.ConfigClass):
     """Config for ProcessEimage"""
+    rngSeed = Field(dtype=int, default=1234567890, doc="Seed for random number generator")
+
     def setDefaults(self):
         ProcessCcdTask.ConfigClass.setDefaults(self)
         self.isr.retarget(EimageIsrTask)
-        self.calibrate.repair.doInterpolate = False
-        self.calibrate.repair.doCosmicRay = False
-        self.calibrate.measurePsf.psfDeterminer['pca'].reducedChi2ForPsfCandidates=3.0
-        self.calibrate.measurePsf.psfDeterminer['pca'].spatialReject=2.0
-        self.calibrate.measurePsf.psfDeterminer['pca'].nIterForPsf=0
-        self.calibrate.measurePsf.psfDeterminer['pca'].tolerance=0.01
+        self.charImage.repair.doInterpolate = False
+        self.charImage.repair.doCosmicRay = False
+        self.charImage.measurePsf.psfDeterminer['pca'].reducedChi2ForPsfCandidates=3.0
+        self.charImage.measurePsf.psfDeterminer['pca'].spatialReject=2.0
+        self.charImage.measurePsf.psfDeterminer['pca'].nIterForPsf=0
+        self.charImage.measurePsf.psfDeterminer['pca'].tolerance=0.01
 
 class ProcessEimageTask(ProcessCcdTask):
     """Process an Eimage CCD

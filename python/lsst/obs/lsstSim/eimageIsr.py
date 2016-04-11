@@ -59,7 +59,7 @@ class EimageIsrTask(pipeBase.Task):
 
         \return     postIsrExposure  exposure to be passed to processCcdExposure
         """
-        inputExposure = sensorRef.get(self.dataPrefix + "eimage")
+        inputExposure = sensorRef.get("eimage", immediate=True)
         if self.config.doAddNoise:
             self.addNoise(inputExposure)
 
@@ -77,7 +77,7 @@ class EimageIsrTask(pipeBase.Task):
         md.add('RDNOISE', 0.)
         md.add('SATURATE', 100000)
         md.add('GAINEFF', 1.)
-        return inputExposure
+        return pipeBase.Struct(exposure=inputExposure)
 
     def addNoise(self, inputExposure):
         mi = inputExposure.getMaskedImage()
