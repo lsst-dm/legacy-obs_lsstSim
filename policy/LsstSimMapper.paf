@@ -6,7 +6,6 @@ defects:    "../description/defects"
 needCalibRegistry: false
 
 levels: {
-    skyTile: "visit" "raft" "sensor"
     visit: "snap" "raft" "sensor" "channel"
     raft: "snap" "sensor" "channel"
     sensor: "snap" "channel"
@@ -15,7 +14,6 @@ levels: {
 }
 defaultLevel: "sensor"
 defaultSubLevels: {
-    skyTile: "sensor"
     visit: "sensor"
     raft: "sensor"
     sensor: "channel"
@@ -29,7 +27,6 @@ exposures: {
         storage:     "FitsStorage"
         level:        "Amp"
         tables:        raw
-        tables:        raw_skyTile
     }
     snapExp: {
         template:    "snapExp/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s.fits"
@@ -38,7 +35,6 @@ exposures: {
         storage:    "FitsStorage"
         level:        "Ccd"
         tables:        raw
-        tables:        raw_skyTile
     }
     postISRCCD: {
         template:    "postISRCCD/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
@@ -47,7 +43,6 @@ exposures: {
         storage:    "FitsStorage"
         level:        "Ccd"
         tables:        raw
-        tables:        raw_skyTile
     }
     crDiffim: {
         template:    "crDiffim/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
@@ -56,7 +51,6 @@ exposures: {
         storage:    "FitsStorage"
         level:        "Ccd"
         tables:        raw
-        tables:        raw_skyTile
     }
     visitim: {
         template:      "visitim/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
@@ -65,7 +59,6 @@ exposures: {
         storage:    "FitsStorage"
         level:        "Ccd"
         tables:        raw
-        tables:        raw_skyTile
     }
     icExp: {
         template:      "icExp/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
@@ -74,7 +67,6 @@ exposures: {
         storage:    "FitsStorage"
         level:        "Ccd"
         tables:        raw
-        tables:        raw_skyTile
     }
     calexp: {
         template:      "calexp/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
@@ -83,7 +75,6 @@ exposures: {
         storage:    "FitsStorage"
         level:        "Ccd"
         tables:        raw
-        tables:        raw_skyTile
     }
     calsnap: {
         template:      "calsnap/v%(visit)d-f%(filter)s/s%(snap)d/R%(raft)s/S%(sensor)s.fits"
@@ -92,7 +83,6 @@ exposures: {
         storage:    "FitsStorage"
         level:        "Ccd"
         tables:        raw
-        tables:        raw_skyTile
     }
     biasOut: {
         template:    "bias/v0/R%(raft)s/S%(sensor)s/imsim_0_R%(raft)s_S%(sensor)s_C%(channel)s.fits"
@@ -150,7 +140,14 @@ exposures: {
         storage:       "FitsStorage"
         level:         "None"
         tables:        raw
-        tables:        raw_skyTile
+    }
+    deepCoadd_calexp_det: {
+        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/calexp_det-%(filter)s-%(tract)d-%(patch)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:   "ExposureF"
+        storage:       "FitsStorage"
+        level:         "None"
+        tables:        raw
     }
 
     goodSeeingCoadd_tempExp: {
@@ -176,7 +173,6 @@ exposures: {
         storage:       "FitsStorage"
         level:         "None"
         tables:        raw
-        tables:        raw_skyTile
     }
 
     chiSquaredCoadd: {
@@ -194,7 +190,6 @@ exposures: {
         storage:       "FitsStorage"
         level:         "None"
         tables:        raw
-        tables:        raw_skyTile
     }
     wcs: {
         template:      "wcs/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.wcs.fits"
@@ -204,7 +199,6 @@ exposures: {
         level:        "Ccd"
         tables:        "raw"
         tables:        "raw_visit"
-        tables:        "raw_skyTile"
     }
 
     fcr: {
@@ -215,7 +209,6 @@ exposures: {
         level:        "Ccd"
         tables:        "raw"
         tables:        "raw_visit"
-        tables:        "raw_skyTile"
     }
 }
 
@@ -376,7 +369,6 @@ datasets: {
         persistable:   "PurePythonClass"
         storage:       "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     crDiffimSrc: {
         template:      "crDiffimSrc/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
@@ -384,7 +376,6 @@ datasets: {
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     crDiffimSrc_schema: {
         template:      "schema/crDiffSrc.fits"
@@ -392,7 +383,6 @@ datasets: {
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     icSrc: {
         template:      "icSrc/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
@@ -400,7 +390,6 @@ datasets: {
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     icSrc_schema: {
         template:      "schema/icSrc.fits"
@@ -408,7 +397,6 @@ datasets: {
         persistable:   "SourceCatalog"
         storage:       "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     icMatch: {
         template:      "icMatch/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
@@ -416,7 +404,6 @@ datasets: {
         persistable:        "BaseCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     srcMatch: {
         template:      "srcMatch/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
@@ -424,7 +411,6 @@ datasets: {
         persistable:        "BaseCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     apCorr: {
         template:      "apCorr/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.pickle"
@@ -432,7 +418,6 @@ datasets: {
         persistable:        "ApertureCorrection"
         storage:    "PickleStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     forced_src: {
         template:      "forced/%(tract)d/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
@@ -440,31 +425,27 @@ datasets: {
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
-    forced_config: {
-        template:      "config/forced.py"
-        python:        "lsst.meas.base.forcedCcd.ForcedCcdMeasurementConfig"
-        persistable:      "Config"
-        storage:    "ConfigStorage"
-        tables:        raw
-        tables:        raw_skyTile
-    }
-    forced_metadata: {
-        template:      "forced_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
-        python:        "lsst.daf.base.PropertySet"
-        persistable:        "PropertySet"
-        storage:    "BoostStorage"
-        tables:        raw
-        tables:        raw_skyTile
-    }
-    forced_schema: {
+    forced_src_schema: {
         template:      "schema/forced.fits"
         python:        "lsst.afw.table.SourceCatalog"
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
+    }
+    forcedPhotCcd_config: {
+        template:      "config/forcedPhotCcd.py"
+        python:        "lsst.meas.base.forcedPhotCcd.ForcedPhotCcdConfig"
+        persistable:      "Config"
+        storage:    "ConfigStorage"
+    }
+    forcedPhotCcd_metadata: {
+        template: "forcedPhotCcd_metadata/tract%(tract)d/%(visit)d-%(sensor)s.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
+        storage:    "BoostStorage"
+        tables:        raw
+        tables:        raw_visit
     }
     src: {
         template:      "src/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
@@ -472,7 +453,6 @@ datasets: {
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     src_schema: {
         template:      "schema/src.fits"
@@ -480,7 +460,6 @@ datasets: {
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     modelfits: {
         template:      "modelfits/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
@@ -488,7 +467,6 @@ datasets: {
         persistable:        "ModelFitCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     modelfits_schema: {
         template:      "schema/modelfits.fits"
@@ -496,7 +474,6 @@ datasets: {
         persistable:        "ModelFitCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepCoadd_modelfits: {
         template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/modelfits-%(filter)s-%(tract)d-%(patch)s.fits"
@@ -504,7 +481,6 @@ datasets: {
         persistable:        "ModelFitCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepCoadd_modelfits_schema: {
         template:      "schema/deepCoadd_modelfits.fits"
@@ -512,7 +488,6 @@ datasets: {
         persistable:        "ModelFitCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepCoadd_multiModelfits: {
         template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/multiModelfits-%(filter)s-%(tract)d-%(patch)s.fits"
@@ -520,7 +495,6 @@ datasets: {
         persistable:        "ModelFitCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepCoadd_multiModelfits_schema: {
         template:      "schema/deepCoadd_multiModelfits.fits"
@@ -528,7 +502,6 @@ datasets: {
         persistable:        "ModelFitCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     sourceHist: {
         template:      "results/st%(skyTile)d/sourceHist.fits"
@@ -536,7 +509,6 @@ datasets: {
         persistable:        "DecoratedImageU"
         storage:    "FitsStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     badSourceHist: {
         template:      "results/st%(skyTile)d/badSourceHist.fits"
@@ -544,7 +516,6 @@ datasets: {
         persistable:        "DecoratedImageU"
         storage:    "FitsStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     source: {
         template:      "results/st%(skyTile)d/source.fits"
@@ -552,7 +523,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     source_schema: {
         template:      "schema/source.fits"
@@ -560,7 +530,6 @@ datasets: {
         persistable:   "ignored"
         storage:       "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     badSource: {
         template:      "results/st%(skyTile)d/badSource.fits"
@@ -568,7 +537,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     badSource_schema: {
         template:      "schema/badSource.fits"
@@ -576,7 +544,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     invalidSource: {
         template:      "results/st%(skyTile)d/invalidSource.fits"
@@ -584,7 +551,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     invalidSource_schema: {
         template:      "schema/invalidSource.fits"
@@ -592,7 +558,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     object: {
         template:      "results/st%(skyTile)d/object.fits"
@@ -600,7 +565,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     object_schema: {
         template:      "schema/object.fits"
@@ -608,7 +572,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     Mosaic_config: {
         template:      "config/mosaic.py"
@@ -616,7 +579,6 @@ datasets: {
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     Mosaic_metadata: {
         template:      "metadata/Mosaic.boost"
@@ -624,7 +586,6 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     processCcd_config: {
         template:      "config/processCcd.py"
@@ -632,7 +593,6 @@ datasets: {
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     processCcd_metadata: {
         template:      "processCcd_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
@@ -640,7 +600,6 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     processEimage_config: {
         template:      "config/processEimage.py"
@@ -648,7 +607,6 @@ datasets: {
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     processEimage_metadata: {
         template:      "processEimage_metadata/v%(visit)d-f%(filter)s/s%(snap)i/R%(raft)s/S%(sensor)s.boost"
@@ -656,7 +614,6 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     measureCcd_config: {
         template:      "config/measureCcd.py"
@@ -664,7 +621,6 @@ datasets: {
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     measureCcd_metadata: {
         template:      "measureCcd_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
@@ -672,7 +628,6 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deep_measureCoadd_config: {
         template:      "config/deep_measureCoadd.py"
@@ -680,7 +635,6 @@ datasets: {
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deep_measureCoadd_metadata: {
         template:      "deep_measureCoadd_metadata/%(filter)s/%(tract)d/%(patch)s/metadata-%(filter)s-%(tract)d-%(patch)s.boost"
@@ -688,7 +642,6 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deep_measureMulti_config: {
         template:      "config/deep_measureMulti.py"
@@ -696,7 +649,6 @@ datasets: {
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deep_measureMulti_metadata: {
         template:      "deep_measureMulti_metadata/%(filter)s/%(tract)d/%(patch)s/metadata-%(filter)s-%(tract)d-%(patch)s.boost"
@@ -704,7 +656,6 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     sourceAssoc_config: {
         template:      "config/sourceAssoc.py"
@@ -712,7 +663,6 @@ datasets: {
         persistable:   "Config"
         storage:       "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     sourceAssoc_metadata: {
         template:      "sourceAssoc_metadata/st%(skyTile)d/metadata.boost"
@@ -720,7 +670,19 @@ datasets: {
         persistable:   "PropertySet"
         storage:       "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
+    }
+    IngestIndexedReferenceTask_config: {
+        template:      "config/IngestIndexedReferenceTask.py"
+        python:        "lsst.pipe.tasks.indexReferenceTask.IngestIndexedReferenceConfig"
+        persistable:   "Config"
+        storage:       "ConfigStorage"
+    }
+    cal_ref_cat: {
+        persistable: SourceCatalog
+        python: lsst.afw.table.SourceCatalog
+        storage: FitsCatalogStorage
+        table: ignored
+        template: photo_astro_ref/%(pixel_id)s.fits
     }
 
     deepCoadd_depth: {
@@ -757,7 +719,6 @@ datasets: {
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deep_assembleCoadd_metadata: {
         template:      "deep_assembleCoadd_metadata/%(filter)s/%(tract)d/%(patch)s.boost"
@@ -765,7 +726,20 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
+    }
+    deep_safeClipAssembleCoadd_config: {
+        template:      "config/deep_safeClipAssembleCoadd.py"
+        python:        "lsst.pipe.tasks.assembleCoadd.SafeClipAssembleCoaddConfig"
+        persistable:      "Config"
+        storage:    "ConfigStorage"
+        tables:        raw
+    }
+    deep_safeClipAssembleCoadd_metadata: {
+        template:      "deep_safeClipAssembleCoadd_metadata/%(filter)s/%(tract)d/%(patch)s.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
+        storage:    "BoostStorage"
+        tables:        raw
     }
     deep_coadd_config: {
         template:      "config/deep_coadd.py"
@@ -773,7 +747,6 @@ datasets: {
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deep_coadd_metadata: {
         template:      "deep_coadd_metadata/%(filter)s/%(tract)d/%(patch)s.boost"
@@ -781,7 +754,6 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepCoadd_icSrc: {
         template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/icSrc-%(filter)s-%(tract)d-%(patch)s.fits"
@@ -789,7 +761,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepCoadd_icSrc_schema: {
         template:      "schema/deepCoadd_icSrc.fits"
@@ -797,7 +768,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepCoadd_icMatch: {
         template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/icMatch-%(filter)s-%(tract)d-%(patch)s.fits"
@@ -805,7 +775,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepCoadd_apCorr: {
         template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/apCorr-%(filter)s-%(tract)d-%(patch)s.pickle"
@@ -813,7 +782,6 @@ datasets: {
         persistable:        "ApertureCorrection"
         storage:    "PickleStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepCoadd_src: {
         template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/src-%(filter)s-%(tract)d-%(patch)s.fits"
@@ -821,7 +789,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepCoadd_src_schema: {
         template:      "schema/deepCoadd_src.fits"
@@ -829,7 +796,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepCoadd_calexp_background: {
         template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/bkgd-%(filter)s-%(tract)d-%(patch)s.fits"
@@ -837,7 +803,13 @@ datasets: {
         persistable:   "PurePythonClass"
         storage:       "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
+    }
+    deepCoadd_calexp_detBackground: {
+        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/det_bkgd-%(filter)s-%(tract)d-%(patch)s.fits"
+        python:        "lsst.afw.math.BackgroundList"
+        persistable:   "PurePythonClass"
+        storage:       "FitsCatalogStorage"
+        tables:        raw
     }
     deepCoadd_srcMatch: {
         template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/srcMatch-%(filter)s-%(tract)d-%(patch)s.fits"
@@ -845,7 +817,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepCoadd_forced_src: {
         template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/forced-%(filter)s-%(tract)d-%(patch)s.fits"
@@ -853,7 +824,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepCoadd_forced_config: {
         template:      "config/deepCoadd_forced.py"
@@ -861,7 +831,6 @@ datasets: {
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepCoadd_forced_metadata: {
         template:      "deepCoadd_forced_metadata/%(filter)s/%(tract)d/%(patch)s.boost"
@@ -869,7 +838,6 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepCoadd_forced_schema: {
         template:      "schema/deepCoadd_forced.fits"
@@ -877,7 +845,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepDiff_differenceExp: {
         template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/diffexp-S%(sensor)s.fits"
@@ -885,7 +852,6 @@ datasets: {
         persistable:        "ExposureF"
         storage:    "FitsStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepDiff_matchedExp: {
         template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/matchexp-S%(sensor)s.fits"
@@ -893,7 +859,6 @@ datasets: {
         persistable:        "ExposureF"
         storage:    "FitsStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepDiff_diaSrc: {
         template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/diaSrc-S%(sensor)s.fits"
@@ -901,7 +866,6 @@ datasets: {
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepDiff_diaSrc_schema: {
         template:      "schema/deepDiff_diaSrc.fits"
@@ -909,7 +873,6 @@ datasets: {
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepDiff_kernelSrc: {
         template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/kernelSrc-S%(sensor)s.fits"
@@ -917,7 +880,6 @@ datasets: {
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deep_makeCoaddTempExp_config: {
         template:      "config/deep_makeCoaddTempExp.py"
@@ -925,7 +887,6 @@ datasets: {
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deep_makeCoaddTempExp_metadata: {
         template:      "deep_makeCoaddTempExp_metadata/%(filter)s/%(tract)d/%(patch)s_metadata.boost"
@@ -933,7 +894,6 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deep_processCoadd_config: {
         template:      "config/deep_processCoadd.py"
@@ -941,7 +901,6 @@ datasets: {
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deep_processCoadd_metadata: {
         template:      "deep_processCoadd_metadata/%(filter)s/%(tract)d/%(patch)s/metadata-%(filter)s-%(tract)d-%(patch)s.boost"
@@ -949,7 +908,6 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepDiff_config: {
         template:      "config/deepDiff.py"
@@ -957,7 +915,6 @@ datasets: {
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepDiff_metadata: {
         template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/metadata-S%(sensor)s.boost"
@@ -965,7 +922,22 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
+    }
+    deepMergedCoaddId: {
+        template:     "ignored"
+        # Provide something to import, although we actually return a Long
+        python:       "lsst.daf.base.PropertySet"
+        persistable:  "ignored"
+        storage:      "ignored"
+        tables:       "raw"
+    }
+    deepMergedCoaddId_bits: {
+        template:     "ignored"
+        # Provide something to import, although we actually return an int
+        python:       "lsst.daf.base.PropertySet"
+        persistable:  "ignored"
+        storage:      "ignored"
+        tables:       "raw"
     }
 
     goodSeeingCoadd_depth: {
@@ -1002,7 +974,6 @@ datasets: {
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeing_assembleCoadd_metadata: {
         template:      "goodSeeing_assembleCoadd_metadata/%(filter)s/%(tract)d/%(patch)s.boost"
@@ -1010,7 +981,6 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeing_coadd_config: {
         template:      "config/goodSeeing_coadd.py"
@@ -1018,7 +988,6 @@ datasets: {
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeing_coadd_metadata: {
         template:      "goodSeeing_coadd_metadata/%(filter)s/%(tract)d/%(patch)s.boost"
@@ -1026,7 +995,6 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeingCoadd_icSrc: {
         template:      "goodSeeingCoadd-results/%(filter)s/%(tract)d/%(patch)s/icSrc-%(filter)s-%(tract)d-%(patch)s.fits"
@@ -1034,7 +1002,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeingCoadd_icSrc_schema: {
         template:      "schema/goodSeeingCoadd_icSrc.fits"
@@ -1042,7 +1009,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeingCoadd_icMatch: {
         template:      "goodSeeingCoadd-results/%(filter)s/%(tract)d/%(patch)s/icMatch-%(filter)s-%(tract)d-%(patch)s.fits"
@@ -1050,7 +1016,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeingCoadd_apCorr: {
         template:      "goodSeeingCoadd-results/%(filter)s/%(tract)d/%(patch)s/apCorr-%(filter)s-%(tract)d-%(patch)s.pickle"
@@ -1058,7 +1023,6 @@ datasets: {
         persistable:        "ApertureCorrection"
         storage:    "PickleStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeingCoadd_src: {
         template:      "goodSeeingCoadd-results/%(filter)s/%(tract)d/%(patch)s/src-%(filter)s-%(tract)d-%(patch)s.fits"
@@ -1066,7 +1030,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeingCoadd_src_schema: {
         template:      "schema/goodSeeingCoadd_src.fits"
@@ -1074,7 +1037,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeingCoadd_calexpBackground: {
         template:      "goodSeeingCoadd-results/%(filter)s/%(tract)d/%(patch)s/bkgd-%(filter)s-%(tract)d-%(patch)s.fits"
@@ -1082,7 +1044,6 @@ datasets: {
         persistable:   "PurePythonClass"
         storage:       "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeing_srcMatch: {
         template:      "goodSeeingCoadd-results/%(filter)s/%(tract)d/%(patch)s/srcMatch-%(filter)s-%(tract)d-%(patch)s.fits"
@@ -1090,7 +1051,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
 
     goodSeeingDiff_differenceExp: {
@@ -1099,7 +1059,6 @@ datasets: {
         persistable:        "ExposureF"
         storage:    "FitsStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeingDiff_matchedExp: {
         template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/matchexp-S%(sensor)s.fits"
@@ -1107,7 +1066,6 @@ datasets: {
         persistable:        "ExposureF"
         storage:    "FitsStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeingDiff_diaSrc: {
         template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/diaSrc-S%(sensor)s.fits"
@@ -1115,7 +1073,6 @@ datasets: {
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeingDiff_diaSrc_schema: {
         template:      "schema/goodSeeingDiffSrc.fits"
@@ -1123,7 +1080,6 @@ datasets: {
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeingDiff_kernelSrc: {
         template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/kernelSrc-S%(sensor)s.fits"
@@ -1131,7 +1087,6 @@ datasets: {
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeing_makeCoaddTempExp_config: {
         template:      "config/goodSeeing_makeCoaddTempExp.py"
@@ -1139,7 +1094,6 @@ datasets: {
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeing_makeCoaddTempExp_metadata: {
         template:      "goodSeeing_makeCoaddTempExp_metadata/%(filter)s/%(tract)d/%(patch)s_metadata.boost"
@@ -1147,7 +1101,6 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeing_processCoadd_config: {
         template:      "config/goodSeeing_processCoadd.py"
@@ -1155,7 +1108,6 @@ datasets: {
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeing_processCoadd_metadata: {
         template:      "goodSeeing_processCoadd_metadata/%(filter)s/%(tract)d/%(patch)s/metadata-%(filter)s-%(tract)d-%(patch)s.boost"
@@ -1163,7 +1115,6 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeingDiff_config: {
         template:      "config/goodSeeingDiff.py"
@@ -1171,7 +1122,6 @@ datasets: {
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     goodSeeingDiff_metadata: {
         template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/metadata-S%(sensor)s.boost"
@@ -1179,7 +1129,6 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
 
     chiSquaredCoadd_skyMap: {
@@ -1209,7 +1158,6 @@ datasets: {
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     chiSquared_coadd_metadata: {
         template:      "chiSquared_coadd_metadata/%(tract)d/%(patch)s.boost"
@@ -1217,7 +1165,6 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     chiSquared_assembleCoadd_config: {
         template:      "config/chiSquared_assembleCoadd.py"
@@ -1225,7 +1172,6 @@ datasets: {
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     chiSquared_assembleCoadd_metadata: {
         template:      "chiSquared_assembleCoadd_metadata/%(filter)s/%(tract)d/%(patch)s.boost"
@@ -1233,7 +1179,6 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
 
     chiSquaredCoadd_icSrc: {
@@ -1242,7 +1187,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     chiSquaredCoadd_icSrc_schema: {
         template:      "schema/chiSquaredCoadd_icSrc.fits"
@@ -1250,7 +1194,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     chiSquaredCoadd_icMatch: {
         template:      "chiSquaredCoadd-results/%(tract)d/%(patch)s/icMatch-%(tract)d-%(patch)s.fits"
@@ -1258,7 +1201,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     chiSquaredCoadd_apCorr: {
         template:      "chiSquaredCoadd-results/%(tract)d/%(patch)s/apCorr-%(tract)d-%(patch)s.pickle"
@@ -1266,7 +1208,6 @@ datasets: {
         persistable:        "ApertureCorrection"
         storage:    "PickleStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     chiSquaredCoadd_src: {
         template:      "chiSquaredCoadd-results/%(tract)d/%(patch)s/src-%(tract)d-%(patch)s.fits"
@@ -1274,7 +1215,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     chiSquaredCoadd_src_schema: {
         template:      "schema/chiSquaredCoadd_src.fits"
@@ -1282,7 +1222,6 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     chiSquared_processCoadd_config: {
         template:      "config/chiSquared_processCoadd.py"
@@ -1290,7 +1229,6 @@ datasets: {
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     chiSquared_processCoadd_metadata: {
         template:      "chiSquared_processCoadd_metadata/%(tract)d/%(patch)s/metadata-%(tract)d-%(patch)s.boost"
@@ -1298,7 +1236,6 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     refcat: {
         template:      "refcat.fits"
@@ -1306,7 +1243,6 @@ datasets: {
         persistable:        "SimpleCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     # Detections on coadds
     deepCoadd_det: {
@@ -1315,7 +1251,6 @@ datasets: {
         persistable:   "ignored"
         storage:       "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     detectCoaddSources_config: {
         template:      "config/detect.py"
@@ -1329,7 +1264,6 @@ datasets: {
         persistable:   "PropertySet"
         storage:       "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepCoadd_det_schema: {
         template:      "schema/deepCoadd_det.fits"
@@ -1345,7 +1279,6 @@ datasets: {
         persistable:   "ignored"
         storage:       "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     mergeCoaddDetections_config: {
         template:      "config/mergeDetect.py"
@@ -1359,7 +1292,6 @@ datasets: {
         persistable:   "PropertySet"
         storage:       "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepCoadd_mergeDet_schema: {
         template:      "schema/deepCoadd_mergeDet.fits"
@@ -1381,7 +1313,6 @@ datasets: {
         persistable:   "ignored"
         storage:       "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     measureCoaddSources_config: {
         template:      "config/measureMerged.py"
@@ -1395,7 +1326,6 @@ datasets: {
         persistable:   "PropertySet"
         storage:       "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepCoadd_meas_schema: {
         template:      "schema/deepCoadd_meas.fits"
@@ -1411,7 +1341,6 @@ datasets: {
         persistable:   "ignored"
         storage:       "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     mergeCoaddMeasurements_config: {
         template:      "config/mergeMeasure.py"
@@ -1425,7 +1354,6 @@ datasets: {
         persistable:   "PropertySet"
         storage:       "BoostStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     deepCoadd_ref_schema: {
         template:      "schema/deepCoadd_ref.fits"
