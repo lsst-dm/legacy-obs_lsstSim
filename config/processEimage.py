@@ -1,0 +1,1 @@
+config.calibrate.photoCal.doSelectUnresolved=False
