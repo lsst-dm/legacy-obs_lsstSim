@@ -219,6 +219,21 @@ class LsstSimMapper(CameraMapper):
         if singleFilter:
             return id * 8 + self.filterIdMap[dataId['filter']]
         return id
+    # I don't actually know what to say about how many bits are taaken.  This is a WAG
+    _nbit_id = 30
+    def bypass_deepCoaddId_bits(self, *args, **kwargs):
+        """The number of bits used up for patch ID bits"""
+        return 64 - self._nbit_id
+
+    def bypass_deepCoaddId(self, datasetType, pythonType, location, dataId):
+        return self._computeCoaddExposureId(dataId, True)
+
+    def bypass_deepMergedCoaddId_bits(self, *args, **kwargs):
+        """The number of bits used up for patch ID bits"""
+        return 64 - self._nbit_id
+
+    def bypass_deepMergedCoaddId(self, datasetType, pythonType, location, dataId):
+        return self._computeCoaddExposureId(dataId, False)
 
     @staticmethod
     def getShortCcdName(ccdId):

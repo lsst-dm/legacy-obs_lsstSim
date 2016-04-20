@@ -23,6 +23,7 @@
 import lsst.afw.image as afwImage
 import lsst.pex.config as pexConfig
 import lsst.pipe.base as pipeBase
+from lsst.ip.isr import isr
 import numpy
 
 class EimageIsrConfig(pexConfig.Config):
@@ -40,6 +41,8 @@ class EimageIsrConfig(pexConfig.Config):
                                          doc="Choose method for setting the variance")
     varianceValue = pexConfig.Field(dtype=float, default=0.01, doc="Value to use in the variance plane.")
     maskEdgeBorder = pexConfig.Field(dtype=int, default=0, doc="Set mask to EDGE for a border of x pixels")
+    sat_val = pexConfig.Field(dtype=int, default=100000, doc="Value at which to detect saturation")
+    interp_size = pexConfig.Field(dtype=float, default=0.5, doc="Size of interpolation kernel in arcsec")
 
 
 class EimageIsrTask(pipeBase.Task):
@@ -59,7 +62,7 @@ class EimageIsrTask(pipeBase.Task):
 
         \return     postIsrExposure  exposure to be passed to processCcdExposure
         """
-        inputExposure = sensorRef.get(self.dataPrefix + "eimage")
+        inputExposure = sensorRef.get("eimage", immediate=True)
         if self.config.doAddNoise:
             self.addNoise(inputExposure)
 
@@ -69,15 +72,35 @@ class EimageIsrTask(pipeBase.Task):
         if self.config.maskEdgeBorder > 0:
             self.maskEdges(inputExposure)
 
+        # eimages are transposed relative to the read direction.
+        # Transpose the image to do interpolation in the serial direction
+        mi = inputExposure.getMaskedImage()
+        mi = isr.transposeMaskedImage(mi)
+
         # We may need to ingest the results of the processing and
         # ingestProcessed.py expects some specific header cards.
         # Set the header cards to values appropriate for an image
         # that has not been read out.
         md = inputExposure.getMetadata()
         md.add('RDNOISE', 0.)
-        md.add('SATURATE', 100000)
+        md.add('SATURATE', self.config.sat_val)
         md.add('GAINEFF', 1.)
-        return inputExposure
+        # Mask saturation
+        isr.makeThresholdMask(
+                maskedImage = mi,
+                threshold = self.config.sat_val,
+                growFootprints = 0,
+                maskName = 'SAT',
+            )
+        # Interpolate
+        isr.interpolateFromMask(
+            maskedImage = mi,
+            fwhm = self.config.interp_size,
+            growFootprints = 0,
+            maskName = 'SAT',
+        )
+        inputExposure.setMaskedImage(isr.transposeMaskedImage(mi))
+        return pipeBase.Struct(exposure=inputExposure)
 
     def addNoise(self, inputExposure):
         mi = inputExposure.getMaskedImage()
