@@ -26,6 +26,7 @@ import lsst.pipe.base as pipeBase
 from lsst.ip.isr import isr
 import numpy
 
+
 class EimageIsrConfig(pexConfig.Config):
     """Config for EimageIsrTask"""
     doAddNoise = pexConfig.Field(dtype=bool, default=False,
@@ -36,8 +37,8 @@ class EimageIsrConfig(pexConfig.Config):
     noiseValue = pexConfig.Field(dtype=int, default=1000, doc="Mean of the Poisson distribution in counts")
     doSetVariance = pexConfig.Field(dtype=bool, default=True, doc="Set the variance plane in the eimage?")
     varianceType = pexConfig.ChoiceField(dtype=str, default="image",
-                                         allowed={"image":"set variance from image plane",
-                                                  "value":"set variance to a value"},
+                                         allowed={"image": "set variance from image plane",
+                                                  "value": "set variance to a value"},
                                          doc="Choose method for setting the variance")
     varianceValue = pexConfig.Field(dtype=float, default=0.01, doc="Value to use in the variance plane.")
     maskEdgeBorder = pexConfig.Field(dtype=int, default=0, doc="Set mask to EDGE for a border of x pixels")
@@ -87,11 +88,10 @@ class EimageIsrTask(pipeBase.Task):
         md.add('GAINEFF', 1.)
         # Mask saturation
         isr.makeThresholdMask(
-                maskedImage = mi,
-                threshold = self.config.sat_val,
-                growFootprints = 0,
-                maskName = 'SAT',
-            )
+            maskedImage = mi,
+            threshold = self.config.sat_val,
+            growFootprints = 0,
+            maskName = 'SAT')
         # Interpolate
         isr.interpolateFromMask(
             maskedImage = mi,
@@ -104,8 +104,8 @@ class EimageIsrTask(pipeBase.Task):
 
     def addNoise(self, inputExposure):
         mi = inputExposure.getMaskedImage()
-        (x,y) = mi.getDimensions()
-        noiseArr = numpy.random.poisson(self.config.noiseValue, size=x*y).reshape(y,x)
+        (x, y) = mi.getDimensions()
+        noiseArr = numpy.random.poisson(self.config.noiseValue, size=x*y).reshape(y, x)
         noiseArr = noiseArr.astype(numpy.float32)
         noiseImage = afwImage.makeImageFromArray(noiseArr)
         mi += noiseImage
@@ -125,7 +125,7 @@ class EimageIsrTask(pipeBase.Task):
         maskArr = mask.getArray()
         # Note, in numpy arrays, y index comes first
         (ys, xs) = maskArr.shape
-        maskArr[:npix,:] |= edgeBitMask # Bottom
-        maskArr[ys-npix-1:,:] |= edgeBitMask # Top
-        maskArr[npix:ys-npix-1,:npix] |= edgeBitMask # Left
-        maskArr[npix:ys-npix-1,xs-npix-1:] |= edgeBitMask # Right
+        maskArr[:npix, :] |= edgeBitMask  # Bottom
+        maskArr[ys-npix-1:, :] |= edgeBitMask  # Top
+        maskArr[npix:ys-npix-1, :npix] |= edgeBitMask  # Left
+        maskArr[npix:ys-npix-1, xs-npix-1:] |= edgeBitMask  # Right
