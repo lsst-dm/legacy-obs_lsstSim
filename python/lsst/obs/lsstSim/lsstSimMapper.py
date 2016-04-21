@@ -1,7 +1,7 @@
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010, 2011, 2012, 2013 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -9,14 +9,14 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
@@ -32,12 +32,13 @@ import lsst.pex.policy as pexPolicy
 from lsst.daf.butlerUtils import CameraMapper
 
 # Solely to get boost serialization registrations for Measurement subclasses
-import lsst.meas.algorithms as measAlgo
+
 
 class LsstSimMapper(CameraMapper):
     packageName = 'obs_lsstSim'
 
     _CcdNameRe = re.compile(r"R:(\d,\d) S:(\d,\d(?:,[AB])?)$")
+
     def __init__(self, inputPolicy=None, **kwargs):
         policyFile = pexPolicy.DefaultPolicyFile(self.packageName, "LsstSimMapper.paf", "policy")
         policy = pexPolicy.Policy(policyFile)
@@ -51,19 +52,18 @@ class LsstSimMapper(CameraMapper):
                     kwargs[kw] = inputPolicy.get(kw)
 
         super(LsstSimMapper, self).__init__(policy, policyFile.getRepositoryPath(), **kwargs)
-        self.filterIdMap = {
-                'u': 0, 'g': 1, 'r': 2, 'i': 3, 'z': 4, 'y': 5, 'i2': 5}
+        self.filterIdMap = {'u': 0, 'g': 1, 'r': 2, 'i': 3, 'z': 4, 'y': 5, 'i2': 5}
 
-        #The LSST Filters from L. Jones 04/07/10
+        # The LSST Filters from L. Jones 04/07/10
         afwImageUtils.defineFilter('u', 364.59)
         afwImageUtils.defineFilter('g', 476.31)
         afwImageUtils.defineFilter('r', 619.42)
         afwImageUtils.defineFilter('i', 752.06)
         afwImageUtils.defineFilter('z', 866.85)
-        afwImageUtils.defineFilter('y', 971.68, alias=['y4']) # official y filter
+        afwImageUtils.defineFilter('y', 971.68, alias=['y4'])  # official y filter
         # If/when y3 sim data becomes available, uncomment this and
         # modify the schema appropriately
-        #afwImageUtils.defineFilter('y3', 1002.44) # candidate y-band
+        # afwImageUtils.defineFilter('y3', 1002.44) # candidate y-band
 
     def _transformId(self, dataId):
         """Transform an ID dict into standard form for LSST
@@ -162,7 +162,7 @@ class LsstSimMapper(CameraMapper):
                 int(m.group(1)), int(m.group(2)))
 
     def _computeAmpExposureId(self, dataId):
-        #visit, snap, raft, sensor, channel):
+        # visit, snap, raft, sensor, channel):
         """Compute the 64-bit (long) identifier for an amp exposure.
 
         @param dataId (dict) Data identifier with visit, snap, raft, sensor, channel
@@ -171,17 +171,17 @@ class LsstSimMapper(CameraMapper):
         pathId = self._transformId(dataId)
         visit = pathId['visit']
         snap = pathId['snap']
-        raft = pathId['raft'] # "xy" e.g. "20"
-        sensor = pathId['sensor'] # "xy" e.g. "11"
-        channel = pathId['channel'] # "yx" e.g. "05" (NB: yx, not xy, in original comment)
+        raft = pathId['raft']  # "xy" e.g. "20"
+        sensor = pathId['sensor']  # "xy" e.g. "11"
+        channel = pathId['channel']  # "yx" e.g. "05" (NB: yx, not xy, in original comment)
 
         r1, r2 = raft
         s1, s2 = sensor
         c1, c2 = channel
         return (visit << 13) + (snap << 12) + \
-                (long(r1) * 5 + long(r2)) * 160 + \
-                (long(s1) * 3 + long(s2)) * 16 + \
-                (long(c1) * 8 + long(c2))
+            (long(r1) * 5 + long(r2)) * 160 + \
+            (long(s1) * 3 + long(s2)) * 16 + \
+            (long(c1) * 8 + long(c2))
 
     def _computeCcdExposureId(self, dataId):
         """Compute the 64-bit (long) identifier for a CCD exposure.
@@ -191,20 +191,20 @@ class LsstSimMapper(CameraMapper):
 
         pathId = self._transformId(dataId)
         visit = pathId['visit']
-        raft = pathId['raft'] # "xy" e.g. "20"
-        sensor = pathId['sensor'] # "xy" e.g. "11"
+        raft = pathId['raft']  # "xy" e.g. "20"
+        sensor = pathId['sensor']  # "xy" e.g. "11"
 
         r1, r2 = raft
         s1, s2 = sensor
         return (visit << 9) + \
-                (long(r1) * 5 + long(r2)) * 10 + \
-                (long(s1) * 3 + long(s2))
+            (long(r1) * 5 + long(r2)) * 10 + \
+            (long(s1) * 3 + long(s2))
 
     def _computeCoaddExposureId(self, dataId, singleFilter):
         """Compute the 64-bit (long) identifier for a coadd.
 
         @param dataId (dict)       Data identifier with tract and patch.
-        @param singleFilter (bool) True means the desired ID is for a single- 
+        @param singleFilter (bool) True means the desired ID is for a single-
                                    filter coadd, in which case dataId
                                    must contain filter.
         """
@@ -250,9 +250,9 @@ class LsstSimMapper(CameraMapper):
 
         md = exposure.getMetadata()
         if md.exists("VERSION") and md.getInt("VERSION") < 16952:
-        # Precess WCS based on actual observation date
+            # Precess WCS based on actual observation date
             epoch = dafBase.DateTime(md.get("MJD-OBS"), dafBase.DateTime.MJD,
-                    dafBase.DateTime.TAI).get(dafBase.DateTime.EPOCH)
+                                     dafBase.DateTime.TAI).get(dafBase.DateTime.EPOCH)
             wcs = exposure.getWcs()
             origin = wcs.getSkyOrigin()
             refCoord = afwCoord.Fk5Coord(
@@ -262,24 +262,28 @@ class LsstSimMapper(CameraMapper):
             crval.setX(newRefCoord.getRa().asDegrees())
             crval.setY(newRefCoord.getDec().asDegrees())
             wcs = afwImage.Wcs(crval, wcs.getPixelOrigin(),
-                    wcs.getCDMatrix())
+                               wcs.getCDMatrix())
             exposure.setWcs(wcs)
-        
+
         return exposure
 
 ###############################################################################
 
     def bypass_ampExposureId(self, datasetType, pythonType, location, dataId):
         return self._computeAmpExposureId(dataId)
+
     def bypass_ampExposureId_bits(self, datasetType, pythonType, location, dataId):
         return 45
+
     def bypass_ccdExposureId(self, datasetType, pythonType, location, dataId):
         return self._computeCcdExposureId(dataId)
+
     def bypass_ccdExposureId_bits(self, datasetType, pythonType, location, dataId):
         return 41
 
     def bypass_goodSeeingCoaddId(self, datasetType, pythonType, location, dataId):
         return self._computeCoaddExposureId(dataId, True)
+
     def bypass_goodSeeingCoaddId_bits(self, datasetType, pythonType, location, dataId):
         return 1 + 7 + 13*2 + 3
 
@@ -289,6 +293,7 @@ class LsstSimMapper(CameraMapper):
 
     def bypass_chiSquaredCoaddId(self, datasetType, pythonType, location, dataId):
         return self._computeCoaddExposureId(dataId, False)
+
     def bypass_chiSquaredCoaddId_bits(self, datasetType, pythonType, location, dataId):
         return 1 + 7 + 13*2
 
