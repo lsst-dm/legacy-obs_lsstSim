@@ -23,7 +23,7 @@
  */
 
 #include <cmath>
-#include "boost/make_shared.hpp"
+#include <memory>
 #include "lsst/obs/lsstSim/EdgeRolloffFunctor.h"
 
 namespace lsst {
@@ -37,7 +37,7 @@ EdgeRolloffFunctor::EdgeRolloffFunctor(double amplitude, double scale,
 }
 
 PTR(afw::geom::Functor) EdgeRolloffFunctor::clone() const {
-   return boost::make_shared<EdgeRolloffFunctor>(_amplitude, _scale, _width);
+   return std::make_shared<EdgeRolloffFunctor>(_amplitude, _scale, _width);
 }
 
 double EdgeRolloffFunctor::operator()(double x) const {
