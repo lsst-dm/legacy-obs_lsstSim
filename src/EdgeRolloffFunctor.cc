@@ -23,7 +23,7 @@
  */
 
 #include <cmath>
-#include "boost/make_shared.hpp"
+#include <memory>
 #include "lsst/obs/lsstSim/EdgeRolloffFunctor.h"
 
 namespace lsst {
