@@ -20,8 +20,6 @@
 # the GNU General Public License along with this program.  If not,
 # see <https://www.lsstcorp.org/LegalNotices/>.
 #
-import numpy
-
 from lsst.pex.config import Field
 from lsst.pipe.base.argumentParser import ArgumentParser
 from lsst.pipe.tasks.processCcd import ProcessCcdTask

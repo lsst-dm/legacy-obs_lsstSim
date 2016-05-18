@@ -31,14 +31,15 @@ if __name__ == "__main__":
     parser = ArgumentParser(name="argumentParser")
     namespace = parser.parse_args(config=TaskClass.ConfigClass())
     sensorDataRefLists = {}
-    typeMap = {'0':'bias', '1':'dark', '2':'flat_u', '3':'flat_g', '4':'flat_r', '5':'flat_i', '6':'flat_z', '7':'flat_y'}
+    typeMap = {'0':'bias', '1':'dark', '2':'flat_u', '3':'flat_g', '4':'flat_r',
+               '5':'flat_i', '6':'flat_z', '7':'flat_y'}
     types = []
     for dr in namespace.dataRefList:
         tdict = eval(dr.dataId.__repr__())
         types.append(typeMap[str(tdict['visit'])[4]])
         del tdict['visit']
         dstr = tdict.__repr__()
-        if sensorDataRefLists.has_key(dstr):
+        if dstr in sensorDataRefLists:
             sensorDataRefLists[dstr].append(dr)
         else:
             sensorDataRefLists[dstr] = []
