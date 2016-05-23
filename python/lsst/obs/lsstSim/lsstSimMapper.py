@@ -113,11 +113,11 @@ class LsstSimMapper(CameraMapper):
             actualId.setdefault("snap", actualId["exposure"])
 
         # why strip out the commas after carefully adding them?
-        if actualId.has_key("raft"):
+        if "raft" in actualId:
             actualId['raft'] = re.sub(r'(\d),(\d)', r'\1\2', actualId['raft'])
-        if actualId.has_key("sensor"):
+        if "sensor" in actualId:
             actualId['sensor'] = actualId['sensor'].replace(",", "")
-        if actualId.has_key("channel"):
+        if "channel" in actualId:
             actualId['channel'] = re.sub(r'(\d),(\d)', r'\1\2', actualId['channel'])
         return actualId
 

@@ -68,13 +68,13 @@ class EdgeRolloffFunctorTestCase(unittest.TestCase):
         tol = 1e-5
         for func in self.funcs:
             # Check bad maxiter value.
-            self.assertRaises(pexExcept.OutOfRangeError, func.inverse, self.y0, tol, 0);
+            self.assertRaises(pexExcept.OutOfRangeError, func.inverse, self.y0, tol, 0)
 
     def testInverseMaxiterRuntimeError(self):
         for func in self.funcs:
             # Check for exceeding maximum iterations.
             self.assertRaises(pexExcept.RuntimeError, func.inverse, self.y0, 1e-10, 1)
-    
+
 def suite():
     """Return a suite containing all of the test cases in this module."""
     lsst.utils.tests.init()

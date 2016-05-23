@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -11,14 +11,14 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
@@ -70,7 +70,7 @@ class LsstMapperTestCase(unittest.TestCase):
             filter = "r"
             expInfoList = task.run(coordList, filter).exposureInfoList
             self.assertEqual(len(expInfoList), maxExposures)
-        
+
     def testWholeSky(self):
         """Test whole-sky search
         """
@@ -83,7 +83,7 @@ class LsstMapperTestCase(unittest.TestCase):
             filter = "r"
             expInfoList = task.run(coordList, filter).exposureInfoList
             self.assertEqual(tuple(expInfo for expInfo in expInfoList if expInfo.fwhm > maxFwhm), ())
-    
+
 
 def suite():
     utilsTests.init()
@@ -95,7 +95,7 @@ def suite():
 def run(shouldExit=False):
     config = SelectLsstImagesTask.ConfigClass()
     try:
-        user = DbAuth.username(config.host, str(config.port)),
+        DbAuth.username(config.host, str(config.port)),
     except Exception:
         print "Warning: did not find host=%s, port=%s in your db-auth file; skipping SelectLsstImagesTask unit tests" % \
             (config.host, str(config.port))

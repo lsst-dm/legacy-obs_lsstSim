@@ -20,6 +20,7 @@ tests/data/snapExp/
 version.py
 bin/genDefectRegistry.py
 bin/genInputRegistry.py
+bin/ingestSimImages.py
 bin/makeDefectMaps.py
 bin/makeLsstCameraRepository.py
 bin/processCalibLsstSim.py

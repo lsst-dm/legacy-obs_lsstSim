@@ -24,7 +24,7 @@ import lsst.pipe.base as pipeBase
 from lsstDebug import getDebugFrame
 from lsst.afw.display import getDisplay
 from lsst.ip.isr import IsrTask
-from lsst.pipe.tasks.snapCombine import SnapCombineTask 
+from lsst.pipe.tasks.snapCombine import SnapCombineTask
 import numpy
 
 __all__ = ["LsstSimIsrTask"]
