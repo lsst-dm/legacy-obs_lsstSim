@@ -29,7 +29,7 @@ import shutil
 import lsst.utils
 import lsst.afw.geom as afwGeom
 import lsst.afw.table as afwTable
-from lsst.afw.cameraGeom import (DetectorConfig, CameraConfig, PUPIL, FOCAL_PLANE, PIXELS)
+from lsst.afw.cameraGeom import DetectorConfig, CameraConfig, PUPIL, FOCAL_PLANE, PIXELS, NullLinearityType
 from lsst.obs.lsstSim import LsstSimMapper
 
 def expandDetectorName(abbrevName):
@@ -73,7 +73,7 @@ def makeAmpTables(segmentsFile, gainFile):
     #TODO currently there is no linearity provided, but we should identify
     #how to get this information.
     linearityCoeffs = (0.,1.,0.,0.)
-    linearityType = "Polynomial"
+    linearityType = NullLinearityType
     readoutMap = {'LL':afwTable.LL, 'LR':afwTable.LR, 'UR':afwTable.UR, 'UL':afwTable.UL}
     ampCatalog = None
     detectorName = [] # set to a value that is an invalid dict key, to catch bugs
