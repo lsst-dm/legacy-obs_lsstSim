@@ -1,1 +1,1 @@
-config.doPropagateFlags=False
+config.doPropagateFlags = False
