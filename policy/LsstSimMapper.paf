@@ -587,15 +587,36 @@ datasets: {
         storage:    "BoostStorage"
         tables:        raw
     }
-    processCcd_config: {
-        template:      "config/processCcd.py"
-        python:        "lsst.pipe.tasks.processCcd.ProcessCcdConfig"
+    processCcd_metadata: {
+        template:      "processCcd_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
+        storage:    "BoostStorage"
+        tables:        raw
+    }
+    isr_config: {
+        template:      "config/isr.py"
+        python:        "lsst.obs.lsstSim.LsstSimIsrConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
         tables:        raw
     }
-    processCcd_metadata: {
-        template:      "processCcd_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
+    isr_metadata: {
+        template:      "isr_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
+        storage:    "BoostStorage"
+        tables:        raw
+    }
+    characterizeImage_metadata: {
+        template:      "characterizeImage_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
+        storage:    "BoostStorage"
+        tables:        raw
+    }
+    calibrate_metadata: {
+        template:      "calibrate_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost"
         python:        "lsst.daf.base.PropertySet"
         persistable:        "PropertySet"
         storage:    "BoostStorage"
