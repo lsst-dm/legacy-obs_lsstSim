@@ -692,12 +692,6 @@ datasets: {
         storage:       "BoostStorage"
         tables:        raw
     }
-    IngestIndexedReferenceTask_config: {
-        template:      "config/IngestIndexedReferenceTask.py"
-        python:        "lsst.pipe.tasks.indexReferenceTask.IngestIndexedReferenceConfig"
-        persistable:   "Config"
-        storage:       "ConfigStorage"
-    }
     cal_ref_cat: {
         persistable: SourceCatalog
         python: lsst.afw.table.SourceCatalog
