@@ -121,14 +121,14 @@ class LsstSimIsrTask(IsrTask):
         @return a pipeBase.Struct with fields:
         - exposure: the exposure after application of ISR
         """
-        self.log.log(self.log.INFO, "Performing ISR on sensor %s" % (sensorRef.dataId))
+        self.log.info("Performing ISR on sensor %s", sensorRef.dataId)
         snapDict = dict()
         for snapRef in sensorRef.subItems(level="snap"):
             snapId = snapRef.dataId['snap']
             if snapId not in (0, 1):
                 raise RuntimeError("Unrecognized snapId=%s" % (snapId,))
 
-            self.log.log(self.log.INFO, "Performing ISR on snap %s" % (snapRef.dataId))
+            self.log.info("Performing ISR on snap %s", snapRef.dataId)
             ccdExposure = snapRef.get('raw')
             isrData = self.readIsrData(snapRef, ccdExposure)
             ccdExposure = self.run(ccdExposure, **isrData.getDict()).exposure
@@ -145,7 +145,7 @@ class LsstSimIsrTask(IsrTask):
             loadSnapDict(snapDict, snapIdList=(0, 1), sensorRef=sensorRef)
             postIsrExposure = self.snapCombine.run(snapDict[0], snapDict[1]).exposure
         else:
-            self.log.log(self.log.WARN, "doSnapCombine false; using snap 0 as the result")
+            self.log.warn("doSnapCombine false; using snap 0 as the result")
             loadSnapDict(snapDict, snapIdList=(0,), sensorRef=sensorRef)
             postIsrExposure = snapDict[0]
 
