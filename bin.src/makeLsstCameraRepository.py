@@ -20,6 +20,11 @@
 # the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
+"""
+Produce the camera description FITS files from phosim text files.
+
+Scons should have automatically run this when building obs_lsstSim.
+"""
 from __future__ import absolute_import, division
 import argparse
 import os
@@ -65,7 +70,11 @@ def detectorIdFromAbbrevName(abbrevName):
 def makeAmpTables(segmentsFile, gainFile):
     """
     Read the segments file from a PhoSim release and produce the appropriate AmpInfo
-    @param segmentsFile -- String indicating where the file is located
+
+    @param segmentsFile (str) full path to the segmentation file.
+    @param gainFile (str) full path to the gain/saturation file.
+
+    @return (dict) per amp dictionary of ampCatalogs
     """
     gainDict = {}
     with open(gainFile) as fh:
@@ -264,7 +273,7 @@ if __name__ == "__main__":
     baseDir = lsst.utils.getPackageDir('obs_lsstsim')
     defaultOutDir = os.path.join(os.path.normpath(baseDir), "description", "camera")
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("DetectorLayoutFile", help="Path to detector layout file")
     parser.add_argument("SegmentsFile", help="Path to amp segments file")
     parser.add_argument("GainFile", help="Path to gain and saturation file")
