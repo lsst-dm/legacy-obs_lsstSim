@@ -1,3 +1,4 @@
+# focal plane geometry layout data
 # 
 # rows are the chips in the focal plane
 # columns are the name, x position (microns), y position (microns),

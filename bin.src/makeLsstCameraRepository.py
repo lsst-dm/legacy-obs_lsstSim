@@ -23,7 +23,8 @@
 """
 Produce the camera description FITS files from phosim text files.
 
-Scons should have automatically run this when building obs_lsstSim.
+Scons should have automatically run this when building obs_lsstSim. To produce
+the same files that scons would have, run with no arguments.
 """
 from __future__ import absolute_import, division
 import argparse
@@ -258,6 +259,13 @@ def makeDetectorConfigs(detectorLayoutFile, phosimVersion):
             detectorConfigs.append(detConfig)
     return detectorConfigs
 
+
+def getPhosimVersion(defaultDataDir):
+    """Return the phosim version from data/phosim_version.txt"""
+    with open(os.path.join(defaultDataDir, 'phosim_version.txt')) as infile:
+        return infile.read().strip()
+
+
 if __name__ == "__main__":
     """
     Create the configs for building a camera.  This runs on the files distributed with PhoSim.
@@ -271,14 +279,28 @@ if __name__ == "__main__":
         https://dev.lsstcorp.org/cgit/LSST/sims/phosim.git/plain/data/lsst/segmentation.txt?h=dev
     """
     baseDir = lsst.utils.getPackageDir('obs_lsstsim')
+    defaultDataDir = os.path.join(os.path.normpath(baseDir), "description")
     defaultOutDir = os.path.join(os.path.normpath(baseDir), "description", "camera")
 
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("DetectorLayoutFile", help="Path to detector layout file")
-    parser.add_argument("SegmentsFile", help="Path to amp segments file")
-    parser.add_argument("GainFile", help="Path to gain and saturation file")
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("DetectorLayoutFile",
+                        default=os.path.join(defaultDataDir, 'focalplanelayout.txt'),
+                        nargs='?',
+                        help="Path to detector layout file")
+    parser.add_argument("SegmentsFile",
+                        default=os.path.join(defaultDataDir, 'segmentation.txt'),
+                        nargs='?',
+                        help="Path to amp segments file")
+    parser.add_argument("GainFile",
+                        default=os.path.join(defaultDataDir, 'gain_saturation.txt'),
+                        nargs='?',
+                        help="Path to gain and saturation file")
     parser.add_argument("phosimVersion",
-                        help="String id of the version of phosim used to construct this camera repository")
+                        default=None,
+                        nargs='?',
+                        help="String id of the version of phosim used to construct this camera repository."
+                        "If None, use the value in data/phosim_version.txt.")
     parser.add_argument("OutputDir",
                         help = "Path to dump configs and AmpInfo Tables; defaults to %r" % (defaultOutDir,),
                         nargs = "?",
@@ -288,7 +310,11 @@ if __name__ == "__main__":
                         help=("remove and re-create the output directory if it already exists?"))
     args = parser.parse_args()
     ampTableDict = makeAmpTables(args.SegmentsFile, args.GainFile)
-    detectorConfigList = makeDetectorConfigs(args.DetectorLayoutFile, args.phosimVersion)
+    if args.phosimVersion is None:
+        phosimVersion = getPhosimVersion(defaultDataDir)
+    else:
+        phosimVersion = args.phosimVersion
+    detectorConfigList = makeDetectorConfigs(args.DetectorLayoutFile, phosimVersion)
 
     # Build the camera config.
     camConfig = CameraConfig()
