@@ -22,10 +22,12 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 import os.path
+import sys
 import unittest
 
-import lsst.utils.tests as utilsTests
 import lsst.daf.persistence as dafPersist
+import lsst.utils.tests
+
 
 class ValidateTestCase(unittest.TestCase):
     """Testing butler id validation"""
@@ -54,21 +56,15 @@ class ValidateTestCase(unittest.TestCase):
         self.assertRaises(RuntimeError, self.butler.subset,
                 "bias", visit=85471048, snap=0, raft=True)
 
-#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-def suite():
-    """Returns a suite containing all the test cases in this module."""
+class MemoryTester(lsst.utils.tests.MemoryTestCase):
+    pass
 
-    utilsTests.init()
 
-    suites = []
-    suites += unittest.makeSuite(ValidateTestCase)
-    suites += unittest.makeSuite(utilsTests.MemoryTestCase)
-    return unittest.TestSuite(suites)
+def setup_module(module):
+    lsst.utils.tests.init()
 
-def run(shouldExit = False):
-    """Run the tests"""
-    utilsTests.run(suite(), shouldExit)
 
 if __name__ == "__main__":
-    run(True)
+    setup_module(sys.modules[__name__])
+    unittest.main()

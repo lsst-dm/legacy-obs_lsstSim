@@ -25,6 +25,7 @@
 """Test lsst.obs.lsstSim.selectFluxMag0 and integration with pipe.tasks.scaleZeroPoint
 """
 import numpy
+import sys
 import unittest
 
 import lsst.daf.base
@@ -37,8 +38,6 @@ from lsst.daf.persistence import DbAuth
 from lsst.pipe.tasks.scaleZeroPoint import SpatialScaleZeroPointTask
 from lsst.obs.lsstSim.selectFluxMag0 import SelectLsstSimFluxMag0Task
 
-
-#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 class WrapDataId():
     """A container for dataId that looks like dataRef to computeImageScaler()
@@ -149,15 +148,9 @@ class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
         return calib
 
 
-def suite():
-    """Return a suite containing all the test cases in this module.
-    """
-    utilsTests.init()
+class MemoryTester(lsst.utils.tests.MemoryTestCase):
+    pass
 
-    suites = [
-        unittest.makeSuite(ScaleLsstSimZeroPointTaskTestCase),
-        unittest.makeSuite(utilsTests.MemoryTestCase),
-    ]
 
     return unittest.TestSuite(suites)
 
@@ -175,9 +168,11 @@ def run(shouldExit=False):
               "skipping unit tests" % \
             (config.selectFluxMag0.host, str(config.selectFluxMag0.port), e)
         return
-
-    utilsTests.run(suite(), shouldExit)
+def setup_module(module):
+    lsst.utils.tests.init()
 
 
 if __name__ == "__main__":
-    run(True)
+    setup_module(sys.modules[__name__])
+    unittest.main()
+

@@ -22,13 +22,14 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
+import sys
 import unittest
-import lsst.utils.tests as utilsTests
 
-from lsst.daf.persistence import DbAuth
 import lsst.afw.coord as afwCoord
 import lsst.afw.geom as afwGeom
+from lsst.daf.persistence import DbAuth
 from lsst.obs.lsstSim.selectLsstImages import SelectLsstImagesTask
+import lsst.utils.tests
 
 # this database should be around for awhile, but in the long run
 # I hope we can define a standard database that is saved essentially forever
@@ -84,13 +85,9 @@ class LsstMapperTestCase(unittest.TestCase):
             expInfoList = task.run(coordList, filter).exposureInfoList
             self.assertEqual(tuple(expInfo for expInfo in expInfoList if expInfo.fwhm > maxFwhm), ())
 
+class MemoryTester(lsst.utils.tests.MemoryTestCase):
+    pass
 
-def suite():
-    utilsTests.init()
-    suites = []
-    suites += unittest.makeSuite(LsstMapperTestCase)
-    suites += unittest.makeSuite(utilsTests.MemoryTestCase)
-    return unittest.TestSuite(suites)
 
 def run(shouldExit=False):
     config = SelectLsstImagesTask.ConfigClass()
@@ -101,7 +98,10 @@ def run(shouldExit=False):
             (config.host, str(config.port))
         return
 
-    utilsTests.run(suite(), shouldExit)
+def setup_module(module):
+    lsst.utils.tests.init()
+
 
 if __name__ == "__main__":
-    run(True)
+    setup_module(sys.modules[__name__])
+    unittest.main()

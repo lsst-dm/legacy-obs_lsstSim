@@ -22,10 +22,12 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 import os.path
+import sys
 import unittest
 
-import lsst.utils.tests as utilsTests
 import lsst.daf.persistence as dafPersist
+import lsst.utils.tests
+
 
 class GetIdTestCase(unittest.TestCase):
     """Testing butler exposure id retrieval"""
@@ -66,21 +68,14 @@ class GetIdTestCase(unittest.TestCase):
         self.assertEqual(id, (((1L * 8192) + 2) * 8192) + 3)
 
 
-#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+class MemoryTester(lsst.utils.tests.MemoryTestCase):
+    pass
 
-def suite():
-    """Returns a suite containing all the test cases in this module."""
 
-    utilsTests.init()
+def setup_module(module):
+    lsst.utils.tests.init()
 
-    suites = []
-    suites += unittest.makeSuite(GetIdTestCase)
-    suites += unittest.makeSuite(utilsTests.MemoryTestCase)
-    return unittest.TestSuite(suites)
-
-def run(shouldExit = False):
-    """Run the tests"""
-    utilsTests.run(suite(), shouldExit)
 
 if __name__ == "__main__":
-    run(True)
+    setup_module(sys.modules[__name__])
+    unittest.main()

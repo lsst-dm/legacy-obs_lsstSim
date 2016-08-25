@@ -20,14 +20,15 @@
 # the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
-"""
-Tests for lsst.obs.lsstSim.EdgeRolloffFunctor class.
-"""
+import sys
 import unittest
+
 import numpy as np
-import lsst.utils.tests
+
 import lsst.obs.lsstSim as obs_lsstSim
 import lsst.pex.exceptions as pexExcept
+import lsst.utils.tests
+
 
 def num_deriv(func, x, eps=1e-7):
     h = eps*max(abs(x), 1)
@@ -35,8 +36,11 @@ def num_deriv(func, x, eps=1e-7):
     dx = xp - x
     return (func(x + dx) - func(x))/dx
 
-class EdgeRolloffFunctorTestCase(unittest.TestCase):
 
+class EdgeRolloffFunctorTestCase(unittest.TestCase):
+    """
+    Tests for lsst.obs.lsstSim.EdgeRolloffFunctor class.
+    """
     def setUp(self):
         self.funcs = [obs_lsstSim.EdgeRolloffFunctor(2, 30, 4000)]
         self.xvals = np.logspace(-8, 1, 10)
@@ -75,16 +79,15 @@ class EdgeRolloffFunctorTestCase(unittest.TestCase):
             # Check for exceeding maximum iterations.
             self.assertRaises(pexExcept.RuntimeError, func.inverse, self.y0, 1e-10, 1)
 
-def suite():
-    """Return a suite containing all of the test cases in this module."""
+
+class MemoryTester(lsst.utils.tests.MemoryTestCase):
+    pass
+
+
+def setup_module(module):
     lsst.utils.tests.init()
-    suites = []
-    suites += unittest.makeSuite(EdgeRolloffFunctorTestCase)
-    suites += unittest.makeSuite(lsst.utils.tests.MemoryTestCase)
-    return unittest.TestSuite(suites)
 
-def run(shouldExit=False):
-    lsst.utils.tests.run(suite(), shouldExit)
 
-if __name__ == '__main__':
-    run(True)
+if __name__ == "__main__":
+    setup_module(sys.modules[__name__])
+    unittest.main()
