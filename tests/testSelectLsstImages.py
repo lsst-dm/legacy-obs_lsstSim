@@ -52,8 +52,9 @@ class LsstMapperTestCase(unittest.TestCase):
         try:
             DbAuth.username(config.host, str(config.port)),
         except (Exception, RuntimeError) as e:
-            reason = "Warning: did not find host=%s, port=%s in your db-auth file; skipping SelectLsstImagesTask unit tests" % \
-                     (config.host, str(config.port))
+            reason = "Warning: did not find host=%s, port=%s in your db-auth file; or %s " \
+                     "skipping unit tests" % \
+                     (config.host, str(config.port), e)
             raise unittest.SkipTest(reason)
 
     def testMaxFwhm(self):
