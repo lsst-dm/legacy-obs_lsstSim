@@ -22,10 +22,12 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 import os.path
+import sys
 import unittest
 
-import lsst.utils.tests as utilsTests
 import lsst.daf.persistence as dafPersist
+import lsst.utils.tests
+
 
 class GetCameraTestCase(unittest.TestCase):
     """Testing butler camera retrieval"""
@@ -41,21 +43,15 @@ class GetCameraTestCase(unittest.TestCase):
         camera = self.butler.get("camera", immediate=True)
         self.assertEquals(len(camera), 205)
 
-#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-def suite():
-    """Returns a suite containing all the test cases in this module."""
+class MemoryTester(lsst.utils.tests.MemoryTestCase):
+    pass
 
-    utilsTests.init()
 
-    suites = []
-    suites += unittest.makeSuite(GetCameraTestCase)
-    suites += unittest.makeSuite(utilsTests.MemoryTestCase)
-    return unittest.TestSuite(suites)
+def setup_module(module):
+    lsst.utils.tests.init()
 
-def run(shouldExit = False):
-    """Run the tests"""
-    utilsTests.run(suite(), shouldExit)
 
 if __name__ == "__main__":
-    run(True)
+    setup_module(sys.modules[__name__])
+    unittest.main()

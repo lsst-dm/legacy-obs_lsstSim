@@ -22,10 +22,12 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 import os.path
+import sys
 import unittest
 
-import lsst.utils.tests as utilsTests
+import lsst.utils.tests
 import lsst.daf.persistence as dafPersist
+
 
 class GetRawMetadataTestCase(unittest.TestCase):
     """Testing butler raw image retrieval"""
@@ -39,26 +41,20 @@ class GetRawMetadataTestCase(unittest.TestCase):
     def testRawMetadata(self):
         """Test retrieval of raw image metadata"""
         rawMd = self.butler.get("raw_md", visit=85471048, snap=0, raft='0,3',
-                sensor='0,1', channel='1,0', immediate=True)
+                                sensor='0,1', channel='1,0', immediate=True)
         self.assertAlmostEqual(rawMd.get("AIRMASS"), 1.3184949200550, places=11)
         self.assertEqual(rawMd.get("BITPIX"), 16)
         self.assertEqual(rawMd.get("CCDID"), "R03_S01_C10")
 
-#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-def suite():
-    """Returns a suite containing all the test cases in this module."""
+class MemoryTester(lsst.utils.tests.MemoryTestCase):
+    pass
 
-    utilsTests.init()
 
-    suites = []
-    suites += unittest.makeSuite(GetRawMetadataTestCase)
-    suites += unittest.makeSuite(utilsTests.MemoryTestCase)
-    return unittest.TestSuite(suites)
+def setup_module(module):
+    lsst.utils.tests.init()
 
-def run(shouldExit = False):
-    """Run the tests"""
-    utilsTests.run(suite(), shouldExit)
 
 if __name__ == "__main__":
-    run(True)
+    setup_module(sys.modules[__name__])
+    unittest.main()

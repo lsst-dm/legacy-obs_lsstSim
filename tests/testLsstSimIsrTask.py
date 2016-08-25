@@ -23,13 +23,14 @@
 #
 
 import os
+import sys
 import unittest
-from lsst.obs.lsstSim import LsstSimIsrTask
-import lsst.afw.math as afwMath
-import lsst.utils.tests as utilsTests
-import lsst.daf.persistence as dafPersist
 
-#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+import lsst.afw.math as afwMath
+import lsst.daf.persistence as dafPersist
+from lsst.obs.lsstSim import LsstSimIsrTask
+import lsst.utils.tests
+
 
 class LsstSimIsrTaskTestCase(unittest.TestCase):
     """A test case for LsstSimIsrTask
@@ -40,6 +41,7 @@ class LsstSimIsrTaskTestCase(unittest.TestCase):
         self.ampRef = self.butler.dataRef("raw", level=None,
                                           dataId=dict(visit=85471048, snap=0, raft='0,3',
                                                       sensor='0,1', channel='1,0'))
+
     def tearDown(self):
         del self.butler
         del self.ampRef
@@ -81,23 +83,15 @@ class LsstSimIsrTaskTestCase(unittest.TestCase):
         self.assertAlmostEqual(afwMath.makeStatistics(postIsrExp.getMaskedImage(), afwMath.MEAN).getValue(),
                                2.855780, places = 3)
 
-def suite():
-    """Return a suite containing all the test cases in this module.
-    """
-    utilsTests.init()
 
-    suites = [
-        unittest.makeSuite(LsstSimIsrTaskTestCase),
-        unittest.makeSuite(utilsTests.MemoryTestCase),
-    ]
-
-    return unittest.TestSuite(suites)
+class MemoryTester(lsst.utils.tests.MemoryTestCase):
+    pass
 
 
-def run(shouldExit=False):
-    """Run the tests"""
-    utilsTests.run(suite(), shouldExit)
+def setup_module(module):
+    lsst.utils.tests.init()
 
 
 if __name__ == "__main__":
-    run(True)
+    setup_module(sys.modules[__name__])
+    unittest.main()

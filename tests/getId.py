@@ -22,10 +22,12 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 import os.path
+import sys
 import unittest
 
-import lsst.utils.tests as utilsTests
 import lsst.daf.persistence as dafPersist
+import lsst.utils.tests
+
 
 class GetIdTestCase(unittest.TestCase):
     """Testing butler exposure id retrieval"""
@@ -41,7 +43,7 @@ class GetIdTestCase(unittest.TestCase):
         bits = self.butler.get("ampExposureId_bits", immediate=True)
         self.assertEqual(bits, 45)
         id = self.butler.get("ampExposureId", visit=85471048, snap=0, raft='0,3', sensor='0,1',
-            channel='1,0', immediate=True)
+                             channel='1,0', immediate=True)
         self.assertEqual(id, (85471048 << 13) + 480 + 16 + 8)
 
         dr = self.butler.dataRef("raw", visit=85471048, raft='2,1', sensor='1,2')
@@ -66,21 +68,14 @@ class GetIdTestCase(unittest.TestCase):
         self.assertEqual(id, (((1L * 8192) + 2) * 8192) + 3)
 
 
-#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+class MemoryTester(lsst.utils.tests.MemoryTestCase):
+    pass
 
-def suite():
-    """Returns a suite containing all the test cases in this module."""
 
-    utilsTests.init()
+def setup_module(module):
+    lsst.utils.tests.init()
 
-    suites = []
-    suites += unittest.makeSuite(GetIdTestCase)
-    suites += unittest.makeSuite(utilsTests.MemoryTestCase)
-    return unittest.TestSuite(suites)
-
-def run(shouldExit = False):
-    """Run the tests"""
-    utilsTests.run(suite(), shouldExit)
 
 if __name__ == "__main__":
-    run(True)
+    setup_module(sys.modules[__name__])
+    unittest.main()

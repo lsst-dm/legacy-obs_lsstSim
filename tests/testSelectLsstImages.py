@@ -22,17 +22,19 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
+import sys
 import unittest
-import lsst.utils.tests as utilsTests
 
-from lsst.daf.persistence import DbAuth
 import lsst.afw.coord as afwCoord
 import lsst.afw.geom as afwGeom
+from lsst.daf.persistence import DbAuth
 from lsst.obs.lsstSim.selectLsstImages import SelectLsstImagesTask
+import lsst.utils.tests
 
 # this database should be around for awhile, but in the long run
 # I hope we can define a standard database that is saved essentially forever
 Database = "test_select_lsst_images"
+
 
 def getCoordList(minRa, minDec, maxRa, maxDec):
     degList = (
@@ -43,8 +45,20 @@ def getCoordList(minRa, minDec, maxRa, maxDec):
     )
     return tuple(afwCoord.IcrsCoord(afwGeom.Point2D(d[0], d[1]), afwGeom.degrees) for d in degList)
 
+
 class LsstMapperTestCase(unittest.TestCase):
     """A test case for SelectLsstImagesTask."""
+    def setUp(self):
+        """Initialize the DB connection.  Raise SkipTest if unable to access DB."""
+        config = SelectLsstImagesTask.ConfigClass()
+        try:
+            DbAuth.username(config.host, str(config.port)),
+        except RuntimeError as e:
+            reason = "Warning: did not find host=%s, port=%s in your db-auth file; or %s " \
+                     "skipping unit tests" % \
+                     (config.host, str(config.port), e)
+            raise unittest.SkipTest(reason)
+
     def testMaxFwhm(self):
         """Test config.maxFwhm
         """
@@ -85,23 +99,14 @@ class LsstMapperTestCase(unittest.TestCase):
             self.assertEqual(tuple(expInfo for expInfo in expInfoList if expInfo.fwhm > maxFwhm), ())
 
 
-def suite():
-    utilsTests.init()
-    suites = []
-    suites += unittest.makeSuite(LsstMapperTestCase)
-    suites += unittest.makeSuite(utilsTests.MemoryTestCase)
-    return unittest.TestSuite(suites)
+class MemoryTester(lsst.utils.tests.MemoryTestCase):
+    pass
 
-def run(shouldExit=False):
-    config = SelectLsstImagesTask.ConfigClass()
-    try:
-        DbAuth.username(config.host, str(config.port)),
-    except Exception:
-        print "Warning: did not find host=%s, port=%s in your db-auth file; skipping SelectLsstImagesTask unit tests" % \
-            (config.host, str(config.port))
-        return
 
-    utilsTests.run(suite(), shouldExit)
+def setup_module(module):
+    lsst.utils.tests.init()
+
 
 if __name__ == "__main__":
-    run(True)
+    setup_module(sys.modules[__name__])
+    unittest.main()
