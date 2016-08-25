@@ -46,6 +46,16 @@ def getCoordList(minRa, minDec, maxRa, maxDec):
 
 class LsstMapperTestCase(unittest.TestCase):
     """A test case for SelectLsstImagesTask."""
+    def setUp(self):
+        """Initialize the DB connection.  Raise SkipTest if unable to access DB."""
+        config = SelectLsstImagesTask.ConfigClass()
+        try:
+            DbAuth.username(config.host, str(config.port)),
+        except (Exception, RuntimeError) as e:
+            reason = "Warning: did not find host=%s, port=%s in your db-auth file; skipping SelectLsstImagesTask unit tests" % \
+                     (config.host, str(config.port))
+            raise unittest.SkipTest(reason)
+
     def testMaxFwhm(self):
         """Test config.maxFwhm
         """
@@ -88,15 +98,6 @@ class LsstMapperTestCase(unittest.TestCase):
 class MemoryTester(lsst.utils.tests.MemoryTestCase):
     pass
 
-
-def run(shouldExit=False):
-    config = SelectLsstImagesTask.ConfigClass()
-    try:
-        DbAuth.username(config.host, str(config.port)),
-    except Exception:
-        print "Warning: did not find host=%s, port=%s in your db-auth file; skipping SelectLsstImagesTask unit tests" % \
-            (config.host, str(config.port))
-        return
 
 def setup_module(module):
     lsst.utils.tests.init()

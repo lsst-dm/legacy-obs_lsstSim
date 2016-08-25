@@ -48,6 +48,20 @@ class WrapDataId():
 class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
     """A test case for ScaleLsstSimZeroPointTask
     """
+    def setUp(self):
+        """Initialize the DB connection.  Raise SkipTest if unable to access DB."""
+        config = SpatialScaleZeroPointTask.ConfigClass()
+        config.selectFluxMag0.retarget(SelectLsstSimFluxMag0Task)
+        print config
+        try:
+            DbAuth.username(config.selectFluxMag0.host, str(config.selectFluxMag0.port)),
+        except (Exception, RuntimeError) as e:
+            reason = "Warning: did not find host=%s, port=%s in your db-auth file; or %s " \
+                     "skipping unit tests" % \
+                     (config.selectFluxMag0.host, str(config.selectFluxMag0.port), e)
+            raise unittest.SkipTest(reason)
+
+
     def makeTestExposure(self, xNumPix, yNumPix):
         """
         Create and return an exposure that is completely covered by the database: test_select_lsst_images
@@ -152,22 +166,6 @@ class MemoryTester(lsst.utils.tests.MemoryTestCase):
     pass
 
 
-    return unittest.TestSuite(suites)
-
-
-def run(shouldExit=False):
-    """Run the tests"""
-
-    config = SpatialScaleZeroPointTask.ConfigClass()
-    config.selectFluxMag0.retarget(SelectLsstSimFluxMag0Task)
-    print config
-    try:
-        DbAuth.username(config.selectFluxMag0.host, str(config.selectFluxMag0.port)),
-    except Exception, e:
-        print "Warning: did not find host=%s, port=%s in your db-auth file; or %s " \
-              "skipping unit tests" % \
-            (config.selectFluxMag0.host, str(config.selectFluxMag0.port), e)
-        return
 def setup_module(module):
     lsst.utils.tests.init()
 
