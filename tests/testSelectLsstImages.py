@@ -53,7 +53,7 @@ class LsstMapperTestCase(unittest.TestCase):
         config = SelectLsstImagesTask.ConfigClass()
         try:
             DbAuth.username(config.host, str(config.port)),
-        except (Exception, RuntimeError) as e:
+        except RuntimeError as e:
             reason = "Warning: did not find host=%s, port=%s in your db-auth file; or %s " \
                      "skipping unit tests" % \
                      (config.host, str(config.port), e)

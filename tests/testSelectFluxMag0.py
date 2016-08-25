@@ -53,10 +53,9 @@ class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
         """Initialize the DB connection.  Raise SkipTest if unable to access DB."""
         config = SpatialScaleZeroPointTask.ConfigClass()
         config.selectFluxMag0.retarget(SelectLsstSimFluxMag0Task)
-        print config
         try:
             DbAuth.username(config.selectFluxMag0.host, str(config.selectFluxMag0.port)),
-        except (Exception, RuntimeError) as e:
+        except RuntimeError as e:
             reason = "Warning: did not find host=%s, port=%s in your db-auth file; or %s " \
                      "skipping unit tests" % \
                      (config.selectFluxMag0.host, str(config.selectFluxMag0.port), e)
