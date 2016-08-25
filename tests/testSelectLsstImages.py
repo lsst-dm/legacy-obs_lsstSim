@@ -35,6 +35,7 @@ import lsst.utils.tests
 # I hope we can define a standard database that is saved essentially forever
 Database = "test_select_lsst_images"
 
+
 def getCoordList(minRa, minDec, maxRa, maxDec):
     degList = (
         (minRa, minDec),
@@ -43,6 +44,7 @@ def getCoordList(minRa, minDec, maxRa, maxDec):
         (minRa, maxDec),
     )
     return tuple(afwCoord.IcrsCoord(afwGeom.Point2D(d[0], d[1]), afwGeom.degrees) for d in degList)
+
 
 class LsstMapperTestCase(unittest.TestCase):
     """A test case for SelectLsstImagesTask."""
@@ -95,6 +97,7 @@ class LsstMapperTestCase(unittest.TestCase):
             filter = "r"
             expInfoList = task.run(coordList, filter).exposureInfoList
             self.assertEqual(tuple(expInfo for expInfo in expInfoList if expInfo.fwhm > maxFwhm), ())
+
 
 class MemoryTester(lsst.utils.tests.MemoryTestCase):
     pass

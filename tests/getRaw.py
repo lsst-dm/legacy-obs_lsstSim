@@ -41,7 +41,7 @@ class GetRawTestCase(unittest.TestCase):
     def testRaw(self):
         """Test retrieval of raw image"""
         raw = self.butler.get("raw", visit=85471048, snap=0, raft='0,3', sensor='0,1', channel='1,0',
-            immediate=True)
+                              immediate=True)
         self.assertEqual(raw.getWidth(), 513)
         self.assertEqual(raw.getHeight(), 2001)
         self.assertEqual(raw.getFilter().getFilterProperty().getName(), "y")

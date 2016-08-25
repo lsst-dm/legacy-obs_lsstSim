@@ -41,7 +41,7 @@ class GetBiasTestCase(unittest.TestCase):
     def testBias(self):
         """Test retrieval of bias image"""
         raw = self.butler.get("bias", visit=85471048, snap=0, raft='0,3',
-                sensor='0,1', channel='1,0', immediate=True)
+                              sensor='0,1', channel='1,0', immediate=True)
         self.assertEqual(raw.getWidth(), 513)
         self.assertEqual(raw.getHeight(), 2001)
         self.assertEqual(raw.getDetector().getName(), "R:0,3 S:0,1")

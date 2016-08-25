@@ -43,7 +43,7 @@ class GetIdTestCase(unittest.TestCase):
         bits = self.butler.get("ampExposureId_bits", immediate=True)
         self.assertEqual(bits, 45)
         id = self.butler.get("ampExposureId", visit=85471048, snap=0, raft='0,3', sensor='0,1',
-            channel='1,0', immediate=True)
+                             channel='1,0', immediate=True)
         self.assertEqual(id, (85471048 << 13) + 480 + 16 + 8)
 
         dr = self.butler.dataRef("raw", visit=85471048, raft='2,1', sensor='1,2')

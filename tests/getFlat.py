@@ -42,7 +42,7 @@ class GetFlatTestCase(unittest.TestCase):
         """Test retrieval of flat image"""
         # Note: no filter!
         raw = self.butler.get("flat", visit=85471048, snap=0, raft='0,3',
-                sensor='0,1', channel='1,0', immediate=True)
+                              sensor='0,1', channel='1,0', immediate=True)
         self.assertEqual(raw.getWidth(), 513)
         self.assertEqual(raw.getHeight(), 2001)
         self.assertEqual(raw.getFilter().getName(), "y")

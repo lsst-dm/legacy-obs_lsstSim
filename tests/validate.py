@@ -41,20 +41,20 @@ class ValidateTestCase(unittest.TestCase):
     def testValidate(self):
         """Test validation of ids"""
         raw = self.butler.get("bias", visit=85471048, snap=0, raft='0,3',
-                sensor='0,1', channel='1,0')
+                              sensor='0,1', channel='1,0')
         self.assertEqual(raw.getWidth(), 513)
         self.assertEqual(raw.getHeight(), 2001)
         self.assertRaises(RuntimeError, self.butler.get,
-                "bias", visit=85471048, snap=0, raft="03")
+                          "bias", visit=85471048, snap=0, raft="03")
         self.assertRaises(RuntimeError, self.butler.get,
-                "bias", visit=85471048, snap=0, raft="0,3", sensor="01")
+                          "bias", visit=85471048, snap=0, raft="0,3", sensor="01")
         self.assertRaises(RuntimeError, self.butler.get,
-                "bias", visit=85471048, snap=0, raft="0,3",
-                sensor="0,1", channel="10")
+                          "bias", visit=85471048, snap=0, raft="0,3",
+                          sensor="0,1", channel="10")
         self.assertRaises(RuntimeError, self.butler.subset,
-                "bias", visit=85471048, snap=0, raft="03")
+                          "bias", visit=85471048, snap=0, raft="03")
         self.assertRaises(RuntimeError, self.butler.subset,
-                "bias", visit=85471048, snap=0, raft=True)
+                          "bias", visit=85471048, snap=0, raft=True)
 
 
 class MemoryTester(lsst.utils.tests.MemoryTestCase):
