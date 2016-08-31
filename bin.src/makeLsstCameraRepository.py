@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 #
 # LSST Data Management System
-# Copyright 2014 LSST Corporation.
+# Copyright 2014-2016 LSST Corporation.
 #
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
@@ -272,11 +272,6 @@ if __name__ == "__main__":
 
     Currently gain and saturation need to be supplied as well. The file should have three columns:
         on disk amp id (R22_S11_C00), gain, saturation.
-    For example:
-    - DetectorLayoutFile
-        https://dev.lsstcorp.org/cgit/LSST/sims/phosim.git/plain/data/lsst/focalplanelayout.txt?h=dev
-    - SegmentsFile
-        https://dev.lsstcorp.org/cgit/LSST/sims/phosim.git/plain/data/lsst/segmentation.txt?h=dev
     """
     baseDir = lsst.utils.getPackageDir('obs_lsstsim')
     defaultDataDir = os.path.join(os.path.normpath(baseDir), "description")

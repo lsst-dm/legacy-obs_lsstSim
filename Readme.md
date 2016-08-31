@@ -6,7 +6,7 @@ This obs_lsstSim package provides an interface to the phosim output for the LSST
 Updating camera description
 ---------------------------
 
-The camera description FITS files are built from the phosim lsst data text files. To update the camera camera description to match a new version of phosim, you will need two files from `phosim_release/data/lsst`, and the gain and saturation data from the header of a phosim generated file.
+The camera description FITS files are built from the phosim lsst data text files. To update the camera description to match a new version of phosim, you will need two files from `phosim_release/data/lsst`, and the gain and saturation data from the header of the phosim generated files for the entire focalplane.
 
 1. Checkout the latest version of phosim:
     * `git clone https://bitbucket.org/phosim/phosim_release.git`
@@ -24,3 +24,5 @@ The camera description FITS files are built from the phosim lsst data text files
 4. Commit your above changes and push.
 
 The files you have updated above will be converted into the camera description files when this product is built by scons. You can check that this completes successfully by setting up this product and running "scons" at the root level.
+
+Note that this process does not build the wavefront sensor files.
