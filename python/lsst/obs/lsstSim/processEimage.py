@@ -25,7 +25,9 @@ from lsst.pipe.base.argumentParser import ArgumentParser
 from lsst.pipe.tasks.processCcd import ProcessCcdTask
 from .eimageIsr import EimageIsrTask
 
+
 class ProcessEimageConfig(ProcessCcdTask.ConfigClass):
+
     """Config for ProcessEimage"""
     rngSeed = Field(dtype=int, default=1234567890, doc="Seed for random number generator")
 
@@ -34,12 +36,14 @@ class ProcessEimageConfig(ProcessCcdTask.ConfigClass):
         self.isr.retarget(EimageIsrTask)
         self.charImage.repair.doInterpolate = False
         self.charImage.repair.doCosmicRay = False
-        self.charImage.measurePsf.psfDeterminer['pca'].reducedChi2ForPsfCandidates=3.0
-        self.charImage.measurePsf.psfDeterminer['pca'].spatialReject=2.0
-        self.charImage.measurePsf.psfDeterminer['pca'].nIterForPsf=0
-        self.charImage.measurePsf.psfDeterminer['pca'].tolerance=0.01
+        self.charImage.measurePsf.psfDeterminer['pca'].reducedChi2ForPsfCandidates = 3.0
+        self.charImage.measurePsf.psfDeterminer['pca'].spatialReject = 2.0
+        self.charImage.measurePsf.psfDeterminer['pca'].nIterForPsf = 0
+        self.charImage.measurePsf.psfDeterminer['pca'].tolerance = 0.01
+
 
 class ProcessEimageTask(ProcessCcdTask):
+
     """Process an Eimage CCD
 
     This variant of processCcdTask loads e-images as post-ISR images

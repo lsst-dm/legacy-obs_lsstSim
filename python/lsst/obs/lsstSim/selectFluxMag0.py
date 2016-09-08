@@ -26,21 +26,24 @@ from lsst.afw.coord import IcrsCoord
 import lsst.afw.geom as afwGeom
 from lsst.daf.persistence import DbAuth
 import lsst.pipe.base as pipeBase
-from lsst.pipe.tasks.selectImages import BaseExposureInfo,  DatabaseSelectImagesConfig
+from lsst.pipe.tasks.selectImages import BaseExposureInfo, DatabaseSelectImagesConfig
 
 __all__ = ["SelectLsstSimFluxMag0Task"]
 
+
 class SelectLsstSimFluxMag0Config(DatabaseSelectImagesConfig):
+
     """Config for SelectLsstImagesTask
     """
 
     def setDefaults(self):
-        super(SelectLsstSimFluxMag0Config,self).setDefaults()
+        super(SelectLsstSimFluxMag0Config, self).setDefaults()
         self.host = "lsst-db.ncsa.illinois.edu"
         self.port = 3306
 
 
 class FluxMagInfo(BaseExposureInfo):
+
     """Data about a selected exposure
 
     Data includes:
@@ -49,6 +52,7 @@ class FluxMagInfo(BaseExposureInfo):
     - fluxMag0: float
     - fluxMag0Sigma: float
     """
+
     def __init__(self, result):
         """Set exposure information based on a query result from a db connection
         """
@@ -61,7 +65,7 @@ class FluxMagInfo(BaseExposureInfo):
         )
 
         coordList = [IcrsCoord(afwGeom.Angle(result.pop(0), afwGeom.degrees),
-                                    afwGeom.Angle(result.pop(0), afwGeom.degrees)) for i in range(4)]
+                               afwGeom.Angle(result.pop(0), afwGeom.degrees)) for i in range(4)]
 
         BaseExposureInfo.__init__(self, dataId=dataId, coordList=coordList)
         self.fluxMag0 = result.pop(0)
@@ -74,17 +78,19 @@ class FluxMagInfo(BaseExposureInfo):
         @return database column names as list of strings
         """
         return (
-            "visit raftName ccdName filterName".split() + \
-            "corner1Ra corner1Decl corner2Ra corner2Decl".split() + \
-            "corner3Ra corner3Decl corner4Ra corner4Decl".split() + \
+            "visit raftName ccdName filterName".split() +
+            "corner1Ra corner1Decl corner2Ra corner2Decl".split() +
+            "corner3Ra corner3Decl corner4Ra corner4Decl".split() +
             "fluxMag0 fluxMag0Sigma".split()
         )
 
+
 class SelectLsstSimFluxMag0Task(pipeBase.Task):
+
     """Select LsstSim data suitable for computing fluxMag0
     """
     ConfigClass = SelectLsstSimFluxMag0Config
-    _DefaultName= "selectFluxMag0"
+    _DefaultName = "selectFluxMag0"
 
     @pipeBase.timeMethod
     def run(self, dataId):

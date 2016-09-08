@@ -219,8 +219,9 @@ class LsstSimMapper(CameraMapper):
         if singleFilter:
             return id * 8 + self.filterIdMap[dataId['filter']]
         return id
-    
+
     _nbit_id = 30
+
     def bypass_deepMergedCoaddId_bits(self, *args, **kwargs):
         """The number of bits used up for patch ID bits"""
         return 64 - self._nbit_id
