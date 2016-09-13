@@ -54,7 +54,7 @@ class SimParseTask(ParseTask):
     def translate_taiobs(self, md):
         import lsst.daf.base as dafBase
         return dafBase.DateTime(md.get('MJD-OBS'), dafBase.DateTime.MJD,
-                                dafBase.DateTime.TAI).toString()[:-1]
+                                dafBase.DateTime.TAI).toString(dafBase.DateTime.UTC)[:-1]
 
     def translate_channel(self, md):
         if 'AMPID' in md.names():
