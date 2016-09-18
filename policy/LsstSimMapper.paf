@@ -131,15 +131,6 @@ exposures: {
         persistable: "ExposureF"
         storage:     "FitsStorage"
         level:       "None"
-        tables:      raw
-    }
-    deepCoadd_calexp: {
-        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/calexp-%(filter)s-%(tract)d-%(patch)s.fits"
-        python:        "lsst.afw.image.ExposureF"
-        persistable:   "ExposureF"
-        storage:       "FitsStorage"
-        level:         "None"
-        tables:        raw
     }
     deepCoadd_calexp_det: {
         template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/calexp_det-%(filter)s-%(tract)d-%(patch)s.fits"
@@ -299,22 +290,6 @@ datasets: {
         storage:      "ignored"
         tables:       "raw"
     }
-    ccdExposureId: {
-        template:     "ignored"
-        # Provide something to import, although we actually return a tuple
-        python:       "lsst.daf.base.PropertySet"
-        persistable:  "ignored"
-        storage:      "ignored"
-        tables:       "raw"
-    }
-    ccdExposureId_bits: {
-        template:     "ignored"
-        # Provide something to import, although we actually return a tuple
-        python:       "lsst.daf.base.PropertySet"
-        persistable:  "ignored"
-        storage:      "ignored"
-        tables:       "raw"
-    }
     goodSeeingCoaddId: {
         template:     "ignored"
         # Provide something to import, although we actually return a Long
@@ -324,22 +299,6 @@ datasets: {
         tables:       "raw"
     }
     goodSeeingCoaddId_bits: {
-        template:     "ignored"
-        # Provide something to import, although we actually return an int
-        python:       "lsst.daf.base.PropertySet"
-        persistable:  "ignored"
-        storage:      "ignored"
-        tables:       "raw"
-    }
-    deepCoaddId: {
-        template:     "ignored"
-        # Provide something to import, although we actually return a Long
-        python:       "lsst.daf.base.PropertySet"
-        persistable:  "ignored"
-        storage:      "ignored"
-        tables:       "raw"
-    }
-    deepCoaddId_bits: {
         template:     "ignored"
         # Provide something to import, although we actually return an int
         python:       "lsst.daf.base.PropertySet"
@@ -399,13 +358,6 @@ datasets: {
         storage:    "FitsCatalogStorage"
         tables:        raw
     }
-    icSrc_schema: {
-        template:      "schema/icSrc.fits"
-        python:        "lsst.afw.table.SourceCatalog"
-        persistable:   "SourceCatalog"
-        storage:       "FitsCatalogStorage"
-        tables:        raw
-    }
     icMatch: {
         template:      "icMatch/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
         python:        "lsst.afw.table.BaseCatalog"
@@ -439,13 +391,6 @@ datasets: {
         python:        "lsst.afw.table.SourceCatalog"
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
-        tables:        raw
-    }
-    forcedPhotCcd_config: {
-        template:      "config/forcedPhotCcd.py"
-        python:        "lsst.meas.base.forcedPhotCcd.ForcedPhotCcdConfig"
-        persistable:      "Config"
-        storage:    "ConfigStorage"
     }
     forcedPhotCcd_metadata: {
         template: "forcedPhotCcd_metadata/tract%(tract)d/%(visit)d-%(sensor)s.boost"
@@ -457,13 +402,6 @@ datasets: {
     }
     src: {
         template:      "src/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
-        python:        "lsst.afw.table.SourceCatalog"
-        persistable:        "SourceCatalog"
-        storage:    "FitsCatalogStorage"
-        tables:        raw
-    }
-    src_schema: {
-        template:      "schema/src.fits"
         python:        "lsst.afw.table.SourceCatalog"
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
@@ -579,13 +517,6 @@ datasets: {
         python:        "lsst.ap.cluster.SourceClusterCatalog"
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
-        tables:        raw
-    }
-    Mosaic_config: {
-        template:      "config/mosaic.py"
-        python:        "lsst.meas.mosaic.mosaicTask.MosaicConfig"
-        persistable:      "Config"
-        storage:    "ConfigStorage"
         tables:        raw
     }
     Mosaic_metadata: {
@@ -708,20 +639,6 @@ datasets: {
         template: photo_astro_ref/%(pixel_id)s.fits
     }
 
-    deepCoadd_depth: {
-        template:    "deepCoadd/%(filter)s/%(tract)d/%(patch)s.depth.fits"
-        python:      "lsst.afw.image.ImageF"
-        persistable: "ImageF"
-        storage:     "FitsStorage"
-        tables:      raw
-    }
-    deepCoadd_skyMap: {
-        template:    "deepCoadd/skyMap.pickle"
-        python:      "lsst.skymap.BaseSkyMap"
-        persistable: "ignored"
-        storage:     "PickleStorage"
-        tables:      raw
-    }
     deep_makeSkyMap_config: {
         template:      "config/deep_makeSkyMap.py"
         python:        "lsst.pipe.tasks.makeSkyMap.MakeSkyMapTask.ConfigClass"
@@ -729,103 +646,11 @@ datasets: {
         storage:       "ConfigStorage"
         tables:        raw
     }
-    deep_makeSkyMap_metadata: {
-        template:      "metadata/deep_makeSkyMap.boost"
-        python:        "lsst.daf.base.PropertySet"
-        persistable:   "PropertySet"
-        storage:       "BoostStorage"
-        tables:        raw
-    }
-    deep_assembleCoadd_config: {
-        template:      "config/deep_assembleCoadd.py"
-        python:        "lsst.pipe.tasks.assembleCoadd.AssembleCoaddConfig"
-        persistable:      "Config"
-        storage:    "ConfigStorage"
-        tables:        raw
-    }
-    deep_assembleCoadd_metadata: {
-        template:      "deep_assembleCoadd_metadata/%(filter)s/%(tract)d/%(patch)s.boost"
-        python:        "lsst.daf.base.PropertySet"
-        persistable:        "PropertySet"
-        storage:    "BoostStorage"
-        tables:        raw
-    }
-    deep_safeClipAssembleCoadd_config: {
-        template:      "config/deep_safeClipAssembleCoadd.py"
-        python:        "lsst.pipe.tasks.assembleCoadd.SafeClipAssembleCoaddConfig"
-        persistable:      "Config"
-        storage:    "ConfigStorage"
-        tables:        raw
-    }
     deep_safeClipAssembleCoadd_metadata: {
         template:      "deep_safeClipAssembleCoadd_metadata/%(filter)s/%(tract)d/%(patch)s.boost"
         python:        "lsst.daf.base.PropertySet"
         persistable:        "PropertySet"
         storage:    "BoostStorage"
-        tables:        raw
-    }
-    deep_coadd_config: {
-        template:      "config/deep_coadd.py"
-        python:        "lsst.pipe.tasks.coadd.CoaddConfig"
-        persistable:      "Config"
-        storage:    "ConfigStorage"
-        tables:        raw
-    }
-    deep_coadd_metadata: {
-        template:      "deep_coadd_metadata/%(filter)s/%(tract)d/%(patch)s.boost"
-        python:        "lsst.daf.base.PropertySet"
-        persistable:        "PropertySet"
-        storage:    "BoostStorage"
-        tables:        raw
-    }
-    deepCoadd_icSrc: {
-        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/icSrc-%(filter)s-%(tract)d-%(patch)s.fits"
-        python:        "lsst.afw.table.SourceCatalog"
-        persistable:        "ignored"
-        storage:    "FitsCatalogStorage"
-        tables:        raw
-    }
-    deepCoadd_icSrc_schema: {
-        template:      "schema/deepCoadd_icSrc.fits"
-        python:        "lsst.afw.table.SourceCatalog"
-        persistable:        "ignored"
-        storage:    "FitsCatalogStorage"
-        tables:        raw
-    }
-    deepCoadd_icMatch: {
-        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/icMatch-%(filter)s-%(tract)d-%(patch)s.fits"
-        python:        "lsst.afw.table.SourceCatalog"
-        persistable:        "ignored"
-        storage:    "FitsCatalogStorage"
-        tables:        raw
-    }
-    deepCoadd_apCorr: {
-        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/apCorr-%(filter)s-%(tract)d-%(patch)s.pickle"
-        python:        "lsst.meas.algorithms.ApertureCorrection"
-        persistable:        "ApertureCorrection"
-        storage:    "PickleStorage"
-        tables:        raw
-    }
-    deepCoadd_src: {
-        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/src-%(filter)s-%(tract)d-%(patch)s.fits"
-        python:        "lsst.afw.table.SourceCatalog"
-        persistable:        "ignored"
-        storage:    "FitsCatalogStorage"
-        tables:        raw
-    }
-    deepCoadd_src_schema: {
-        template:      "schema/deepCoadd_src.fits"
-        python:        "lsst.afw.table.SourceCatalog"
-        persistable:        "ignored"
-        storage:    "FitsCatalogStorage"
-        tables:        raw
-    }
-    deepCoadd_calexp_background: {
-        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/bkgd-%(filter)s-%(tract)d-%(patch)s.fits"
-        python:        "lsst.afw.math.BackgroundList"
-        persistable:   "PurePythonClass"
-        storage:       "FitsCatalogStorage"
-        tables:        raw
     }
     deepCoadd_calexp_detBackground: {
         template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/det_bkgd-%(filter)s-%(tract)d-%(patch)s.fits"
@@ -834,33 +659,23 @@ datasets: {
         storage:       "FitsCatalogStorage"
         tables:        raw
     }
-    deepCoadd_srcMatch: {
-        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/srcMatch-%(filter)s-%(tract)d-%(patch)s.fits"
-        python:        "lsst.afw.table.BaseCatalog"
-        persistable:        "ignored"
-        storage:    "FitsCatalogStorage"
-        tables:        raw
-    }
     deepCoadd_forced_src: {
         template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/forced-%(filter)s-%(tract)d-%(patch)s.fits"
         python:        "lsst.afw.table.SourceCatalog"
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
-        tables:        raw
     }
     deepCoadd_forced_config: {
         template:      "config/deepCoadd_forced.py"
         python:        "lsst.meas.base.forcedCoadd.ForcedCoaddMeasurementConfig"
         persistable:      "Config"
         storage:    "ConfigStorage"
-        tables:        raw
     }
     deepCoadd_forced_metadata: {
         template:      "deepCoadd_forced_metadata/%(filter)s/%(tract)d/%(patch)s.boost"
         python:        "lsst.daf.base.PropertySet"
         persistable:        "PropertySet"
         storage:    "BoostStorage"
-        tables:        raw
     }
     deepCoadd_forced_schema: {
         template:      "schema/deepCoadd_forced.fits"
@@ -904,34 +719,6 @@ datasets: {
         storage:    "FitsCatalogStorage"
         tables:        raw
     }
-    deep_makeCoaddTempExp_config: {
-        template:      "config/deep_makeCoaddTempExp.py"
-        python:        "lsst.pipe.tasks.makeCoaddTempExp.MakeCoaddTempExpConfig"
-        persistable:      "Config"
-        storage:    "ConfigStorage"
-        tables:        raw
-    }
-    deep_makeCoaddTempExp_metadata: {
-        template:      "deep_makeCoaddTempExp_metadata/%(filter)s/%(tract)d/%(patch)s_metadata.boost"
-        python:        "lsst.daf.base.PropertySet"
-        persistable:        "PropertySet"
-        storage:    "BoostStorage"
-        tables:        raw
-    }
-    deep_processCoadd_config: {
-        template:      "config/deep_processCoadd.py"
-        python:        "lsst.pipe.tasks.processCoadd.ProcessCoaddConfig"
-        persistable:      "Config"
-        storage:    "ConfigStorage"
-        tables:        raw
-    }
-    deep_processCoadd_metadata: {
-        template:      "deep_processCoadd_metadata/%(filter)s/%(tract)d/%(patch)s/metadata-%(filter)s-%(tract)d-%(patch)s.boost"
-        python:        "lsst.daf.base.PropertySet"
-        persistable:        "PropertySet"
-        storage:    "BoostStorage"
-        tables:        raw
-    }
     deepDiff_config: {
         template:      "config/deepDiff.py"
         python:        "lsst.pex.config.Config"
@@ -945,22 +732,6 @@ datasets: {
         persistable:        "PropertySet"
         storage:    "BoostStorage"
         tables:        raw
-    }
-    deepMergedCoaddId: {
-        template:     "ignored"
-        # Provide something to import, although we actually return a Long
-        python:       "lsst.daf.base.PropertySet"
-        persistable:  "ignored"
-        storage:      "ignored"
-        tables:       "raw"
-    }
-    deepMergedCoaddId_bits: {
-        template:     "ignored"
-        # Provide something to import, although we actually return an int
-        python:       "lsst.daf.base.PropertySet"
-        persistable:  "ignored"
-        storage:      "ignored"
-        tables:       "raw"
     }
 
     goodSeeingCoadd_depth: {
@@ -1268,134 +1039,18 @@ datasets: {
         tables:        raw
     }
     # Detections on coadds
-    deepCoadd_det: {
-        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/det-%(filter)s-%(tract)d-%(patch)s.fits"
-        python:        "lsst.afw.table.SourceCatalog"
-        persistable:   "ignored"
-        storage:       "FitsCatalogStorage"
-        tables:        raw
-    }
-    detectCoaddSources_config: {
-        template:      "config/detect.py"
-        python:        "lsst.pipe.tasks.multiBand.DetectCoaddSourcesConfig"
-        persistable:   "Config"
-        storage:       "ConfigStorage"
-    }
-    detectCoaddSources_metadata: {
-        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/detectMD-%(filter)s-%(tract)d-%(patch)s.boost"
-        python:        "lsst.daf.base.PropertySet"
-        persistable:   "PropertySet"
-        storage:       "BoostStorage"
-        tables:        raw
-    }
-    deepCoadd_det_schema: {
-        template:      "schema/deepCoadd_det.fits"
-        python:        "lsst.afw.table.SourceCatalog"
-        persistable:   "SourceCatalog"
-        storage:       "FitsCatalogStorage"
-    }
 
     # Merged detections on coadds
-    deepCoadd_mergeDet: {
-        template:      "deepCoadd-results/merged/%(tract)d/%(patch)s/mergeDet-%(tract)d-%(patch)s.fits"
-        python:        "lsst.afw.table.SourceCatalog"
-        persistable:   "ignored"
-        storage:       "FitsCatalogStorage"
-        tables:        raw
-    }
-    mergeCoaddDetections_config: {
-        template:      "config/mergeDetect.py"
-        python:        "lsst.pipe.tasks.multiBand.MergeDetectionsConfig"
-        persistable:   "Config"
-        storage:       "ConfigStorage"
-    }
-    mergeCoaddDetections_metadata: {
-        template:      "deepCoadd-results/merged/%(tract)d/%(patch)s/mergeDetMD-%(tract)d-%(patch)s.boost"
-        python:        "lsst.daf.base.PropertySet"
-        persistable:   "PropertySet"
-        storage:       "BoostStorage"
-        tables:        raw
-    }
-    deepCoadd_mergeDet_schema: {
-        template:      "schema/deepCoadd_mergeDet.fits"
-        python:        "lsst.afw.table.SourceCatalog"
-        persistable:   "SourceCatalog"
-        storage:       "FitsCatalogStorage"
-    }
-    deepCoadd_peak_schema: {
-        template:      "schema/deepCoadd_peak.fits"
-        python:        "lsst.afw.detection.PeakCatalog"
-        persistable:   "PeakCatalog"
-        storage:       "FitsCatalogStorage"
-    }
 
     # Measurements on coadds
-    deepCoadd_meas: {
-        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/meas-%(filter)s-%(tract)d-%(patch)s.fits"
-        python:        "lsst.afw.table.SourceCatalog"
-        persistable:   "ignored"
-        storage:       "FitsCatalogStorage"
-        tables:        raw
-    }
-    measureCoaddSources_config: {
-        template:      "config/measureMerged.py"
-        python:        "lsst.pipe.tasks.multiBand.MeasureMergedCoaddSourcesConfig"
-        persistable:   "Config"
-        storage:       "ConfigStorage"
-    }
-    measureCoaddSources_metadata: {
-        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/measMD-%(filter)s-%(tract)d-%(patch)s.boost"
-        python:        "lsst.daf.base.PropertySet"
-        persistable:   "PropertySet"
-        storage:       "BoostStorage"
-        tables:        raw
-    }
-    deepCoadd_meas_schema: {
-        template:      "schema/deepCoadd_meas.fits"
-        python:        "lsst.afw.table.SourceCatalog"
-        persistable:   "SourceCatalog"
-        storage:       "FitsCatalogStorage"
-    }
 
     # Reference catalog for coadds
-    deepCoadd_ref: {
-        template:      "deepCoadd-results/merged/%(tract)d/%(patch)s/ref-%(tract)d-%(patch)s.fits"
-        python:        "lsst.afw.table.SourceCatalog"
-        persistable:   "ignored"
-        storage:       "FitsCatalogStorage"
-        tables:        raw
-    }
-    mergeCoaddMeasurements_config: {
-        template:      "config/mergeMeasure.py"
-        python:        "lsst.pipe.tasks.multiBand.MergeMeasurementsConfig"
-        persistable:   "Config"
-        storage:       "ConfigStorage"
-    }
-    mergeCoaddMeasurements_metadata: {
-        template:      "deepCoadd-results/merged/%(tract)d/%(patch)s/mergeMeasMD-%(tract)d-%(patch)s.boost"
-        python:        "lsst.daf.base.PropertySet"
-        persistable:   "PropertySet"
-        storage:       "BoostStorage"
-        tables:        raw
-    }
-    deepCoadd_ref_schema: {
-        template:      "schema/deepCoadd_ref.fits"
-        python:        "lsst.afw.table.SourceCatalog"
-        persistable:   "SourceCatalog"
-        storage:       "FitsCatalogStorage"
-    }
 
     multiband_config: {
         template:      "config/multiband.py"
         python:        "lsst.pipe.tasks.multiBand.MultiBandConfig"
         persistable:   "Config"
         storage:       "ConfigStorage"
-    }
-    brightObjectMask: {
-        template:      "deepCoadd/BrightObjectMasks/%(tract)d/BrightObjectMask-%(tract)d-%(patch)s-%(filter)s.reg"
-        python:        "lsst.pipe.tasks.objectMasks.ObjectMaskCatalog"
-        persistable:   "PurePythonClass"
-        storage:       "FitsCatalogStorage"
     }
 
 }
