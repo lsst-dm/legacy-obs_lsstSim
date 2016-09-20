@@ -21,19 +21,39 @@
 # the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
+import math
 import os.path
 import sys
 import unittest
 
+from lsst.daf.base import DateTime
 import lsst.daf.persistence as dafPersist
+from lsst.daf.butlerUtils import MakeRawVisitInfo
 import lsst.utils.tests
+from lsst.afw.image import RotType_SKY
+from lsst.afw.coord import IcrsCoord, Coord
+from lsst.afw.geom import degrees
 
 
-class GetRawTestCase(unittest.TestCase):
+class GetRawTestCase(lsst.utils.tests.TestCase):
     """Testing butler raw image retrieval"""
 
     def setUp(self):
         self.butler = dafPersist.Butler(root=os.path.join(os.path.dirname(__file__), "data"))
+        self.exposureTime = 15.0
+        self.darkTime = 15.0
+        dateObs = DateTime(49552.28496, DateTime.MJD, DateTime.TAI)
+        self.dateAvg = DateTime(dateObs.nsecs(DateTime.TAI) + int(0.5e9*self.exposureTime), DateTime.TAI)
+        self.boresightRaDec = IcrsCoord(359.936019771151*degrees, -2.3356222648145*degrees)
+        self.boresightAzAlt = Coord(127.158246182602*degrees, (90 - 40.6736117075876)*degrees)
+        self.boresightAirmass = 1.31849492005496
+        self.boresightRotAngle = (90 - 3.43228)*degrees
+        self.rotType = RotType_SKY
+        self.obs_longitude = -70.749417*degrees
+        self.obs_latitude = -30.244633*degrees
+        self.obs_elevation = 2663.0
+        self.weath_airTemperature = 5.0
+        self.weath_airPressure = MakeRawVisitInfo.pascalFromMmHg(520.0)
 
     def tearDown(self):
         del self.butler
@@ -51,6 +71,23 @@ class GetRawTestCase(unittest.TestCase):
             origin.getLongitude().asDegrees(), 0.005865, 6)
         self.assertAlmostEqual(
             origin.getLatitude().asDegrees(), -2.305262, 6)
+        visitInfo = raw.getInfo().getVisitInfo()
+        self.assertAlmostEqual(visitInfo.getDate().get(), self.dateAvg.get())
+        self.assertAlmostEqual(visitInfo.getExposureTime(), self.exposureTime)
+        self.assertAlmostEqual(visitInfo.getDarkTime(), self.darkTime)
+        self.assertCoordsNearlyEqual(visitInfo.getBoresightRaDec(), self.boresightRaDec)
+        self.assertCoordsNearlyEqual(visitInfo.getBoresightAzAlt(), self.boresightAzAlt)
+        self.assertAlmostEqual(visitInfo.getBoresightAirmass(), self.boresightAirmass)
+        self.assertAnglesNearlyEqual(visitInfo.getBoresightRotAngle(), self.boresightRotAngle)
+        self.assertEqual(visitInfo.getRotType(), self.rotType)
+        observatory = visitInfo.getObservatory()
+        self.assertAnglesNearlyEqual(observatory.getLongitude(), self.obs_longitude)
+        self.assertAnglesNearlyEqual(observatory.getLatitude(), self.obs_latitude)
+        self.assertAlmostEqual(observatory.getElevation(), self.obs_elevation)
+        weather = visitInfo.getWeather()
+        self.assertAlmostEqual(weather.getAirTemperature(), self.weath_airTemperature)
+        self.assertAlmostEqual(weather.getAirPressure(), self.weath_airPressure)
+        self.assertTrue(math.isnan(weather.getHumidity()))
 
 
 class MemoryTester(lsst.utils.tests.MemoryTestCase):
