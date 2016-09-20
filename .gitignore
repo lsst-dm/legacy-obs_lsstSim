@@ -18,6 +18,7 @@ tests/.tests
 tests/data/postISRCCD/
 tests/data/snapExp/
 version.py
+bin/extractPhosimGainSaturation.py
 bin/genDefectRegistry.py
 bin/genInputRegistry.py
 bin/ingestSimImages.py
