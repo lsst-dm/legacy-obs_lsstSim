@@ -74,12 +74,12 @@ class ProcessCalibLsstSimTask(IsrTask):
         for amp in referenceAmps:
             if amp.dataId['snap'] == 1:
                 continue
-            self.log.log(self.log.INFO, "Amp: Processing %s" % (amp.dataId))
+            self.log.info("Amp: Processing %s", amp.dataId)
             print "dataid %s"%(amp.dataId)
             butler = amp.butlerSubset.butler
             ampMIList = afwImage.vectorMaskedImageF()
             for sRef in sensorRefList:
-                self.log.log(self.log.INFO, "Sensor: Processing %s" % (sRef.dataId))
+                self.log.info("Sensor: Processing %s", sRef.dataId)
                 ampSnapMIList = afwImage.vectorMaskedImageF()
                 dataId = eval(amp.dataId.__repr__())
                 dataId['visit'] = sRef.dataId['visit']
@@ -200,6 +200,6 @@ class ProcessCalibLsstSimTask(IsrTask):
             else:
                 raise ValueError("Method %s is not supported for combining frames"%(method))
         except Exception as e:
-            self.log.log(self.log.WARN, "Could not combine the frames. %s" % (e,))
+            self.log.warn("Could not combine the frames. %s", e)
 
         return combinedFrame
