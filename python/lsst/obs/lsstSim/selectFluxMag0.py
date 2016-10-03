@@ -99,7 +99,7 @@ class SelectLsstSimFluxMag0Task(pipeBase.Task):
             runArgDict = self.runArgDictFromDataId(dataId)
             visit = runArgDict["visit"]
         except Exception:
-            self.log.fatal("dataId does not contain mandatory visit key: dataId: %s"%dataId)
+            self.log.fatal("dataId does not contain mandatory visit key: dataId: %s", dataId)
 
         if self._display:
             self.log.info(self.config.database)
@@ -127,14 +127,13 @@ class SelectLsstSimFluxMag0Task(pipeBase.Task):
         dataTuple += tuple(wd[1] for wd in whereDataList)
 
         if self._display:
-            self.log.info("queryStr=%r; dataTuple=%s" % (queryStr, dataTuple))
+            self.log.info("queryStr=%r; dataTuple=%s", queryStr, dataTuple)
 
         cursor.execute(queryStr, dataTuple)
         result = cursor.fetchall()
         fluxMagInfoList = [FluxMagInfo(r) for r in result]
         if self._display:
-            self.log.info("Found %d exposures" % \
-                      (len(fluxMagInfoList)))
+            self.log.info("Found %d exposures", len(fluxMagInfoList))
 
         return pipeBase.Struct(
             fluxMagInfoList = fluxMagInfoList,

@@ -58,5 +58,5 @@ if __name__ == "__main__":
         try:
             task.run(sensorDataRefLists[k], type)
         except Exception, e:
-            task.log.log(task.log.FATAL, "Failed on dataId=%s: %s" % (k, e))
+            task.log.fatal("Failed on dataId=%s: %s", k, e)
             traceback.print_exc(file=sys.stderr)
