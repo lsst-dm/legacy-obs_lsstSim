@@ -24,3 +24,4 @@ from .lsstSimMapper import *
 from .lsstSimIsrTask import *
 from .utils import *
 from .sensorLib import *
+from .makeLsstSimRawVisitInfo import *

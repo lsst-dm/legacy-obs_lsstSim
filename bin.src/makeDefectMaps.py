@@ -36,18 +36,18 @@ ha = None
 if len(sys.argv) > 5:
     ha = str(sys.argv[5])
 if ha is None:
-    mi = ai.MaskedImageF("QE_R%i%i_S%i%i.fits.gz"%(rx,ry,sx,sy))
+    mi = ai.MaskedImageF("QE_R%i%i_S%i%i.fits.gz"%(rx, ry, sx, sy))
 elif ha == 'A':
-    mi = ai.MaskedImageF("QE_R%i%i_S%i%i_C0.fits.gz"%(rx,ry,sx,sy))
+    mi = ai.MaskedImageF("QE_R%i%i_S%i%i_C0.fits.gz"%(rx, ry, sx, sy))
 elif ha == 'B':
-    mi = ai.MaskedImageF("QE_R%i%i_S%i%i_C1.fits.gz"%(rx,ry,sx,sy))
+    mi = ai.MaskedImageF("QE_R%i%i_S%i%i_C1.fits.gz"%(rx, ry, sx, sy))
 else:
     raise ValueError("passed an invalid value for ha")
 
 im = mi.getImage()
 arr = im.getArray()
 deadidx = numpy.where(arr == 0.)
-hotidx = numpy.where(arr> 1.1)
+hotidx = numpy.where(arr > 1.1)
 arr[deadidx] = 2.
 arr[hotidx] = 3.
 im2 = ai.makeImageFromArray(arr)
@@ -66,16 +66,17 @@ for f in fs.getFootprints():
         height.append(bbox.getHeight())
 
 head = pyfits.Header()
-cmap = {'A':(0,0), 'B':(0,1)}
+cmap = {'A': (0, 0), 'B': (0, 1)}
 if ha is not None:
-    head.update('SERIAL',int('%i%i%i%i%i%i'%(rx,ry,sx,sy,cmap[ha][0],cmap[ha][1])),'Serial of the sensor')
-    head.update('NAME','R:%i,%i S:%i,%i,%c'%(rx,ry,sx,sy,ha),'Name of sensor for this defect map')
+    head.update('SERIAL', int('%i%i%i%i%i%i' %
+                              (rx, ry, sx, sy, cmap[ha][0], cmap[ha][1])), 'Serial of the sensor')
+    head.update('NAME', 'R:%i,%i S:%i,%i,%c'%(rx, ry, sx, sy, ha), 'Name of sensor for this defect map')
 else:
-    head.update('SERIAL',int('%i%i%i%i'%(rx,ry,sx,sy)),'Serial of the sensor')
-    head.update('NAME','R:%i,%i S:%i,%i'%(rx,ry,sx,sy),'Name of sensor for this defect map')
-head.update('CDATE',time.asctime(time.gmtime()),'UTC of creation')
+    head.update('SERIAL', int('%i%i%i%i'%(rx, ry, sx, sy)), 'Serial of the sensor')
+    head.update('NAME', 'R:%i,%i S:%i,%i'%(rx, ry, sx, sy), 'Name of sensor for this defect map')
+head.update('CDATE', time.asctime(time.gmtime()), 'UTC of creation')
 
-#Need to transpose from the phosim on disk orientation
+# Need to transpose from the phosim on disk orientation
 col1 = pyfits.Column(name='y0', format='I', array=numpy.array(y0))
 col2 = pyfits.Column(name='x0', format='I', array=numpy.array(x0))
 col3 = pyfits.Column(name='width', format='I', array=numpy.array(width))
@@ -85,6 +86,6 @@ tbhdu = pyfits.new_table(cols, header = head)
 hdu = pyfits.PrimaryHDU()
 thdulist = pyfits.HDUList([hdu, tbhdu])
 if ha is None:
-    thdulist.writeto("defects%i%i%i%i.fits"%(rx,ry,sx,sy))
+    thdulist.writeto("defects%i%i%i%i.fits"%(rx, ry, sx, sy))
 else:
-    thdulist.writeto("defects%i%i%i%i%c.fits"%(rx,ry,sx,sy,ha))
+    thdulist.writeto("defects%i%i%i%i%c.fits"%(rx, ry, sx, sy, ha))

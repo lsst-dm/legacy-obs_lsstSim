@@ -31,8 +31,8 @@ if __name__ == "__main__":
     parser = ArgumentParser(name="argumentParser")
     namespace = parser.parse_args(config=TaskClass.ConfigClass())
     sensorDataRefLists = {}
-    typeMap = {'0':'bias', '1':'dark', '2':'flat_u', '3':'flat_g', '4':'flat_r',
-               '5':'flat_i', '6':'flat_z', '7':'flat_y'}
+    typeMap = {'0': 'bias', '1': 'dark', '2': 'flat_u', '3': 'flat_g', '4': 'flat_r',
+               '5': 'flat_i', '6': 'flat_z', '7': 'flat_y'}
     types = []
     for dr in namespace.dataRefList:
         tdict = eval(dr.dataId.__repr__())
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     task = TaskClass()
     if type in ('flat_u', 'flat_g', 'flat_r', 'flat_i', 'flat_z', 'flat_y'):
         type = 'flat'
-    
+
     for k in sensorDataRefLists.keys():
         try:
             task.run(sensorDataRefLists[k], type)

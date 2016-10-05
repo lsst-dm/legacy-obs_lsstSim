@@ -32,7 +32,9 @@ from lsst.pipe.tasks.selectImages import BaseSelectImagesTask, DatabaseSelectIma
 
 __all__ = ["SelectLsstImagesTask"]
 
+
 class SelectLsstImagesConfig(DatabaseSelectImagesConfig):
+
     """Config for SelectLsstImagesTask
     """
     maxFwhm = pexConfig.Field(
@@ -40,7 +42,7 @@ class SelectLsstImagesConfig(DatabaseSelectImagesConfig):
         dtype = float,
         default = 2.0,
     )
-    
+
     def setDefaults(self):
         super(SelectLsstImagesConfig, self).setDefaults()
         self.host = "lsst-db.ncsa.illinois.edu"
@@ -48,13 +50,15 @@ class SelectLsstImagesConfig(DatabaseSelectImagesConfig):
 
 
 class ExposureInfo(BaseExposureInfo):
+
     """Data about a selected exposure
-    
+
     Data includes:
     - dataId: data ID of exposure (a dict)
     - coordList: a list of corner coordinates of the exposure (list of IcrsCoord)
     - fwhm: mean FWHM of exposure
     """
+
     def __init__(self, result):
         """Set exposure information based on a query result from a db connection
         """
@@ -93,7 +97,7 @@ class ExposureInfo(BaseExposureInfo):
     @staticmethod
     def getColumnNames():
         """Get database columns to retrieve, in a format useful to the database interface
-        
+
         @return database column names as string of comma-separated values
         """
         return "raftName, visit, ccdName, filterName, " + \
@@ -103,18 +107,19 @@ class ExposureInfo(BaseExposureInfo):
 
 
 class SelectLsstImagesTask(BaseSelectImagesTask):
+
     """Select LSST CCD exposures suitable for coaddition
     """
     ConfigClass = SelectLsstImagesConfig
     _DefaultName = "selectImages"
-    
+
     @pipeBase.timeMethod
     def run(self, coordList, filter):
         """Select LSST images suitable for coaddition in a particular region
-        
+
         @param[in] coordList: list of coordinates defining region of interest; if None then select all images
         @param[in] filter: filter (e.g. "g", "r", "i"...)
-        
+
         @return a pipeBase Struct containing:
         - exposureInfoList: a list of ExposureInfo objects, which have the following fields:
             - dataId: data ID of exposure (a dict)
@@ -139,8 +144,8 @@ class SelectLsstImagesTask(BaseSelectImagesTask):
             coordStr = ", ".join(coordStrList)
             coordCmd = "call scisql.scisql_s2CPolyRegion(scisql_s2CPolyToBin(%s), 10)" % (coordStr,)
             cursor.execute(coordCmd)
-            cursor.nextset() # ignore one-line result of coordCmd
-        
+            cursor.nextset()  # ignore one-line result of coordCmd
+
             # find exposures
             queryStr = ("""select %s
                 from Science_Ccd_Exposure as ccdExp,
@@ -158,7 +163,7 @@ class SelectLsstImagesTask(BaseSelectImagesTask):
                 where filterName = %%s
                     and fwhm < %%s
                 """ % ExposureInfo.getColumnNames())
-        
+
         if self.config.maxExposures is not None:
             queryStr += " limit %s" % (self.config.maxExposures,)
 
@@ -175,7 +180,7 @@ class SelectLsstImagesTask(BaseSelectImagesTask):
 
     def _runArgDictFromDataId(self, dataId):
         """Extract keyword arguments for run (other than coordList) from a data ID
-        
+
         @return keyword arguments for run (other than coordList), as a dict
         """
         return dict(

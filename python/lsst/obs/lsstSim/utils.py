@@ -4,6 +4,7 @@ from .lsstSimMapper import LsstSimMapper
 
 __all__ = ['loadCamera']
 
+
 def loadCamera(repoDir):
     """Load a camera given the path to its description
 

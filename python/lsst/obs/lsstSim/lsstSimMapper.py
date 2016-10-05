@@ -20,6 +20,7 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
+import math
 import re
 
 import lsst.daf.base as dafBase
@@ -28,6 +29,7 @@ import lsst.afw.image.utils as afwImageUtils
 import lsst.afw.coord as afwCoord
 import lsst.afw.geom as afwGeom
 import lsst.pex.policy as pexPolicy
+from .makeLsstSimRawVisitInfo import MakeLsstSimRawVisitInfo
 
 from lsst.daf.butlerUtils import CameraMapper
 
@@ -36,6 +38,8 @@ from lsst.daf.butlerUtils import CameraMapper
 
 class LsstSimMapper(CameraMapper):
     packageName = 'obs_lsstSim'
+
+    MakeRawVisitInfoClass = MakeLsstSimRawVisitInfo
 
     _CcdNameRe = re.compile(r"R:(\d,\d) S:(\d,\d(?:,[AB])?)$")
 
@@ -219,8 +223,9 @@ class LsstSimMapper(CameraMapper):
         if singleFilter:
             return id * 8 + self.filterIdMap[dataId['filter']]
         return id
-    
+
     _nbit_id = 30
+
     def bypass_deepMergedCoaddId_bits(self, *args, **kwargs):
         """The number of bits used up for patch ID bits"""
         return 64 - self._nbit_id
@@ -248,12 +253,12 @@ class LsstSimMapper(CameraMapper):
 
     def std_raw(self, item, dataId):
         exposure = super(LsstSimMapper, self).std_raw(item, dataId)
-
         md = exposure.getMetadata()
         if md.exists("VERSION") and md.getInt("VERSION") < 16952:
-            # Precess WCS based on actual observation date
-            epoch = dafBase.DateTime(md.get("MJD-OBS"), dafBase.DateTime.MJD,
-                                     dafBase.DateTime.TAI).get(dafBase.DateTime.EPOCH)
+            # Precess crval of WCS from date of observation to J2000
+            epoch = exposure.getInfo().getVisitInfo().getDate().get(dafBase.DateTime.EPOCH)
+            if math.isnan(epoch):
+                raise RuntimeError("Date not found in raw exposure %s" % (dataId,))
             wcs = exposure.getWcs()
             origin = wcs.getSkyOrigin()
             refCoord = afwCoord.Fk5Coord(

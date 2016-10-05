@@ -29,6 +29,7 @@ import numpy
 
 __all__ = ["LsstSimIsrTask"]
 
+
 class LsstSimIsrConfig(IsrTask.ConfigClass):
     doWriteSnaps = pexConfig.Field(
         dtype = bool,
@@ -47,13 +48,14 @@ class LsstSimIsrConfig(IsrTask.ConfigClass):
 
     def setDefaults(self):
         IsrTask.ConfigClass.setDefaults(self)
-        self.doDark = False # LSSTSims do not include darks at this time
+        self.doDark = False  # LSSTSims do not include darks at this time
         self.snapCombine.averageKeys = ("TAI", "MJD-OBS", "AIRMASS", "AZIMUTH", "ZENITH",
-            "ROTANG", "SPIDANG", "ROTRATE")
+                                        "ROTANG", "SPIDANG", "ROTRATE")
         self.snapCombine.sumKeys = ("EXPTIME", "CREXPTM", "DARKTIME")
 
 
 class LsstSimIsrTask(IsrTask):
+
     """
     \section obs_lsstSim_isr_Debug Debug variables
 
@@ -88,9 +90,9 @@ class LsstSimIsrTask(IsrTask):
         maskarr = mask.getArray()
         badBitmask = numpy.array(mask.getPlaneBitMask("BAD"), dtype=maskarr.dtype)
         satBitmask = numpy.array(mask.getPlaneBitMask("SAT"), dtype=maskarr.dtype)
-        orBitmask = badBitmask|satBitmask
+        orBitmask = badBitmask | satBitmask
         andMask = ~satBitmask
-        idx = numpy.where((maskarr&orBitmask)==orBitmask)
+        idx = numpy.where((maskarr & orBitmask) == orBitmask)
         maskarr[idx] &= andMask
 
     def saturationInterpolation(self, ccdExposure):
@@ -108,10 +110,10 @@ class LsstSimIsrTask(IsrTask):
     @pipeBase.timeMethod
     def runDataRef(self, sensorRef):
         """Do instrument signature removal on an exposure
-        
+
         Correct for saturation, bias, overscan, dark, flat..., perform CCD assembly,
         optionally combine snaps, and interpolate over defects and saturated pixels.
-        
+
         If config.doSnapCombine true then combine the two ISR-corrected snaps to produce the final exposure.
         If config.doSnapCombine false then uses ISR-corrected snap 0 as the final exposure.
         In either case, the final exposure is persisted as "postISRCCD" if config.doWriteSpans is True,
@@ -133,14 +135,14 @@ class LsstSimIsrTask(IsrTask):
             isrData = self.readIsrData(snapRef, ccdExposure)
             ccdExposure = self.run(ccdExposure, **isrData.getDict()).exposure
             snapDict[snapId] = ccdExposure
-    
+
             if self.config.doWriteSnaps:
                 sensorRef.put(ccdExposure, "snapExp", snap=snapId)
 
             frame = getDebugFrame(self._display, "snapExp%d" % (snapId,))
             if frame:
                 getDisplay(frame).mtv(ccdExposure)
-        
+
         if self.config.doSnapCombine:
             loadSnapDict(snapDict, snapIdList=(0, 1), sensorRef=sensorRef)
             postIsrExposure = self.snapCombine.run(snapDict[0], snapDict[1]).exposure
@@ -155,14 +157,15 @@ class LsstSimIsrTask(IsrTask):
         frame = getDebugFrame(self._display, "postISRCCD")
         if frame:
             getDisplay(frame).mtv(postIsrExposure)
-                
+
         return pipeBase.Struct(
             exposure = postIsrExposure,
         )
 
+
 def loadSnapDict(snapDict, snapIdList, sensorRef):
     """Load missing snaps from disk.
-    
+
     @paramp[in,out] snapDict: a dictionary of snapId: snap exposure ("snapExp")
     @param[in] snapIdList: a list of snap IDs
     @param[in] sensorRef: sensor reference for snap, excluding the snap ID.
@@ -173,4 +176,3 @@ def loadSnapDict(snapDict, snapIdList, sensorRef):
             if snapExposure is None:
                 raise RuntimeError("Could not find snapExp for snap=%s; id=%s" % (snapId, sensorRef.dataId))
             snapDict[snapId] = snapExposure
-    
