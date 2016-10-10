@@ -31,7 +31,7 @@ import lsst.afw.geom as afwGeom
 import lsst.pex.policy as pexPolicy
 from .makeLsstSimRawVisitInfo import MakeLsstSimRawVisitInfo
 
-from lsst.daf.butlerUtils import CameraMapper
+from lsst.obs.base import CameraMapper
 
 # Solely to get boost serialization registrations for Measurement subclasses
 

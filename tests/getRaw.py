@@ -28,7 +28,7 @@ import unittest
 
 from lsst.daf.base import DateTime
 import lsst.daf.persistence as dafPersist
-from lsst.daf.butlerUtils import MakeRawVisitInfo
+from lsst.obs.base import MakeRawVisitInfo
 import lsst.utils.tests
 from lsst.afw.image import RotType_SKY
 from lsst.afw.coord import IcrsCoord, Coord
