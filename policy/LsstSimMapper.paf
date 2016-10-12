@@ -631,14 +631,6 @@ datasets: {
         storage:       "BoostStorage"
         tables:        raw
     }
-    cal_ref_cat: {
-        persistable: SourceCatalog
-        python: lsst.afw.table.SourceCatalog
-        storage: FitsCatalogStorage
-        table: ignored
-        template: photo_astro_ref/%(pixel_id)s.fits
-    }
-
     deepCoadd_depth: {
         template:    "deepCoadd/%(filter)s/%(tract)d/%(patch)s.depth.fits"
         python:      "lsst.afw.image.ImageF"
