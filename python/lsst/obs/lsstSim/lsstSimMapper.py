@@ -23,6 +23,7 @@
 import math
 import re
 
+import lsst.obs.base as obsBase
 import lsst.daf.base as dafBase
 import lsst.afw.image as afwImage
 import lsst.afw.image.utils as afwImageUtils
@@ -272,6 +273,15 @@ class LsstSimMapper(CameraMapper):
             exposure.setWcs(wcs)
 
         return exposure
+
+    def std_eimage(self, item, dataId):
+        """Standardize a eimage dataset by converting it to an Exposure instead of an Image"""
+        exposure = obsBase.exposureFromImage(item)
+        exposureId = self._computeCcdExposureId(dataId)
+        md = exposure.getMetadata()
+        visitInfo = self.makeRawVisitInfo(md=md, exposureId=exposureId)
+        exposure.getInfo().setVisitInfo(visitInfo)
+        return self._standardizeExposure(self.exposures['eimage'], exposure, dataId, trimmed=True)
 
 ###############################################################################
 
