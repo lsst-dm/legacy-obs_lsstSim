@@ -246,7 +246,6 @@ datasets: {
         persistable:   "PurePythonClass"
         storage:       "FitsCatalogStorage"
         tables:        raw
-        tables:        raw_skyTile
     }
     calexpBackground: {
         template:      "calexp/v%(visit)d-f%(filter)s/R%(raft)s/bkgd-S%(sensor)s.fits"
