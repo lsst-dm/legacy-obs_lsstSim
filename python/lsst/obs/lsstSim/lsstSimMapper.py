@@ -298,21 +298,11 @@ class LsstSimMapper(CameraMapper):
     def bypass_ccdExposureId_bits(self, datasetType, pythonType, location, dataId):
         return 41
 
-    def bypass_goodSeeingCoaddId(self, datasetType, pythonType, location, dataId):
+    def bypass_deepCoaddId(self, datasetType, pythonType, location, dataId):
         return self._computeCoaddExposureId(dataId, True)
 
-    def bypass_goodSeeingCoaddId_bits(self, datasetType, pythonType, location, dataId):
+    def bypass_deepCoaddId_bits(self, datasetType, pythonType, location, dataId):
         return 1 + 7 + 13*2 + 3
-
-    # Deep coadds use tract, patch, and filter just like good-seeing coadds
-    bypass_deepCoaddId = bypass_goodSeeingCoaddId
-    bypass_deepCoaddId_bits = bypass_goodSeeingCoaddId_bits
-
-    def bypass_chiSquaredCoaddId(self, datasetType, pythonType, location, dataId):
-        return self._computeCoaddExposureId(dataId, False)
-
-    def bypass_chiSquaredCoaddId_bits(self, datasetType, pythonType, location, dataId):
-        return 1 + 7 + 13*2
 
 ###############################################################################
 
