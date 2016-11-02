@@ -64,6 +64,10 @@ class EimageIsrTask(pipeBase.Task):
         \return     postIsrExposure  exposure to be passed to processCcdExposure
         """
         inputExposure = sensorRef.get("eimage", immediate=True)
+
+        # eimages are int, but computation needs to be done on floating point values
+        inputExposure = inputExposure.convertF()
+
         if self.config.doAddNoise:
             self.addNoise(inputExposure)
 
@@ -115,8 +119,8 @@ class EimageIsrTask(pipeBase.Task):
             var = inputExposure.getMaskedImage().getVariance()
             var.set(self.config.varianceValue)
         elif self.config.varianceType == 'image':
-            var = inputExposure.getMaskedImage().getVariance()
-            var[:] = inputExposure.getMaskedImage().getImage()
+            var = inputExposure.getMaskedImage().getVariance().getArray()
+            var[:] = inputExposure.getMaskedImage().getImage().getArray()
 
     def maskEdges(self, inputExposure):
         mask = inputExposure.getMaskedImage().getMask()
