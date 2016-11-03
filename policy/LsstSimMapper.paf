@@ -129,8 +129,6 @@ exposures: {
         level:         "None"
         tables:        raw
     }
-
-
     wcs: {
         template:      "wcs/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.wcs.fits"
         python:        "lsst.afw.image.ExposureI"
@@ -140,7 +138,6 @@ exposures: {
         tables:        "raw"
         tables:        "raw_visit"
     }
-
     fcr: {
         template:      "fcr/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fcr.fits"
         python:        "lsst.afw.image.ExposureI"
@@ -542,10 +539,6 @@ datasets: {
     deepDiff_metadata: {
         template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/metadata-S%(sensor)s.boost"
     }
-
-
-
-
     refcat: {
         template:      "refcat.fits"
         python:        "lsst.afw.table.SimpleCatalog"
@@ -553,14 +546,6 @@ datasets: {
         storage:    "FitsCatalogStorage"
         tables:        raw
     }
-    # Detections on coadds
-
-    # Merged detections on coadds
-
-    # Measurements on coadds
-
-    # Reference catalog for coadds
-
     multiband_config: {
         template:      "config/multiband.py"
         python:        "lsst.pipe.tasks.multiBand.MultiBandConfig"
