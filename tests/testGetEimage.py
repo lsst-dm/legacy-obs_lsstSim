@@ -87,6 +87,10 @@ class GetEimageTestCase(lsst.utils.tests.TestCase):
         date = DateTime("1994-01-02T01:46:59.520000913", DateTime.TAI)
         self.assertEqual(date, self.visit_info.getDate())
 
+    def test_getEra(self):
+        # numpy.isnan fails on afw:Angle, so just get a number out and test that.
+        self.assertTrue(np.isnan(self.visit_info.getEra().asRadians()))
+
     def test_getExposureId(self):
         self.assertEqual(430204, self.visit_info.getExposureId())
 
