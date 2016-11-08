@@ -38,9 +38,9 @@ class SelectLsstImagesConfig(DatabaseSelectImagesConfig):
     """Config for SelectLsstImagesTask
     """
     maxFwhm = pexConfig.Field(
-        doc = "maximum FWHM (arcsec)",
-        dtype = float,
-        default = 2.0,
+        doc="maximum FWHM (arcsec)",
+        dtype=float,
+        default=2.0,
     )
 
     def setDefaults(self):
@@ -64,10 +64,10 @@ class ExposureInfo(BaseExposureInfo):
         """
         self._ind = -1
         dataId = dict(
-            raft = result[self._nextInd],
-            visit = result[self._nextInd],
-            sensor = result[self._nextInd],
-            filter = result[self._nextInd]
+            raft=result[self._nextInd],
+            visit=result[self._nextInd],
+            sensor=result[self._nextInd],
+            filter=result[self._nextInd]
         )
         coordList = []
         for i in range(4):
@@ -127,11 +127,11 @@ class SelectLsstImagesTask(BaseSelectImagesTask):
             - fwhm: fwhm column
         """
         db = MySQLdb.connect(
-            host = self.config.host,
-            port = self.config.port,
-            user = DbAuth.username(self.config.host, str(self.config.port)),
-            passwd = DbAuth.password(self.config.host, str(self.config.port)),
-            db = self.config.database,
+            host=self.config.host,
+            port=self.config.port,
+            user=DbAuth.username(self.config.host, str(self.config.port)),
+            passwd=DbAuth.password(self.config.host, str(self.config.port)),
+            db=self.config.database,
         )
         cursor = db.cursor()
 
@@ -175,7 +175,7 @@ class SelectLsstImagesTask(BaseSelectImagesTask):
         exposureInfoList = [ExposureInfo(result) for result in cursor]
 
         return pipeBase.Struct(
-            exposureInfoList = exposureInfoList,
+            exposureInfoList=exposureInfoList,
         )
 
     def _runArgDictFromDataId(self, dataId):
@@ -184,7 +184,7 @@ class SelectLsstImagesTask(BaseSelectImagesTask):
         @return keyword arguments for run (other than coordList), as a dict
         """
         return dict(
-            filter = dataId["filter"]
+            filter=dataId["filter"]
         )
 
 
@@ -201,6 +201,6 @@ if __name__ == "__main__":
         IcrsCoord(maxRa, maxDec),
         IcrsCoord(minRa, maxDec),
     ]
-    results = selectTask.run(coordList = coordList, filter = 'r')
+    results = selectTask.run(coordList=coordList, filter='r')
     for ccdInfo in results.exposureInfoList:
         print "dataId=%s, fwhm=%s" % (ccdInfo.dataId, ccdInfo.fwhm)

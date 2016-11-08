@@ -41,6 +41,7 @@ class EdgeRolloffFunctorTestCase(unittest.TestCase):
     """
     Tests for lsst.obs.lsstSim.EdgeRolloffFunctor class.
     """
+
     def setUp(self):
         self.funcs = [obs_lsstSim.EdgeRolloffFunctor(2, 30, 4000)]
         self.xvals = np.logspace(-8, 1, 10)

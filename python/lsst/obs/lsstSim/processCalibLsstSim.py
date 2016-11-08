@@ -121,7 +121,7 @@ class ProcessCalibLsstSimTask(IsrTask):
                 exp.setFilter(expfilter)
             if self.config.doWrite and calibType is not 'flat':
                 print "writing file %s"%dataId
-                butler.put(exp, calibType, dataId = amp.dataId)
+                butler.put(exp, calibType, dataId=amp.dataId)
             masterExpList.append(exp)
             dataIdList.append(amp.dataId)
         if self.config.doWrite and calibType is 'flat':
@@ -130,7 +130,7 @@ class ProcessCalibLsstSimTask(IsrTask):
                 print "writing flat file %s"%dataId
                 butler.put(exp, calibType, dataId)
         return pipeBase.Struct(
-            masterFrameList = masterExpList,
+            masterFrameList=masterExpList,
         )
 
     def normChipAmps(self, exposureList):

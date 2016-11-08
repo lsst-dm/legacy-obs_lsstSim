@@ -297,9 +297,9 @@ if __name__ == "__main__":
                         help="String id of the version of phosim used to construct this camera repository."
                         "If None, use the value in data/phosim_version.txt.")
     parser.add_argument("OutputDir",
-                        help = "Path to dump configs and AmpInfo Tables; defaults to %r" % (defaultOutDir,),
-                        nargs = "?",
-                        default = defaultOutDir,
+                        help="Path to dump configs and AmpInfo Tables; defaults to %r" % (defaultOutDir,),
+                        nargs="?",
+                        default=defaultOutDir,
                         )
     parser.add_argument("--clobber", action="store_true", dest="clobber", default=False,
                         help=("remove and re-create the output directory if it already exists?"))

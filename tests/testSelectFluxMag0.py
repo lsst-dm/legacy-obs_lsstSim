@@ -42,6 +42,7 @@ import lsst.utils.tests
 class WrapDataId():
     """A container for dataId that looks like dataRef to computeImageScaler()
     """
+
     def __init__(self, dataId):
         self.dataId = dataId
 
@@ -49,6 +50,7 @@ class WrapDataId():
 class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
     """A test case for ScaleLsstSimZeroPointTask
     """
+
     def setUp(self):
         """Initialize the DB connection.  Raise SkipTest if unable to access DB."""
         config = SpatialScaleZeroPointTask.ConfigClass()
@@ -170,4 +172,3 @@ def setup_module(module):
 if __name__ == "__main__":
     setup_module(sys.modules[__name__])
     unittest.main()
-

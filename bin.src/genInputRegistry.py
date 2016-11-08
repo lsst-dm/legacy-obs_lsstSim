@@ -126,7 +126,7 @@ def processRaft(raftDir, conn, done, qsp):
         expTime = md.get("EXPTIME")
         mjdObs = md.get("MJD-OBS")
         taiObs = dafBase.DateTime(mjdObs, dafBase.DateTime.MJD,
-                dafBase.DateTime.TAI).toString(dafBase.DateTime.UTC)[:-1]
+                                  dafBase.DateTime.TAI).toString(dafBase.DateTime.UTC)[:-1]
         conn.execute("""INSERT INTO raw VALUES
             (NULL, ?, ?, ?, ?, ?, ?, ?, ?)""",
                      (visit, filter, snap, "%s,%s" % (raft1, raft2),

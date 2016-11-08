@@ -61,7 +61,7 @@ class LsstSimIsrTaskTestCase(unittest.TestCase):
         lsstIsrTask = LsstSimIsrTask(config=config)
         exposure = lsstIsrTask.runDataRef(self.ampRef).exposure
         self.assertAlmostEqual(afwMath.makeStatistics(exposure.getMaskedImage(), afwMath.MEAN).getValue(),
-                               2.855780, places = 3)
+                               2.855780, places=3)
 
     def testRun(self):
         """Test LsstSimIsrTask on amp-sized images in tests/data/
@@ -81,7 +81,7 @@ class LsstSimIsrTaskTestCase(unittest.TestCase):
         self.assertAlmostEqual(ampExp.getDimensions()[0], postIsrExp.getDimensions()[0])
         self.assertAlmostEqual(ampExp.getDimensions()[1], postIsrExp.getDimensions()[1])
         self.assertAlmostEqual(afwMath.makeStatistics(postIsrExp.getMaskedImage(), afwMath.MEAN).getValue(),
-                               2.855780, places = 3)
+                               2.855780, places=3)
 
 
 class MemoryTester(lsst.utils.tests.MemoryTestCase):

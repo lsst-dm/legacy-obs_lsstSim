@@ -6,7 +6,8 @@ config.isr.retarget(LsstSimIsrTask)
 
 try:
     import lsst.meas.extensions.multiShapelet
-    config.calibrate.measurement.algorithms.names = set(config.measurement.algorithms.names) | lsst.meas.extensions.multiShapelet.algorithms
+    config.calibrate.measurement.algorithms.names = set(
+        config.measurement.algorithms.names) | lsst.meas.extensions.multiShapelet.algorithms
     config.calibrate.measurement.slots.modelFlux = "multishapelet.combo.flux"
 except ImportError:
     # TODO: find a better way to log this

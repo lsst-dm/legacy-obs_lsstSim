@@ -82,7 +82,7 @@ col2 = pyfits.Column(name='x0', format='I', array=numpy.array(x0))
 col3 = pyfits.Column(name='width', format='I', array=numpy.array(width))
 col4 = pyfits.Column(name='height', format='I', array=numpy.array(height))
 cols = pyfits.ColDefs([col1, col2, col3, col4])
-tbhdu = pyfits.new_table(cols, header = head)
+tbhdu = pyfits.new_table(cols, header=head)
 hdu = pyfits.PrimaryHDU()
 thdulist = pyfits.HDUList([hdu, tbhdu])
 if ha is None:

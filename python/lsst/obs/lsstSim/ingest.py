@@ -6,6 +6,7 @@ __all__ = ['SimIngestTask', 'SimParseTask']
 
 
 class SimIngestTask(IngestTask):
+
     def run(self, args):
         """Ingest all specified files and add them to the registry"""
         filenameList = sum([glob(filename) for filename in args.files], [])
@@ -39,6 +40,7 @@ class SimIngestTask(IngestTask):
 
 
 class SimParseTask(ParseTask):
+
     def translate_ccd(self, md):
         sensor_str = md.get('CHIPID')
         return ",".join(sensor_str[-2:])
