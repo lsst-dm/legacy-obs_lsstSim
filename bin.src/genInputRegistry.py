@@ -21,6 +21,7 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 from __future__ import absolute_import, division
+from __future__ import print_function
 import glob
 from optparse import OptionParser
 import os
@@ -39,11 +40,11 @@ import lsst.skypix as skypix
 
 def process(dirList, inputRegistry, outputRegistry="registry.sqlite3"):
     if os.path.exists(outputRegistry):
-        print >>sys.stderr, "Output registry exists; will not overwrite."
+        print("Output registry exists; will not overwrite.", file=sys.stderr)
         sys.exit(1)
     if inputRegistry is not None:
         if not os.path.exists(inputRegistry):
-            print >>sys.stderr, "Input registry does not exist."
+            print("Input registry does not exist.", file=sys.stderr)
             sys.exit(1)
         shutil.copy(inputRegistry, outputRegistry)
 
@@ -80,7 +81,7 @@ def process(dirList, inputRegistry, outputRegistry="registry.sqlite3"):
             else:
                 processVisit(dir, conn, done, qsp)
     finally:
-        print >>sys.stderr, "Cleaning up..."
+        print("Cleaning up...", file=sys.stderr)
         conn.execute("DELETE FROM raw_visit")
         conn.commit()
         conn.execute("""INSERT INTO raw_visit
@@ -95,10 +96,10 @@ def process(dirList, inputRegistry, outputRegistry="registry.sqlite3"):
 
 
 def processVisit(visitDir, conn, done, qsp):
-    print >>sys.stderr, visitDir, "... started"
+    print(visitDir, "... started", file=sys.stderr)
     for raftDir in glob.glob(os.path.join(visitDir, "E00[01]", "R[0-4][0-4]")):
         processRaft(raftDir, conn, done, qsp)
-    print >>sys.stderr, visitDir, "... completed"
+    print(visitDir, "... completed", file=sys.stderr)
 
 
 def processRaft(raftDir, conn, done, qsp):
@@ -110,7 +111,7 @@ def processRaft(raftDir, conn, done, qsp):
         m = re.search(r'v(\d+)-f(\w)/E00(\d)/R(\d)(\d)/S(\d)(\d)/' +
                       r'imsim_\1_R\4\5_S\6\7_C(\d)(\d)_E00\3\.fits', fits)
         if not m:
-            print >>sys.stderr, "Warning: Unrecognized file:", fits
+            print("Warning: Unrecognized file:", fits, file=sys.stderr)
             nUnrecognized += 1
             continue
 
@@ -150,9 +151,9 @@ def processRaft(raftDir, conn, done, qsp):
 
         nProcessed += 1
 
-    print >>sys.stderr, raftDir, \
+    print(raftDir, \
         "... %d processed, %d skipped, %d unrecognized" % \
-        (nProcessed, nSkipped, nUnrecognized)
+        (nProcessed, nSkipped, nUnrecognized), file=sys.stderr)
 
 if __name__ == "__main__":
     parser = OptionParser(usage="""%prog [options] DIR ...

@@ -1,5 +1,6 @@
 """lsstSim-specific overrides for the processCcd task
 """
+from __future__ import print_function
 from lsst.obs.lsstSim import LsstSimIsrTask
 
 config.isr.retarget(LsstSimIsrTask)
@@ -11,4 +12,4 @@ try:
     config.calibrate.measurement.slots.modelFlux = "multishapelet.combo.flux"
 except ImportError:
     # TODO: find a better way to log this
-    print "WARNING: Could not import lsst.meas.extensions.multiShapelet; model fluxes not enabled!"
+    print("WARNING: Could not import lsst.meas.extensions.multiShapelet; model fluxes not enabled!")

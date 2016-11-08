@@ -22,6 +22,7 @@
 #
 """Note: this code uses MySQLdb primarily because daf_persistence cannot call scisql.scisql_s2CPolyRegion
 """
+from __future__ import print_function
 import MySQLdb
 from lsst.afw.coord import IcrsCoord
 import lsst.afw.geom as afwGeom
@@ -203,4 +204,4 @@ if __name__ == "__main__":
     ]
     results = selectTask.run(coordList=coordList, filter='r')
     for ccdInfo in results.exposureInfoList:
-        print "dataId=%s, fwhm=%s" % (ccdInfo.dataId, ccdInfo.fwhm)
+        print("dataId=%s, fwhm=%s" % (ccdInfo.dataId, ccdInfo.fwhm))

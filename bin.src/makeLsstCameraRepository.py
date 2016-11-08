@@ -27,6 +27,7 @@ Scons should have automatically run this when building obs_lsstSim. To produce
 the same files that scons would have, run with no arguments.
 """
 from __future__ import absolute_import, division
+from __future__ import print_function
 import argparse
 import os
 import re
@@ -345,11 +346,11 @@ if __name__ == "__main__":
         """
         if os.path.exists(dirPath):
             if doClobber and os.path.isdir(dirPath):
-                print "Clobbering directory %r" % (dirPath,)
+                print("Clobbering directory %r" % (dirPath,))
                 shutil.rmtree(dirPath)
             else:
                 raise RuntimeError("Directory %r exists" % (dirPath,))
-        print "Creating directory %r" % (dirPath,)
+        print("Creating directory %r" % (dirPath,))
         os.makedirs(dirPath)
 
     # write data products

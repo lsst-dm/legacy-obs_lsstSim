@@ -21,6 +21,7 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 from __future__ import absolute_import, division
+from __future__ import print_function
 import glob
 import os
 import re
@@ -42,9 +43,9 @@ registryPath = os.path.join(registryDir, "defectRegistry.sqlite3")
 
 # create new database
 if os.path.exists(registryPath):
-    print "Deleting existing %r" % (registryPath,)
+    print("Deleting existing %r" % (registryPath,))
     os.unlink(registryPath)
-print "Creating %r" % (registryPath,)
+print("Creating %r" % (registryPath,))
 conn = sqlite3.connect(registryPath)
 
 # create "defect" table
@@ -63,7 +64,7 @@ for filePath in glob.glob(os.path.join("rev_*", "defects*.fits")):
     if not m:
         sys.stderr.write("Skipping file with invalid name: %r\n" % (filePath,))
         continue
-    print "Processing %r" % (filePath,)
+    print("Processing %r" % (filePath,))
 
     fitsTable = pyfits.open(filePath)
     ccd = fitsTable[1].header["NAME"]
@@ -78,6 +79,6 @@ for filePath in glob.glob(os.path.join("rev_*", "defects*.fits")):
     ))
     numEntries += 1
 conn.commit()
-print "Added %d entries" % (numEntries)
+print("Added %d entries" % (numEntries))
 
 conn.close()
