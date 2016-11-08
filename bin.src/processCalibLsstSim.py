@@ -54,7 +54,7 @@ if __name__ == "__main__":
     if type in ('flat_u', 'flat_g', 'flat_r', 'flat_i', 'flat_z', 'flat_y'):
         type = 'flat'
 
-    for k in sensorDataRefLists.keys():
+    for k in sensorDataRefLists:
         try:
             task.run(sensorDataRefLists[k], type)
         except Exception as e:

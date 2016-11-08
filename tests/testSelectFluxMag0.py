@@ -24,6 +24,7 @@
 
 """Test lsst.obs.lsstSim.selectFluxMag0 and integration with pipe.tasks.scaleZeroPoint
 """
+from builtins import object
 import numpy
 import sys
 import unittest
@@ -39,7 +40,7 @@ from lsst.pipe.tasks.scaleZeroPoint import SpatialScaleZeroPointTask
 import lsst.utils.tests
 
 
-class WrapDataId():
+class WrapDataId(object):
     """A container for dataId that looks like dataRef to computeImageScaler()
     """
 

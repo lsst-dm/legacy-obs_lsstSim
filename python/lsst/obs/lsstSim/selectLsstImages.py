@@ -23,6 +23,7 @@
 """Note: this code uses MySQLdb primarily because daf_persistence cannot call scisql.scisql_s2CPolyRegion
 """
 from __future__ import print_function
+from builtins import range
 import MySQLdb
 from lsst.afw.coord import IcrsCoord
 import lsst.afw.geom as afwGeom

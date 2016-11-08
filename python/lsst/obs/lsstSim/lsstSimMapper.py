@@ -1,3 +1,4 @@
+from builtins import map
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010, 2011, 2012, 2013 LSST Corporation.
@@ -151,7 +152,7 @@ class LsstSimMapper(CameraMapper):
         @param visit 32 or 64-bit depending on camera
         @param ccdId detector name: same as detector.getName()
         """
-        dataId = {'visit': long(visit)}
+        dataId = {'visit': int(visit)}
         m = self._CcdNameRe.match(ccdId)
         if m is None:
             raise RuntimeError("Cannot parse ccdId=%r" % (ccdId,))
@@ -184,9 +185,9 @@ class LsstSimMapper(CameraMapper):
         s1, s2 = sensor
         c1, c2 = channel
         return (visit << 13) + (snap << 12) + \
-            (long(r1) * 5 + long(r2)) * 160 + \
-            (long(s1) * 3 + long(s2)) * 16 + \
-            (long(c1) * 8 + long(c2))
+            (int(r1) * 5 + int(r2)) * 160 + \
+            (int(s1) * 3 + int(s2)) * 16 + \
+            (int(c1) * 8 + int(c2))
 
     def _computeCcdExposureId(self, dataId):
         """Compute the 64-bit (long) identifier for a CCD exposure.
@@ -202,8 +203,8 @@ class LsstSimMapper(CameraMapper):
         r1, r2 = raft
         s1, s2 = sensor
         return (visit << 9) + \
-            (long(r1) * 5 + long(r2)) * 10 + \
-            (long(s1) * 3 + long(s2))
+            (int(r1) * 5 + int(r2)) * 10 + \
+            (int(s1) * 3 + int(s2))
 
     def _computeCoaddExposureId(self, dataId, singleFilter):
         """Compute the 64-bit (long) identifier for a coadd.
@@ -213,10 +214,10 @@ class LsstSimMapper(CameraMapper):
                                    filter coadd, in which case dataId
                                    must contain filter.
         """
-        tract = long(dataId['tract'])
+        tract = int(dataId['tract'])
         if tract < 0 or tract >= 128:
             raise RuntimeError('tract not in range [0,128)')
-        patchX, patchY = map(int, dataId['patch'].split(','))
+        patchX, patchY = list(map(int, dataId['patch'].split(',')))
         for p in (patchX, patchY):
             if p < 0 or p >= 2**13:
                 raise RuntimeError('patch component not in range [0, 8192)')
