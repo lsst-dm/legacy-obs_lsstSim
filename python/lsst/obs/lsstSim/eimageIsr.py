@@ -92,16 +92,16 @@ class EimageIsrTask(pipeBase.Task):
         md.add('GAINEFF', 1.)
         # Mask saturation
         isr.makeThresholdMask(
-            maskedImage = mi,
-            threshold = self.config.sat_val,
-            growFootprints = 0,
-            maskName = 'SAT')
+            maskedImage=mi,
+            threshold=self.config.sat_val,
+            growFootprints=0,
+            maskName='SAT')
         # Interpolate
         isr.interpolateFromMask(
-            maskedImage = mi,
-            fwhm = self.config.interp_size,
-            growFootprints = 0,
-            maskName = 'SAT',
+            maskedImage=mi,
+            fwhm=self.config.interp_size,
+            growFootprints=0,
+            maskName='SAT',
         )
         inputExposure.setMaskedImage(isr.transposeMaskedImage(mi))
         return pipeBase.Struct(exposure=inputExposure)

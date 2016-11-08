@@ -48,6 +48,7 @@ def getCoordList(minRa, minDec, maxRa, maxDec):
 
 class LsstMapperTestCase(unittest.TestCase):
     """A test case for SelectLsstImagesTask."""
+
     def setUp(self):
         """Initialize the DB connection.  Raise SkipTest if unable to access DB."""
         config = SelectLsstImagesTask.ConfigClass()

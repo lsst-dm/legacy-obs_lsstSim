@@ -32,18 +32,18 @@ __all__ = ["LsstSimIsrTask"]
 
 class LsstSimIsrConfig(IsrTask.ConfigClass):
     doWriteSnaps = pexConfig.Field(
-        dtype = bool,
-        doc = "Persist snapExp for each snap?",
-        default = True,
+        dtype=bool,
+        doc="Persist snapExp for each snap?",
+        default=True,
     )
     doSnapCombine = pexConfig.Field(
-        dtype = bool,
-        doc = "Combine Snaps? If False then use snap 0 as output exposure.",
-        default = True,
+        dtype=bool,
+        doc="Combine Snaps? If False then use snap 0 as output exposure.",
+        default=True,
     )
     snapCombine = pexConfig.ConfigurableField(
-        target = SnapCombineTask,
-        doc = "Combine snaps task",
+        target=SnapCombineTask,
+        doc="Combine snaps task",
     )
 
     def setDefaults(self):
@@ -159,7 +159,7 @@ class LsstSimIsrTask(IsrTask):
             getDisplay(frame).mtv(postIsrExposure)
 
         return pipeBase.Struct(
-            exposure = postIsrExposure,
+            exposure=postIsrExposure,
         )
 
 

@@ -27,6 +27,8 @@ Scons should have automatically run this when building obs_lsstSim. To produce
 the same files that scons would have, run with no arguments.
 """
 from __future__ import absolute_import, division
+from __future__ import print_function
+from builtins import range
 import argparse
 import os
 import re
@@ -297,9 +299,9 @@ if __name__ == "__main__":
                         help="String id of the version of phosim used to construct this camera repository."
                         "If None, use the value in data/phosim_version.txt.")
     parser.add_argument("OutputDir",
-                        help = "Path to dump configs and AmpInfo Tables; defaults to %r" % (defaultOutDir,),
-                        nargs = "?",
-                        default = defaultOutDir,
+                        help="Path to dump configs and AmpInfo Tables; defaults to %r" % (defaultOutDir,),
+                        nargs="?",
+                        default=defaultOutDir,
                         )
     parser.add_argument("--clobber", action="store_true", dest="clobber", default=False,
                         help=("remove and re-create the output directory if it already exists?"))
@@ -313,7 +315,7 @@ if __name__ == "__main__":
 
     # Build the camera config.
     camConfig = CameraConfig()
-    camConfig.detectorList = dict([(i, detectorConfigList[i]) for i in xrange(len(detectorConfigList))])
+    camConfig.detectorList = dict([(i, detectorConfigList[i]) for i in range(len(detectorConfigList))])
     camConfig.name = 'LSST'
     camConfig.plateScale = 20.0
     pScaleRad = afwGeom.arcsecToRad(camConfig.plateScale)
@@ -345,11 +347,11 @@ if __name__ == "__main__":
         """
         if os.path.exists(dirPath):
             if doClobber and os.path.isdir(dirPath):
-                print "Clobbering directory %r" % (dirPath,)
+                print("Clobbering directory %r" % (dirPath,))
                 shutil.rmtree(dirPath)
             else:
                 raise RuntimeError("Directory %r exists" % (dirPath,))
-        print "Creating directory %r" % (dirPath,)
+        print("Creating directory %r" % (dirPath,))
         os.makedirs(dirPath)
 
     # write data products
@@ -359,7 +361,7 @@ if __name__ == "__main__":
     camConfigPath = os.path.join(outDir, "camera.py")
     camConfig.save(camConfigPath)
 
-    for detectorName, ampTable in ampTableDict.iteritems():
+    for detectorName, ampTable in ampTableDict.items():
         shortDetectorName = LsstSimMapper.getShortCcdName(detectorName)
         ampInfoPath = os.path.join(outDir, shortDetectorName + ".fits")
         ampTable.writeFits(ampInfoPath)

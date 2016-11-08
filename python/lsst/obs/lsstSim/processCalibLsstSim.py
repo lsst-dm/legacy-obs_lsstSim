@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import zip
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010, 2011, 2012, 2013 LSST Corporation.
@@ -77,7 +79,7 @@ class ProcessCalibLsstSimTask(IsrTask):
             if amp.dataId['snap'] == 1:
                 continue
             self.log.info("Amp: Processing %s", amp.dataId)
-            print "dataid %s"%(amp.dataId)
+            print("dataid %s" % (amp.dataId))
             butler = amp.butlerSubset.butler
             ampMIList = afwImage.vectorMaskedImageF()
             for sRef in sensorRefList:
@@ -120,17 +122,17 @@ class ProcessCalibLsstSimTask(IsrTask):
             if calibType is 'flat':
                 exp.setFilter(expfilter)
             if self.config.doWrite and calibType is not 'flat':
-                print "writing file %s"%dataId
-                butler.put(exp, calibType, dataId = amp.dataId)
+                print("writing file %s" % dataId)
+                butler.put(exp, calibType, dataId=amp.dataId)
             masterExpList.append(exp)
             dataIdList.append(amp.dataId)
         if self.config.doWrite and calibType is 'flat':
             self.normChipAmps(masterExpList)
             for exp, dataId in zip(masterExpList, dataIdList):
-                print "writing flat file %s"%dataId
+                print("writing flat file %s" % dataId)
                 butler.put(exp, calibType, dataId)
         return pipeBase.Struct(
-            masterFrameList = masterExpList,
+            masterFrameList=masterExpList,
         )
 
     def normChipAmps(self, exposureList):
@@ -199,7 +201,7 @@ class ProcessCalibLsstSimTask(IsrTask):
             elif method is 'MEDIAN':
                 combinedFrame = afwMath.statisticsStack(miList, afwMath.MEDIAN, self.statsCtrl)
             else:
-                raise ValueError("Method %s is not supported for combining frames"%(method))
+                raise ValueError("Method %s is not supported for combining frames" % (method))
         except Exception as e:
             self.log.warn("Could not combine the frames. %s", e)
 

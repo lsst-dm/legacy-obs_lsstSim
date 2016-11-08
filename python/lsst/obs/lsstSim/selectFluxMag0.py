@@ -1,3 +1,4 @@
+from builtins import range
 #!/usr/bin/env python
 #
 # LSST Data Management System
@@ -58,10 +59,10 @@ class FluxMagInfo(BaseExposureInfo):
         """
         result = [r for r in result]
         dataId = dict(
-            visit = result.pop(0),
-            raft = result.pop(0),
-            ccd = result.pop(0),
-            filter = result.pop(0),
+            visit=result.pop(0),
+            raft=result.pop(0),
+            ccd=result.pop(0),
+            filter=result.pop(0),
         )
 
         coordList = [IcrsCoord(afwGeom.Angle(result.pop(0), afwGeom.degrees),
@@ -111,11 +112,11 @@ class SelectLsstSimFluxMag0Task(pipeBase.Task):
             self.log.info(self.config.database)
 
         db = MySQLdb.connect(
-            host = self.config.host,
-            port = self.config.port,
-            db = self.config.database,
-            user = DbAuth.username(self.config.host, str(self.config.port)),
-            passwd = DbAuth.password(self.config.host, str(self.config.port)),
+            host=self.config.host,
+            port=self.config.port,
+            db=self.config.database,
+            user=DbAuth.username(self.config.host, str(self.config.port)),
+            passwd=DbAuth.password(self.config.host, str(self.config.port)),
         )
         cursor = db.cursor()
 
@@ -142,7 +143,7 @@ class SelectLsstSimFluxMag0Task(pipeBase.Task):
             self.log.info("Found %d exposures", len(fluxMagInfoList))
 
         return pipeBase.Struct(
-            fluxMagInfoList = fluxMagInfoList,
+            fluxMagInfoList=fluxMagInfoList,
         )
 
     def runArgDictFromDataId(self, dataId):
@@ -152,5 +153,5 @@ class SelectLsstSimFluxMag0Task(pipeBase.Task):
         @return keyword arguments for visit (other than coordList), as a dict
         """
         return dict(
-            visit = dataId["visit"]
+            visit=dataId["visit"]
         )
