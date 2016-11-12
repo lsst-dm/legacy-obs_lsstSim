@@ -1,7 +1,7 @@
 config.charImage.repair.doCosmicRay=True
 
 config.calibrate.photoCal.doSelectUnresolved = False
-config.charImage.installSimplePsf.fwhm=2.
+config.charImage.installSimplePsf.fwhm=1.
 
 # Allows u-band to lock on to correct locus
 # Does not seem to hurt r-band data
