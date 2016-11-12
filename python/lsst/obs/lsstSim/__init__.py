@@ -20,6 +20,7 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 from .version import *
+from .selectImages import *
 from .lsstSimMapper import *
 from .lsstSimIsrTask import *
 from .utils import *
