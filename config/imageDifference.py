@@ -1,0 +1,2 @@
+config.kernelSourcesFromRef=True
+config.doDecorrelation=True
