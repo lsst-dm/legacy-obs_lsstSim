@@ -392,6 +392,19 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
     }
+    forcedRaDec_src: {
+        template:      "forcedRaDec/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "SourceCatalog"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+    }
+    forcedRaDec_src_schema: {
+        template:      "schema/forcedRaDec.fits"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "ignored"
+        storage:    "FitsCatalogStorage"
+    }
     forcedPhotCcd_metadata: {
         template: "forcedPhotCcd_metadata/tract%(tract)d/%(visit)d-%(sensor)s.boost"
         python:        "lsst.daf.base.PropertySet"
