@@ -405,6 +405,19 @@ datasets: {
         persistable:        "ignored"
         storage:    "FitsCatalogStorage"
     }
+    deepDiff_forcedRaDec_src: {
+        template:      "deepDiff_forcedRaDec/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "SourceCatalog"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+    }
+    deepDiff_forcedRaDec_src_schema: {
+        template:      "schema/deepDiff_forcedRaDec.fits"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "ignored"
+        storage:    "FitsCatalogStorage"
+    }
     forcedPhotCcd_metadata: {
         template: "forcedPhotCcd_metadata/tract%(tract)d/%(visit)d-%(sensor)s.boost"
         python:        "lsst.daf.base.PropertySet"
