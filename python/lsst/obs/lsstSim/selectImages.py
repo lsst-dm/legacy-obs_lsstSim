@@ -87,10 +87,11 @@ class MaxPsfWcsSelectImagesTask(WcsSelectImagesTask):
         
         filteredDataRefList = []
         filteredExposureInfoList = []
-        for size, dataRef, expInfo in zip(psf_sizes, dataRefList, exposureInfoList):
-            # size is in sigma.  Convert to FWHM
-            if size*2.355 < self.config.maxPsfFwhm:
-                self.log.info("%s selected with FWHM of %f pixels"%(dataRef.dataId, size*2.355))
+        for size_sigma, dataRef, expInfo in zip(psf_sizes, dataRefList, exposureInfoList):
+            # size_sigma is in sigma.  Convert to FWHM
+            size_fwhm = size_sigma*2.355
+            if size_fwhm < self.config.maxPsfFwhm:
+                self.log.info("%s selected with FWHM of %f pixels"%(dataRef.dataId, size_fwhm))
                 filteredDataRefList.append(dataRef)
                 filteredExposureInfoList.append(expInfo)
         return pipeBase.Struct(
