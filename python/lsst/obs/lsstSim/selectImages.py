@@ -23,9 +23,7 @@ import lsst.pex.config as pexConfig
 import lsst.pex.exceptions as pexExceptions
 import lsst.afw.geom as afwGeom
 import lsst.pipe.base as pipeBase
-import lsst.pipe.tasks as pipeTasks
 from lsst.pipe.tasks.selectImages import WcsSelectImagesTask, BaseExposureInfo
-import numpy
 
 __all__ = ["MaxPsfWcsSelectImagesTask"]
 
@@ -33,9 +31,11 @@ __all__ = ["MaxPsfWcsSelectImagesTask"]
 class MaxPsfWcsSelectImageConfig(WcsSelectImagesTask.ConfigClass):
     maxPsfFwhm = pexConfig.Field(dtype=float, doc="Maximum PSF FWHM (in pixels) to warp", default=5.)
 
+
 class MaxPsfWcsSelectImagesTask(WcsSelectImagesTask):
     """Select images using their Wcs and a maximum seeing"""
     ConfigClass = MaxPsfWcsSelectImageConfig
+
     def runDataRef(self, dataRef, coordList, makeDataRefList=True, selectDataList=[]):
         """Select images in the selectDataList that overlap the patch
 
@@ -66,9 +66,9 @@ class MaxPsfWcsSelectImagesTask(WcsSelectImagesTask):
             imageWcs = data.wcs
             cal = dataRef.get('calexp', immediate=True)
             psf_size = cal.getPsf().computeShape().getDeterminantRadius()
-            nx,ny = data.dims
+            nx, ny = data.dims
 
-            imageBox = afwGeom.Box2D(afwGeom.Point2D(0,0), afwGeom.Extent2D(nx, ny))
+            imageBox = afwGeom.Box2D(afwGeom.Point2D(0, 0), afwGeom.Extent2D(nx, ny))
             try:
                 imageCorners = [imageWcs.pixelToSky(pix) for pix in imageBox.getCorners()]
             except (pexExceptions.DomainError, pexExceptions.RuntimeError) as e:
@@ -80,11 +80,11 @@ class MaxPsfWcsSelectImagesTask(WcsSelectImagesTask):
             if imagePoly is None:
                 self.log.debug("Unable to create polygon from image %s: deselecting", dataRef.dataId)
                 continue
-            if patchPoly.intersects(imagePoly): # "intersects" also covers "contains" or "is contained by"
+            if patchPoly.intersects(imagePoly):  # "intersects" also covers "contains" or "is contained by"
                 psf_sizes.append(psf_size)
                 dataRefList.append(dataRef)
                 exposureInfoList.append(BaseExposureInfo(dataRef.dataId, imageCorners))
-        
+
         filteredDataRefList = []
         filteredExposureInfoList = []
         for size_sigma, dataRef, expInfo in zip(psf_sizes, dataRefList, exposureInfoList):
