@@ -19,6 +19,12 @@ defaultSubLevels: {
     sensor: "channel"
 }
 
+# exposures and datasets which are needed for all of the mappers are defined
+# in the obs_base package (in either exposures.yaml or datasets.yaml).
+# Where a modification to such a dataset is required for a particular camera,
+# (e.g., for a template or specialized python type), the modification will
+# appear below as a partial dataset definition.
+
 exposures: {
     raw: {
         template:    "raw/v%(visit)d-f%(filter)s/E%(snap)03d/R%(raft)s/S%(sensor)s/imsim_%(visit)d_R%(raft)s_S%(sensor)s_C%(channel)s_E%(snap)03d.fits.gz"
@@ -56,7 +62,6 @@ exposures: {
         level:        "Ccd"
         tables:        raw
     }
-    # dataset defined in obs_base modified in this mapper as follows:
     deepCoadd_tempExp: {
         template:    "deepCoadd/%(filter)s/%(tract)d/%(patch)stempExp/v%(visit)d-f%(filter)s.fits"
     }
@@ -80,11 +85,9 @@ exposures: {
         level:       "None"
         tables:      raw
     }
-    # dataset defined in obs_base modified in this mapper as follows:
     deepDiff_differenceExp: {
         template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/diffexp-S%(sensor)s.fits"
     }
-    # dataset defined in obs_base modified in this mapper as follows:
     deepDiff_matchedExp: {
         template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/matchexp-S%(sensor)s.fits"
     }
@@ -185,7 +188,6 @@ datasets: {
         template:      "forced/%(tract)d/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
         persistable:        "SourceCatalog"
     }
-    # dataset defined in obs_base modified in this mapper as follows:
     forced_src_schema: {
         template:      "schema/forced.fits"
     }
@@ -238,39 +240,30 @@ datasets: {
         storage:    "ConfigStorage"
         tables:        raw
     }
-    # dataset defined in obs_base modified in this mapper as follows:
     deep_safeClipAssembleCoadd_metadata: {
         template:      "deep_safeClipAssembleCoadd_metadata/%(filter)s/%(tract)d/%(patch)s.boost"
     }
-    # dataset defined in obs_base modified in this mapper as follows:
     deepCoadd_srcMatch: {
         template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/srcMatch-%(filter)s-%(tract)d-%(patch)s.fits"
     }
-    # dataset defined in obs_base modified in this mapper as follows:
     deepCoadd_forced_src: {
         template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/forced-%(filter)s-%(tract)d-%(patch)s.fits"
     }
-    # dataset defined in obs_base modified in this mapper as follows:
     deepCoadd_forced_config: {
         template:      "config/deepCoadd_forced.py"
     }
-    # dataset defined in obs_base modified in this mapper as follows:
     deepCoadd_forced_metadata: {
         template:      "deepCoadd_forced_metadata/%(filter)s/%(tract)d/%(patch)s.boost"
     }
-    # dataset defined in obs_base modified in this mapper as follows:
     deepDiff_diaSrc: {
         template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/diaSrc-S%(sensor)s.fits"
     }
-    # dataset defined in obs_base modified in this mapper as follows:
     deepDiff_kernelSrc: {
         template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/kernelSrc-S%(sensor)s.fits"
     }
-    # dataset defined in obs_base modified in this mapper as follows:
     deepDiff_config: {
         python:        "lsst.pex.config.Config"
     }
-    # dataset defined in obs_base modified in this mapper as follows:
     deepDiff_metadata: {
         template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/metadata-S%(sensor)s.boost"
     }
