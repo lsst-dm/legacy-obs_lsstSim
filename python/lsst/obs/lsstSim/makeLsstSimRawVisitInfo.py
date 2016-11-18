@@ -67,6 +67,8 @@ class MakeLsstSimRawVisitInfo(MakeRawVisitInfo):
             self.pascalFromMmHg(self.popFloat(md, "PRESS")),
             float("nan"),
         )
+        # phosim doesn't supply LST, HA, or UT1, and the alt/az/ra/dec/time can be inconsistent.
+        # We will leave ERA as NaN until a better answer is available.
         return makeVisitInfo(**argDict)
 
     def getDateAvg(self, md, exposureTime):

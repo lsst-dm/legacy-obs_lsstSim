@@ -73,6 +73,8 @@ class GetRawTestCase(lsst.utils.tests.TestCase):
             origin.getLatitude().asDegrees(), -2.305262, 6)
         visitInfo = raw.getInfo().getVisitInfo()
         self.assertAlmostEqual(visitInfo.getDate().get(), self.dateAvg.get())
+        # Explicit test for NaN here, because phosim output may not have consistent alt/az/ra/dec/time
+        self.assertTrue(math.isnan(visitInfo.getEra()))
         self.assertAlmostEqual(visitInfo.getExposureTime(), self.exposureTime)
         self.assertAlmostEqual(visitInfo.getDarkTime(), self.darkTime)
         self.assertCoordsNearlyEqual(visitInfo.getBoresightRaDec(), self.boresightRaDec)
