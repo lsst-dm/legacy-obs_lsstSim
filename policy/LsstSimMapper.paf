@@ -262,7 +262,7 @@ datasets: {
         template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/kernelSrc-S%(sensor)s.fits"
     }
     deepDiff_config: {
-        python:        "lsst.pex.config.Config"
+        python:        "lsst.pipe.tasks.imageDifference.ImageDifferenceConfig"
     }
     deepDiff_metadata: {
         template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/metadata-S%(sensor)s.boost"
