@@ -255,6 +255,20 @@ datasets: {
     deepCoadd_forced_metadata: {
         template:      "deepCoadd_forced_metadata/%(filter)s/%(tract)d/%(patch)s.boost"
     }
+    deepDiff_diaObj: {
+        template:      "deepDiff/diaObj_%(filter).s.fits"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:      "SourceCatalog"
+        storage:      "FitsCatalogStorage"
+        tables:      raw
+    }
+    deepDiff_diaObj_schema: {
+        template:      "schema/deepDiff_diaObj.fits"
+        python:      "lsst.afw.table.SourceCatalog"
+        persistable:      "SourceCatalog"
+        storage:      "FitsCatalogStorage"
+        tables:      raw
+    }
     deepDiff_diaSrc: {
         template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/diaSrc-S%(sensor)s.fits"
     }
@@ -266,5 +280,12 @@ datasets: {
     }
     deepDiff_metadata: {
         template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/metadata-S%(sensor)s.boost"
+    }
+    diaObjectMakerMetadata: {
+        template:      "deepDiff/diaObjectMakerMetadata.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
+        storage:    "BoostStorage"
+        tables:        raw
     }
 }
