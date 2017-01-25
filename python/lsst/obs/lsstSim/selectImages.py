@@ -30,6 +30,7 @@ __all__ = ["MaxPsfWcsSelectImagesTask"]
 
 class MaxPsfWcsSelectImageConfig(WcsSelectImagesTask.ConfigClass):
     maxPsfFwhm = pexConfig.Field(dtype=float, doc="Maximum PSF FWHM (in pixels) to warp", default=5.)
+    minPsfFwhm = pexConfig.Field(dtype=float, doc="Minimum PSF FWHM (in pixels) to warp", default=0.)
 
 
 class MaxPsfWcsSelectImagesTask(WcsSelectImagesTask):
@@ -90,7 +91,7 @@ class MaxPsfWcsSelectImagesTask(WcsSelectImagesTask):
         for size_sigma, dataRef, expInfo in zip(psf_sizes, dataRefList, exposureInfoList):
             # size_sigma is in sigma.  Convert to FWHM
             size_fwhm = size_sigma*2.355
-            if size_fwhm < self.config.maxPsfFwhm:
+            if size_fwhm < self.config.maxPsfFwhm and size_fwhm > self.config.minPsfFwhm:
                 self.log.info("%s selected with FWHM of %f pixels"%(dataRef.dataId, size_fwhm))
                 filteredDataRefList.append(dataRef)
                 filteredExposureInfoList.append(expInfo)
