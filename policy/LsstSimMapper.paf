@@ -65,6 +65,21 @@ exposures: {
     deepCoadd_tempExp: {
         template:    "deepCoadd/%(filter)s/%(tract)d/%(patch)stempExp/v%(visit)d-f%(filter)s.fits"
     }
+    goodSeeingCoadd: {
+        persistable: ExposureF
+        storage: FitsStorage
+        python: lsst.afw.image.ExposureF
+        template: goodSeeingCoadd/%(filter)s/%(tract)d/%(patch)s.fits
+        level: Skytile
+    }
+    goodSeeingCoadd_tempExp: {
+        template:    "goodSeeingCoadd/%(filter)s/%(tract)d/%(patch)stempExp/v%(visit)d-f%(filter)s.fits"
+        python:      lsst.afw.image.ExposureF
+        persistable: ExposureF
+        storage:     FitsStorage
+        level:       Skytile
+        tables:      'raw'
+    }
     wcs: {
         template:      "wcs/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.wcs.fits"
     }
@@ -256,7 +271,7 @@ datasets: {
         template:      "deepCoadd_forced_metadata/%(filter)s/%(tract)d/%(patch)s.boost"
     }
     deepDiff_diaObj: {
-        template:      "deepDiff/diaObj_%(filter)s.fits"
+        template:      "deepDiff/diaObj.fits"
         python:        "lsst.afw.table.SourceCatalog"
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
@@ -316,6 +331,30 @@ datasets: {
         persistable:   "PropertySet"
         storage:       "BoostStorage"
         tables:        raw
+    }
+    goodSeeing_makeCoaddTempExp_metadata: {
+        persistable: PropertySet
+        storage: BoostStorage
+        python: lsst.daf.base.PropertySet
+        template: goodSeeing_makeCoaddTempExp_metadata/%(filter)s/%(tract)d/%(patch)s_metadata.boost
+    }
+    goodSeeing_makeCoaddTempExp_config: {
+        persistable: Config
+        storage: ConfigStorage
+        python: lsst.pipe.tasks.makeCoaddTempExp.MakeCoaddTempExpConfig
+        template: config/goodSeeing_makeCoaddTempExp.py
+    }
+    goodSeeing_safeClipAssembleCoadd_config: {
+        persistable: Config
+        storage: ConfigStorage
+        python: lsst.pipe.tasks.assembleCoadd.SafeClipAssembleCoaddConfig
+        template: config/goodSeeing_safeClipAssembleCoadd.py
+    }
+    goodSeeing_safeClipAssembleCoadd_metadata: {
+        persistable: PropertySet
+        storage: BoostStorage
+        python: lsst.daf.base.PropertySet
+        template: goodSeeing_assembleCoadd_metadata/%(filter)s/%(tract)d/%(patch)s.boost
     }
     goodSeeing_assembleCoadd_config: {
         template:      "config/goodSeeing_assembleCoadd.py"
@@ -430,11 +469,46 @@ datasets: {
         storage:    "FitsCatalogStorage"
         tables:        raw
     }
+    goodSeeingDiff_diaObj: {
+        template:      "goodSeeingDiff/diaObj.fits"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "SourceCatalog"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+    }
+    goodSeeingDiff_diaObj_schema: {
+        template:      "schema/goodSeeingDiff_diaObj.fits"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "SourceCatalog"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+    }
     goodSeeingDiff_kernelSrc: {
         template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/kernelSrc-S%(sensor)s.fits"
         python:        "lsst.afw.table.SourceCatalog"
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
         tables:        raw
+    }
+    goodSeeingDiff_config: {
+        template:      config/goodSeeingDiff.py
+        python:        lsst.pipe.tasks.imageDifference.ImageDifferenceConfig
+        persistable:   Config
+        storage:       ConfigStorage
+        tables:        'raw'
+    }
+    goodSeeingDiff_metadata: {
+        template:      "goodSeeingDiff/v%(visit)d-f%(filter)s/R%(raft)s/metadata-S%(sensor)s.boost"
+        python:        lsst.daf.base.PropertySet
+        persistable:   PropertySet
+        storage:       BoostStorage
+        tables:        'raw'
+    }
+    goodSeeingCoadd_srcMatch: {
+        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/srcMatch-%(filter)s-%(tract)d-%(patch)s.fits"
+        python:        lsst.afw.table.BaseCatalog
+        persistable:   BaseCatalog
+        storage:       FitsCatalogStorage
+        tables:        'raw'
     }
 }
