@@ -17,6 +17,6 @@ config.calibrate.photoCal.matcher.numBrightStars=200
 config.charImage.measurePsf.starSelector["objectSize"].widthStdAllowed = 1.
 
 config.charImage.measurePsf.psfDeterminer.name = "pca"
-#config.charImage.measurePsf.psfDeterminer['pca'].kernelSize=25.
-#config.charImage.measurePsf.psfDeterminer['pca'].kernelSizeMax=25
-#config.charImage.measurePsf.psfDeterminer['pca'].kernelSizeMin=25
+config.charImage.measurePsf.psfDeterminer['pca'].kernelSize=25.
+config.charImage.measurePsf.psfDeterminer['pca'].kernelSizeMax=25
+config.charImage.measurePsf.psfDeterminer['pca'].kernelSizeMin=25

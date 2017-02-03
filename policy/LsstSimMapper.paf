@@ -272,6 +272,43 @@ datasets: {
     }
     deepDiff_diaObj: {
         template:      "deepDiff/diaObj.fits"
+    deepCoadd_forced_schema: {
+        template:      "schema/deepCoadd_forced.fits"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "ignored"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+    }
+    deepDiff_differenceExp: {
+        template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/diffexp-S%(sensor)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
+        tables:        raw
+    }
+    deepDiff_matchedExp: {
+        template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/matchexp-S%(sensor)s.fits"
+        python:        "lsst.afw.image.ExposureF"
+        persistable:        "ExposureF"
+        storage:    "FitsStorage"
+        tables:        raw
+    }
+    deepDiff_diaObj: {
+        template:      "deepDiff/diaObj_%(filter)s.fits"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "SourceCatalog"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+    }
+    deepDiff_diaObj_schema: {
+        template:      "schema/deepDiff_diaObj.fits"
+        python:        "lsst.afw.table.SourceCatalog"
+        persistable:        "SourceCatalog"
+        storage:    "FitsCatalogStorage"
+        tables:        raw
+    }
+    deepDiff_diaSrc: {
+        template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/diaSrc-S%(sensor)s.fits"
         python:        "lsst.afw.table.SourceCatalog"
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
@@ -292,9 +329,21 @@ datasets: {
     }
     deepDiff_config: {
         python:        "lsst.pex.config.Config"
+        template:      "config/deepDiff.py"
+        python:        "lsst.pipe.tasks.imageDifference.ImageDifferenceConfig"
+        persistable:      "Config"
+        storage:    "ConfigStorage"
+        tables:        raw
     }
     deepDiff_metadata: {
         template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/metadata-S%(sensor)s.boost"
+    }
+    diaObjectMakerMetadata: {
+        template:      "deepDiff/diaObjectMakerMetadata.boost"
+        python:        "lsst.daf.base.PropertySet"
+        persistable:        "PropertySet"
+        storage:    "BoostStorage"
+        tables:        raw
     }
     diaObjectMakerMetadata: {
         template:      "deepDiff/diaObjectMakerMetadata.boost"
