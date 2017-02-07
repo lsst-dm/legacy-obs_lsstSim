@@ -30,7 +30,7 @@ from lsst.daf.base import DateTime
 import lsst.daf.persistence as dafPersist
 from lsst.obs.base import MakeRawVisitInfo
 import lsst.utils.tests
-from lsst.afw.image import RotType_SKY
+from lsst.afw.image import RotType
 from lsst.afw.coord import IcrsCoord, Coord
 from lsst.afw.geom import degrees
 
@@ -48,7 +48,7 @@ class GetRawTestCase(lsst.utils.tests.TestCase):
         self.boresightAzAlt = Coord(127.158246182602*degrees, (90 - 40.6736117075876)*degrees)
         self.boresightAirmass = 1.31849492005496
         self.boresightRotAngle = (90 - 3.43228)*degrees
-        self.rotType = RotType_SKY
+        self.rotType = RotType.SKY
         self.obs_longitude = -70.749417*degrees
         self.obs_latitude = -30.244633*degrees
         self.obs_elevation = 2663.0
