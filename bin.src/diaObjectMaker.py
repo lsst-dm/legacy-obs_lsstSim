@@ -1,4 +1,5 @@
-#!/user/bin/env python2
+#!/usr/bin/env python2
+
 from lsst.pipe.base import TaskRunner, CmdLineTask, ArgumentParser, ConfigDatasetType
 import lsst.pex.config as pex_config
 from lsst.afw.table import MultiMatch, SourceRecord, SchemaMapper, CoordKey
@@ -45,19 +46,19 @@ MultiMatch.__init__ = __n_init__
 
 class ConfigDiaDatasetType(ConfigDatasetType):
     def getDatasetType(self, namespace):
-    """Return the dataset type as a string, from the appropriate config field
-    @param[in] namespace  parsed command
-    """
-    # getattr does not work reliably if the config field name is dotted,
-    # so step through one level at a time
-    keyList = self.name.split(".")
-    value = namespace.config
-    for key in keyList:
-        try:
-	    value = getattr(value, key)
-        except KeyError:
-	    raise RuntimeError("Cannot find config parameter %r" % (self.name,))
-    return value+"_diaSource"
+        """Return the dataset type as a string, from the appropriate config field
+        @param[in] namespace  parsed command
+        """
+        # getattr does not work reliably if the config field name is dotted,
+        # so step through one level at a time
+        keyList = self.name.split(".")
+        value = namespace.config
+        for key in keyList:
+            try:
+                value = getattr(value, key)
+            except KeyError:
+                raise RuntimeError("Cannot find config parameter %r" % (self.name,))
+        return value+"Diff_diaSrc"
 
 class DiaObjectMakerRunner(TaskRunner):
     def run(self, parsedCmd):
@@ -93,13 +94,13 @@ class DiaObjectMakerRunner(TaskRunner):
                 result=result,
             )
 
-class DiaObjectMakerTask(pex_config.Config):
-    coaddName = pex_config.Field(str, doc="Name of coadd used to make diaSources",
+class DiaObjectMakerTaskConfig(pex_config.Config):
+    coaddName = pex_config.Field(dtype=str, doc="Name of coadd used to make diaSources",
                                  default="goodSeeing")
 
 class DiaObjectMakerTask(CmdLineTask):
     RunnerClass = DiaObjectMakerRunner
-    ConfigClass = pex_config.Config
+    ConfigClass = DiaObjectMakerTaskConfig
     _DefaultName = "DiaObjectMakerTask"
 
     def _getMetadataName(self):
@@ -113,14 +114,14 @@ class DiaObjectMakerTask(CmdLineTask):
             if type(value) == str:
                 vtype = (str, len(value)*2)
             else:
-                vtype = type(value)            
+                vtype = type(value)
             data_id_format[key] = vtype
         multi_match = MultiMatch(seed_cat.schema, data_id_format)
         for data_ref in ref_list:
             dia_source_cat = data_ref.get()
             multi_match.add(dia_source_cat, data_ref.dataId)
         dia_object_cat = multi_match.finish()
-        ref_list[0].put(dia_object_cat, 'deepDiff_diaObj')
+        ref_list[0].put(dia_object_cat, self.config.coaddName+'Diff_diaObj')
 
     @classmethod
     def _makeArgumentParser(cls):
@@ -130,9 +131,9 @@ class DiaObjectMakerTask(CmdLineTask):
         This override is used to delay making the data ref list until the dataset type is known;
         this is done in @ref parseAndRun.
         """
-        parser = pipeBase.ArgumentParser(name=cls._DefaultName)
+        parser = ArgumentParser(name=cls._DefaultName)
         parser.add_id_argument(name="--id",
-                               datasetType=pipeBase.ConfigDiaDatasetType(name="coaddName"),
+                               datasetType=ConfigDiaDatasetType(name="coaddName"),
                                help="data IDs, e.g. --id visit=12345 ccd=1,2^0,3")
         return parser
 
