@@ -270,8 +270,6 @@ datasets: {
     deepCoadd_forced_metadata: {
         template:      "deepCoadd_forced_metadata/%(filter)s/%(tract)d/%(patch)s.boost"
     }
-    deepDiff_diaObj: {
-        template:      "deepDiff/diaObj.fits"
     deepCoadd_forced_schema: {
         template:      "schema/deepCoadd_forced.fits"
         python:        "lsst.afw.table.SourceCatalog"
@@ -294,7 +292,7 @@ datasets: {
         tables:        raw
     }
     deepDiff_diaObj: {
-        template:      "deepDiff/diaObj_%(filter)s.fits"
+        template:      "deepDiff/diaObj.fits"
         python:        "lsst.afw.table.SourceCatalog"
         persistable:        "SourceCatalog"
         storage:    "FitsCatalogStorage"
