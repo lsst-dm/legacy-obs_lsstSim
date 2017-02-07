@@ -23,7 +23,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from lsst.afw.image import makeVisitInfo, RotType_SKY
+from lsst.afw.image import makeVisitInfo, RotType
 from lsst.afw.geom import degrees
 from lsst.afw.coord import Coord, IcrsCoord, Observatory, Weather
 from lsst.obs.base import MakeRawVisitInfo
@@ -60,7 +60,7 @@ class MakeLsstSimRawVisitInfo(MakeRawVisitInfo):
         )
         argDict["boresightAirmass"] = self.popFloat(md, "AIRMASS")
         argDict["boresightRotAngle"] = 90*degrees - self.popAngle(md, "ROTANG")
-        argDict["rotType"] = RotType_SKY
+        argDict["rotType"] = RotType.SKY
         argDict["observatory"] = self.observatory
         argDict["weather"] = Weather(
             self.popFloat(md, "TEMPERA"),

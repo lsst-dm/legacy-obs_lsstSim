@@ -32,6 +32,7 @@ import numpy as np
 
 import lsst.utils
 import lsst.afw.geom as afwGeom
+from lsst.afw.image import RotType
 import lsst.utils.tests
 import lsst.daf.persistence as dafPersistence
 from lsst.afw.coord import Coord, IcrsCoord, Observatory, Weather
@@ -103,7 +104,7 @@ class GetEimageTestCase(lsst.utils.tests.TestCase):
         self.assertEqual(observatory, self.visit_info.getObservatory())
 
     def test_getRotType(self):
-        self.assertEqual(1, self.visit_info.getRotType())
+        self.assertEqual(RotType.SKY, self.visit_info.getRotType())
 
     def test_getWeather(self):
         def test_weather(w1, w2):
