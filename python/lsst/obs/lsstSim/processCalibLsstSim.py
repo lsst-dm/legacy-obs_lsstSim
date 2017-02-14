@@ -81,10 +81,10 @@ class ProcessCalibLsstSimTask(IsrTask):
             self.log.info("Amp: Processing %s", amp.dataId)
             print("dataid %s" % (amp.dataId))
             butler = amp.butlerSubset.butler
-            ampMIList = afwImage.vectorMaskedImageF()
+            ampMIList = []
             for sRef in sensorRefList:
                 self.log.info("Sensor: Processing %s", sRef.dataId)
-                ampSnapMIList = afwImage.vectorMaskedImageF()
+                ampSnapMIList = []
                 dataId = eval(amp.dataId.__repr__())
                 dataId['visit'] = sRef.dataId['visit']
                 for snap in (0, 1):
