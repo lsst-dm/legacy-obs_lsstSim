@@ -21,7 +21,6 @@ from builtins import zip
 # the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
-import lsst.afw.cameraGeom as cameraGeom
 import lsst.afw.image as afwImage
 import lsst.afw.math as afwMath
 import lsst.afw.geom as afwGeom
@@ -94,7 +93,7 @@ class ProcessCalibLsstSimTask(IsrTask):
                         expmeta = ampExposure.getMetadata()
                         expfilter = ampExposure.getFilter()
                         expcalib = ampExposure.getCalib()
-                    ampDetector = cameraGeom.cast_Amp(ampExposure.getDetector())
+                    ampDetector = ampExposure.getDetector()
 
                     ampExposure = self.convertIntToFloat(ampExposure)
                     ampExpDataView = ampExposure.Factory(ampExposure, ampDetector.getDiskDataSec())
@@ -163,7 +162,7 @@ class ProcessCalibLsstSimTask(IsrTask):
         x = dataBbox.getMinY()
         height = dataBbox.getDimensions()[0]
         # When at detector level, there will not be the need to go through the step of getting the parent
-        defectList = cameraGeom.cast_Ccd(detector.getParent()).getDefects()
+        defectList = detector.getParent().getDefects()
         dl = self.transposeDefectList(defectList, dataBbox)
         for d in dl:
             d.shift(-x, -y)
