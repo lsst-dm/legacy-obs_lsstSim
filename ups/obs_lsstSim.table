@@ -9,6 +9,7 @@ setupRequired(pipe_tasks)
 setupRequired(utils)
 setupRequired(python_mysqlclient)
 setupRequired(meas_modelfit)
+setupRequired("meas_extensions_shapeHSM")
 
 envPrepend(LD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
 envPrepend(DYLD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)

@@ -44,6 +44,12 @@ class EimageIsrConfig(pexConfig.Config):
     maskEdgeBorder = pexConfig.Field(dtype=int, default=0, doc="Set mask to EDGE for a border of x pixels")
     sat_val = pexConfig.Field(dtype=int, default=100000, doc="Value at which to detect saturation")
     interp_size = pexConfig.Field(dtype=float, default=0.5, doc="Size of interpolation kernel in arcsec")
+    # CModel needs a rough guess at the photometric zeropoint
+    fluxMag0T1 = pexConfig.Field(
+        dtype=float,
+        doc="The approximate flux of a zero-magnitude object in a one-second exposure",
+        default=1e10,
+    )
 
 
 class EimageIsrTask(pipeBase.Task):
@@ -104,6 +110,8 @@ class EimageIsrTask(pipeBase.Task):
             maskName='SAT',
         )
         inputExposure.setMaskedImage(isr.transposeMaskedImage(mi))
+        exposureTime = inputExposure.getInfo().getVisitInfo().getExposureTime()
+        inputExposure.getCalib().setFluxMag0(self.config.fluxMag0T1*exposureTime)
         return pipeBase.Struct(exposure=inputExposure)
 
     def addNoise(self, inputExposure):
