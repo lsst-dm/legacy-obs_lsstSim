@@ -10,6 +10,7 @@ setupRequired(utils)
 setupRequired(python_mysqlclient)
 setupRequired(meas_modelfit)
 setupRequired("meas_extensions_shapeHSM")
+setupRequired("meas_extensions_photometryKron")
 
 envPrepend(LD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
 envPrepend(DYLD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)

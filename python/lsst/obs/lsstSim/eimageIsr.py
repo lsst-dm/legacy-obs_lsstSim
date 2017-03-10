@@ -71,9 +71,6 @@ class EimageIsrTask(pipeBase.Task):
         """
         inputExposure = sensorRef.get("eimage", immediate=True)
 
-        # eimages are int, but computation needs to be done on floating point values
-        inputExposure = inputExposure.convertF()
-
         if self.config.doAddNoise:
             self.addNoise(inputExposure)
 

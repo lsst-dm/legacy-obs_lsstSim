@@ -31,8 +31,8 @@ exposures: {
     }
     eimage: {
         template:    "eimage/v%(visit)d-f%(filter)s/E%(snap)03d/R%(raft)s/eimage_%(visit)d_R%(raft)s_S%(sensor)s_E%(snap)03d.fits.gz"
-        python:      "lsst.afw.image.DecoratedImageU"
-        persistable: "DecoratedImageU"
+        python:      "lsst.afw.image.DecoratedImageF"
+        persistable: "DecoratedImageF"
         storage:     "FitsStorage"
         level:       "Ccd"
         tables:      raw
