@@ -47,7 +47,7 @@ class GetRawTestCase(lsst.utils.tests.TestCase):
         self.boresightRaDec = IcrsCoord(359.936019771151*degrees, -2.3356222648145*degrees)
         self.boresightAzAlt = Coord(127.158246182602*degrees, (90 - 40.6736117075876)*degrees)
         self.boresightAirmass = 1.31849492005496
-        self.boresightRotAngle = (90 - 3.43228)*degrees
+        self.boresightRotAngle = -3.43228*degrees
         self.rotType = RotType.SKY
         self.obs_longitude = -70.749417*degrees
         self.obs_latitude = -30.244633*degrees
