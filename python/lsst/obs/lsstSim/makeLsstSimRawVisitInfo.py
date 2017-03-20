@@ -35,10 +35,10 @@ class MakeLsstSimRawVisitInfo(MakeRawVisitInfo):
     """Make a VisitInfo from the FITS header of a raw LSST simulated image
 
     The convention for ROTANG is as follows:
-    at  0 degrees E = +Y CCD = -X Focal Plane, N = +X CCD = +Y Focal Plane: 90 boresightRotAng
-    at 90 degrees E = -X CCD = -Y Focal Plane, N = +Y CCD = -X Focal Plane:  0 boresightRotAng
+    at  0 degrees E = +Y CCD = -X Focal Plane, N = +X CCD = +Y Focal Plane:   0 boresightRotAng
+    at 90 degrees E = -X CCD = -Y Focal Plane, N = +Y CCD = -X Focal Plane: 270 boresightRotAng
 
-    So boresightRotAng = 90 - ROTANG
+    So boresightRotAng = -ROTANG
     """
     observatory = Observatory(-70.749417*degrees, -30.244633*degrees, 2663)  # long, lat, elev
 
@@ -59,7 +59,7 @@ class MakeLsstSimRawVisitInfo(MakeRawVisitInfo):
             self.popAngle(md, "DEC_DEG"),
         )
         argDict["boresightAirmass"] = self.popFloat(md, "AIRMASS")
-        argDict["boresightRotAngle"] = 90*degrees - self.popAngle(md, "ROTANG")
+        argDict["boresightRotAngle"] = -self.popAngle(md, "ROTANG")
         argDict["rotType"] = RotType.SKY
         argDict["observatory"] = self.observatory
         argDict["weather"] = Weather(
