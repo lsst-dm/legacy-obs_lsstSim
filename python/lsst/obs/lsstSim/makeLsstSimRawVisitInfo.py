@@ -23,7 +23,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from lsst.afw.image import makeVisitInfo, RotType
+from lsst.afw.image import VisitInfo, RotType
 from lsst.afw.geom import degrees
 from lsst.afw.coord import Coord, IcrsCoord, Observatory, Weather
 from lsst.obs.base import MakeRawVisitInfo
@@ -43,7 +43,7 @@ class MakeLsstSimRawVisitInfo(MakeRawVisitInfo):
     observatory = Observatory(-70.749417*degrees, -30.244633*degrees, 2663)  # long, lat, elev
 
     def setArgDict(self, md, argDict):
-        """Set an argument dict for makeVisitInfo and pop associated metadata
+        """Set an argument dict for VisitInfo and pop associated metadata
 
         @param[in,out] md  metadata, as an lsst.daf.base.PropertyList or PropertySet
         @param[in,out] argdict  a dict of arguments
@@ -69,7 +69,7 @@ class MakeLsstSimRawVisitInfo(MakeRawVisitInfo):
         )
         # phosim doesn't supply LST, HA, or UT1, and the alt/az/ra/dec/time can be inconsistent.
         # We will leave ERA as NaN until a better answer is available.
-        return makeVisitInfo(**argDict)
+        return VisitInfo(**argDict)
 
     def getDateAvg(self, md, exposureTime):
         """Return date at the middle of the exposure
