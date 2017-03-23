@@ -184,6 +184,9 @@ datasets: {
     srcMatch: {
         template:      "srcMatch/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
     }
+    srcMatchFull: {
+        template:      "srcMatchFull/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
+    }
     forced_src: {
         template:      "forced/%(tract)d/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
         persistable:        "SourceCatalog"
@@ -245,6 +248,9 @@ datasets: {
     }
     deepCoadd_measMatch: {
         template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/srcMatch-%(filter)s-%(tract)d-%(patch)s.fits"
+    }
+    deepCoadd_measMatchFull: {
+        template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/srcMatchFull-%(filter)s-%(tract)d-%(patch)s.fits"
     }
     deepCoadd_forced_src: {
         template:      "deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/forced-%(filter)s-%(tract)d-%(patch)s.fits"
