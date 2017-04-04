@@ -80,7 +80,7 @@ class GetEimageTestCase(lsst.utils.tests.TestCase):
     def test_getBoresightRotAngle(self):
         # Note test eimage header has ROTANG=236.983652.  boresightRotAngle is -ROTANG.
         angle = afwGeom.Angle(-236.983652, afwGeom.degrees)
-        self.assertAnglesNearlyEqual(angle, self.visit_info.getBoresightRotAngle())
+        self.assertAnglesAlmostEqual(angle, self.visit_info.getBoresightRotAngle())
 
     def test_getDarkTime(self):
         self.assertEqual(30.0, self.visit_info.getDarkTime())
