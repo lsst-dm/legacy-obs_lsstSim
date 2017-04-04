@@ -130,6 +130,7 @@ def setup_module(module):
 class MemoryTestCase(lsst.utils.tests.MemoryTestCase):
     pass
 
+
 if __name__ == "__main__":
     lsst.utils.tests.init()
     unittest.main()
