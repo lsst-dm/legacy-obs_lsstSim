@@ -1,8 +1,6 @@
-#!/usr/bin/env python
-from __future__ import absolute_import, division, print_function
 #
 # LSST Data Management System
-# Copyright 2008-2016 LSST Corporation.
+# Copyright 2008-2017 LSST Corporation.
 #
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
@@ -21,6 +19,8 @@ from __future__ import absolute_import, division, print_function
 # the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
+from __future__ import absolute_import, division, print_function
+
 """Test ability to get an eimage from the butler.
 **Note that this is an lsstSim specific test and
 should not be considered generalizable.
