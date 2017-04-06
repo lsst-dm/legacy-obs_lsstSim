@@ -1,8 +1,6 @@
-#!/usr/bin/env python
-
 #
 # LSST Data Management System
-# Copyright 2008, 2009, 2010 LSST Corporation.
+# Copyright 2008-2017 LSST Corporation.
 #
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
@@ -21,13 +19,14 @@
 # the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
-
+from __future__ import absolute_import, division, print_function
 """Test lsst.obs.lsstSim.selectFluxMag0 and integration with pipe.tasks.scaleZeroPoint
 """
 from builtins import object
-import numpy
 import sys
 import unittest
+
+import numpy as np
 
 import lsst.afw.geom as afwGeom
 import lsst.afw.image as afwImage
@@ -140,7 +139,7 @@ class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
         # test methods: computeImageScale(), scaleMaskedImage(), getInterpImage()
         imageScaler = zpScaler.computeImageScaler(exposure, exposureFakeDataRef)
         scaleFactorIm = imageScaler.getInterpImage(exposure.getBBox())
-        predScale = numpy.mean(imageScaler._scaleList)  # 0.011125492863357
+        predScale = np.mean(imageScaler._scaleList)  # 0.011125492863357
 
         self.assertAlmostEqual(afwMath.makeStatistics(scaleFactorIm, afwMath.VARIANCE, self.sctrl).getValue(),
                                0.0)
