@@ -61,6 +61,7 @@ class LsstSimMapper(CameraMapper):
         self.filterIdMap = {'u': 0, 'g': 1, 'r': 2, 'i': 3, 'z': 4, 'y': 5, 'i2': 5}
 
         # The LSST Filters from L. Jones 04/07/10
+        afwImageUtils.resetFilters()
         afwImageUtils.defineFilter('u', 364.59)
         afwImageUtils.defineFilter('g', 476.31)
         afwImageUtils.defineFilter('r', 619.42)
