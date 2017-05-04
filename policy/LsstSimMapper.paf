@@ -77,8 +77,8 @@ exposures: {
         tables:        "raw"
         tables:        "raw_visit"
     }
-    dcrModel_tempExp: {
-        template:    "dcrModel/%(filter)s%(subfilter)s/%(tract)d/%(patch)stempExp/v%(visit)d-f%(filter)s%(subfilter)s.fits"
+    dcrCoadd_tempExp: {
+        template:    "dcrCoadd/%(filter)s%(subfilter)s/%(tract)d/%(patch)stempExp/v%(visit)d-f%(filter)s%(subfilter)s.fits"
     }
     deepDiff_differenceExp: {
         template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/diffexp-S%(sensor)s.fits"
@@ -267,5 +267,20 @@ datasets: {
     }
     deepDiff_metadata: {
         template:      "deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/metadata-S%(sensor)s.boost"
+    }
+    dcrCoadd_measMatch: {
+        template:      "dcrCoadd-results/%(filter)s/%(tract)d/%(patch)s/srcMatch-%(filter)s-%(tract)d-%(patch)s.fits"
+    }
+    dcrCoadd_measMatchFull: {
+        template:      "dcrCoadd-results/%(filter)s/%(tract)d/%(patch)s/srcMatchFull-%(filter)s-%(tract)d-%(patch)s.fits"
+    }
+    dcrCoadd_forced_src: {
+        template:      "dcrCoadd-results/%(filter)s/%(tract)d/%(patch)s/forced-%(filter)s-%(tract)d-%(patch)s.fits"
+    }
+    dcrCoadd_forced_config: {
+        template:      "config/dcrCoadd_forced.py"
+    }
+    dcrCoadd_forced_metadata: {
+        template:      "dcrCoadd_forced_metadata/%(filter)s/%(tract)d/%(patch)s.boost"
     }
 }
