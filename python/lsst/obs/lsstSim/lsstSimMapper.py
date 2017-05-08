@@ -238,10 +238,10 @@ class LsstSimMapper(CameraMapper):
 
     def bypass_dcrMergedCoaddId_bits(self, *args, **kwargs):
         """The number of bits used up for patch ID bits"""
-        return 64 - self._nbit_id
+        return self.bypass_deepMergedCoaddId_bits(*args, **kwargs)
 
     def bypass_dcrMergedCoaddId(self, datasetType, pythonType, location, dataId):
-        return self._computeCoaddExposureId(dataId, False)
+        return self.bypass_deepMergedCoaddId(datasetType, pythonType, location, dataId)
 
     @staticmethod
     def getShortCcdName(ccdId):
@@ -313,10 +313,10 @@ class LsstSimMapper(CameraMapper):
         return 1 + 7 + 13*2 + 3
 
     def bypass_dcrCoaddId(self, datasetType, pythonType, location, dataId):
-        return self._computeCoaddExposureId(dataId, True)
+        return self.bypass_deepCoaddId(datasetType, pythonType, location, dataId)
 
     def bypass_dcrCoaddId_bits(self, datasetType, pythonType, location, dataId):
-        return 1 + 7 + 13*2 + 3
+        return self.bypass_deepCoaddId_bits(datasetType, pythonType, location, dataId)
 
 ###############################################################################
 
