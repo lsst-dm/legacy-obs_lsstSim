@@ -62,8 +62,11 @@ exposures: {
         level:        "Ccd"
         tables:        raw
     }
-    deepCoadd_tempExp: {
+    deepCoadd_directWarp: {
         template:    "deepCoadd/%(filter)s/%(tract)d/%(patch)stempExp/v%(visit)d-f%(filter)s.fits"
+    }
+    deepCoadd_psfMatchedWarp: {
+        template:    "deepCoadd/%(filter)s/%(tract)d/%(patch)stempExp/psfMatched-v%(visit)d-f%(filter)s.fits"
     }
     wcs: {
         template:      "wcs/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.wcs.fits"
@@ -77,7 +80,7 @@ exposures: {
         tables:        "raw"
         tables:        "raw_visit"
     }
-    dcrCoadd_tempExp: {
+    dcrCoadd_directWarp: {
         template:    "dcrCoadd/%(filter)s%(subfilter)s/%(tract)d/%(patch)stempExp/v%(visit)d-f%(filter)s%(subfilter)s.fits"
     }
     deepDiff_differenceExp: {
