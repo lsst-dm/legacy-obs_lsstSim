@@ -22,6 +22,7 @@ from builtins import map
 #
 
 import math
+import os
 import re
 
 import lsst.obs.base as obsBase
@@ -30,7 +31,7 @@ import lsst.afw.image as afwImage
 import lsst.afw.image.utils as afwImageUtils
 import lsst.afw.coord as afwCoord
 import lsst.afw.geom as afwGeom
-import lsst.pex.policy as pexPolicy
+import lsst.daf.persistence as dafPersist
 from .makeLsstSimRawVisitInfo import MakeLsstSimRawVisitInfo
 
 from lsst.obs.base import CameraMapper
@@ -46,8 +47,8 @@ class LsstSimMapper(CameraMapper):
     _CcdNameRe = re.compile(r"R:(\d,\d) S:(\d,\d(?:,[AB])?)$")
 
     def __init__(self, inputPolicy=None, **kwargs):
-        policyFile = pexPolicy.DefaultPolicyFile(self.packageName, "LsstSimMapper.paf", "policy")
-        policy = pexPolicy.Policy(policyFile)
+        policyFile = dafPersist.Policy.defaultPolicyFile(self.packageName, "LsstSimMapper.yaml", "policy")
+        policy = dafPersist.Policy(policyFile)
 
         self.doFootprints = False
         if inputPolicy is not None:
@@ -57,7 +58,7 @@ class LsstSimMapper(CameraMapper):
                 else:
                     kwargs[kw] = inputPolicy.get(kw)
 
-        super(LsstSimMapper, self).__init__(policy, policyFile.getRepositoryPath(), **kwargs)
+        super(LsstSimMapper, self).__init__(policy, os.path.dirname(policyFile), **kwargs)
         self.filterIdMap = {'u': 0, 'g': 1, 'r': 2, 'i': 3, 'z': 4, 'y': 5, 'i2': 5}
 
         # The LSST Filters from L. Jones 04/07/10
