@@ -23,7 +23,7 @@
 import lsst.afw.image as afwImage
 import lsst.pex.config as pexConfig
 import lsst.pipe.base as pipeBase
-from lsst.ip.isr import isr
+import lsst.ip.isr as isr
 import numpy
 
 
