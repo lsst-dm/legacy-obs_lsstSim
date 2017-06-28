@@ -5,14 +5,15 @@ config.charImage.refObjLoader.retarget(LoadIndexedReferenceObjectsTask)
 config.calibrate.astromRefObjLoader.retarget(LoadIndexedReferenceObjectsTask)
 config.calibrate.photoRefObjLoader.retarget(LoadIndexedReferenceObjectsTask)
 
+config.isr.doAddNoise=True
 config.charImage.repair.doCosmicRay=True
 
 config.calibrate.photoCal.doSelectUnresolved = False
 config.charImage.installSimplePsf.fwhm=2.
 
 config.charImage.repair.cosmicray.nCrPixelMax=1000000
-config.calibrate.astrometry.matcher.numBrightStars=200
-config.calibrate.photoCal.matcher.numBrightStars=200
+config.calibrate.astrometry.matcher.numBrightStars=100
+config.calibrate.photoCal.matcher.numBrightStars=100
 
 # Allows u-band to lock on to correct locus
 # Does not seem to hurt r-band data

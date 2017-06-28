@@ -26,7 +26,6 @@ import lsst.pipe.base as pipeBase
 from lsst.ip.isr import isr
 import numpy
 
-
 class EimageIsrConfig(pexConfig.Config):
     """Config for EimageIsrTask"""
     doAddNoise = pexConfig.Field(dtype=bool, default=False,
@@ -72,7 +71,10 @@ class EimageIsrTask(pipeBase.Task):
         inputExposure = sensorRef.get("eimage", immediate=True)
 
         if self.config.doAddNoise:
-            self.addNoise(inputExposure)
+            values = sensorRef.get('background_values')
+            dataId = sensorRef.dataId
+            noise_value = values[(dataId['visit'], dataId['raft'], dataId['sensor'])]
+            self.addNoise(inputExposure, noise_value)
 
         if self.config.doSetVariance:
             self.setVariance(inputExposure)
@@ -111,10 +113,10 @@ class EimageIsrTask(pipeBase.Task):
         inputExposure.getCalib().setFluxMag0(self.config.fluxMag0T1*exposureTime)
         return pipeBase.Struct(exposure=inputExposure)
 
-    def addNoise(self, inputExposure):
+    def addNoise(self, inputExposure, noise_value):
         mi = inputExposure.getMaskedImage()
         (x, y) = mi.getDimensions()
-        noiseArr = numpy.random.poisson(self.config.noiseValue, size=x*y).reshape(y, x)
+        noiseArr = numpy.random.poisson(noise_value, size=x*y).reshape(y, x)
         noiseArr = noiseArr.astype(numpy.float32)
         noiseImage = afwImage.makeImageFromArray(noiseArr)
         mi += noiseImage

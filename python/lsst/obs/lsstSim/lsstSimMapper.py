@@ -23,6 +23,7 @@ from builtins import map
 
 import math
 import re
+import numpy
 
 import lsst.obs.base as obsBase
 import lsst.daf.base as dafBase
@@ -37,6 +38,12 @@ from lsst.obs.base import CameraMapper
 
 # Solely to get boost serialization registrations for Measurement subclasses
 
+class BackVals(object):
+    @staticmethod
+    def readFits(filename, *args, **kwargs):
+        values = numpy.genfromtxt(filename, dtype=None, names=True)
+        values = {(value['visit'], value['raft'], value['sensor']):value['value'] for value in values}
+        return values
 
 class LsstSimMapper(CameraMapper):
     packageName = 'obs_lsstSim'

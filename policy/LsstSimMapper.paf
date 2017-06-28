@@ -189,6 +189,12 @@ datasets: {
     icSrc: {
         template:      "icSrc/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
     }
+    background_values: {
+        template:    "background_values/%(visit)d.txt"
+        python:      "lsst.obs.lsstSim.BackVals"
+        persistable: "BaseCatalog"
+        storage:     "FitsCatalogStorage"
+    }
     icMatch: {
         template:      "icMatch/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits"
         python:        "lsst.afw.table.BaseCatalog"
