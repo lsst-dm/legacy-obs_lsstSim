@@ -1,6 +1,8 @@
 from lsst.meas.algorithms import LoadIndexedReferenceObjectsTask
 import os.path
 from lsst.utils import getPackageDir
+import lsstDebug
+
 config.charImage.refObjLoader.retarget(LoadIndexedReferenceObjectsTask)
 config.calibrate.astromRefObjLoader.retarget(LoadIndexedReferenceObjectsTask)
 config.calibrate.photoRefObjLoader.retarget(LoadIndexedReferenceObjectsTask)
@@ -12,8 +14,8 @@ config.calibrate.photoCal.doSelectUnresolved = False
 config.charImage.installSimplePsf.fwhm=2.
 
 config.charImage.repair.cosmicray.nCrPixelMax=1000000
-config.calibrate.astrometry.matcher.numBrightStars=100
-config.calibrate.photoCal.matcher.numBrightStars=100
+config.calibrate.astrometry.matcher.numBrightStars=200
+config.calibrate.photoCal.matcher.numBrightStars=200
 
 # Allows u-band to lock on to correct locus
 # Does not seem to hurt r-band data
@@ -66,3 +68,8 @@ config.calibrate.measurement.plugins["base_CircularApertureFlux"].radii = [3.0, 
 
 # Use a large aperture to be independent of seeing in calibration
 config.calibrate.measurement.plugins["base_CircularApertureFlux"].maxSincRadius = 12.0
+
+'''
+bug = lsstDebug.getInfo("lsst.meas.astrom.astrometry")
+bug.display = True
+'''

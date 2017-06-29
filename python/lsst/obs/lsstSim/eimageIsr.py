@@ -23,6 +23,7 @@
 import lsst.afw.image as afwImage
 import lsst.pex.config as pexConfig
 import lsst.pipe.base as pipeBase
+import lsst.afw.math as afwMath
 from lsst.ip.isr import isr
 import numpy
 
@@ -73,7 +74,13 @@ class EimageIsrTask(pipeBase.Task):
         if self.config.doAddNoise:
             values = sensorRef.get('background_values')
             dataId = sensorRef.dataId
-            noise_value = values[(dataId['visit'], dataId['raft'], dataId['sensor'])]
+            try:
+                noise_value = values[(dataId['visit'], dataId['raft'], dataId['sensor'])]
+            except KeyError:
+                stats = afwMath.makeStatistics(inputExposure.getMaskedImage(), afwMath.MEDIAN)
+                noise_value = stats.getValue()
+                self.log.info("No background value found using image...\n             "
+                              "Using a value %g for dataId: %s"%(noise_value, dataId))
             self.addNoise(inputExposure, noise_value)
 
         if self.config.doSetVariance:
