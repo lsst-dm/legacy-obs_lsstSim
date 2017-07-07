@@ -53,7 +53,7 @@ class GetIdTestCase(unittest.TestCase):
         id = dr.get("ccdExposureId")
         self.assertEqual(bits, 41)
         self.assertEqual(id, (85471048 << 9) + 11*10 + 5)
-        dataId = dict(tract=1, patch='2,3', filter='z')
+        dataId = dict(tract=1, patch='2x3', filter='z')
         bits = self.butler.get("deepCoaddId_bits", dataId, immediate=True)
         id = self.butler.get("deepCoaddId", dataId, immediate=True)
         self.assertEqual(bits, 37)
