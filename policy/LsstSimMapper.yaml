@@ -163,6 +163,8 @@ datasets:
     storage: FitsCatalogStorage
     tables: raw
     template: icMatch/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits
+  photoCalib:
+    template: jointcal-results/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.photoCalib.fits
   srcMatch:
     template: srcMatch/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits
   srcMatchFull:
