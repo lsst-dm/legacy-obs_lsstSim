@@ -116,7 +116,7 @@ class ProcessCalibLsstSimTask(IsrTask):
             exp = afwImage.ExposureF(masterFrame)
             self.copyMetadata(exp, expmeta, calibType)
             exp.setDetector(ampDetector)
-            exp.setWcs(afwImage.Wcs())
+            exp.setWcs(None)
             exp.setCalib(expcalib)
             if calibType is 'flat':
                 exp.setFilter(expfilter)

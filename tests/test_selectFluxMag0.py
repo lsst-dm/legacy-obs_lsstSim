@@ -84,7 +84,7 @@ class ScaleLsstSimZeroPointTaskTestCase(unittest.TestCase):
         metadata.set("CUNIT1", "deg")
         metadata.set("CUNIT2", "deg")
         # exposure needs a wcs and a bbox
-        wcs = afwImage.makeWcs(metadata)
+        wcs = afwGeom.makeSkyWcs(metadata)
         bbox = afwGeom.Box2I(afwGeom.Point2I(327750, 235750), afwGeom.Extent2I(xNumPix, yNumPix))
         exposure = afwImage.ExposureF(bbox, wcs)
         mi = exposure.getMaskedImage()

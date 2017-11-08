@@ -35,7 +35,7 @@ except ImportError:
 import sys
 import lsst.daf.base as dafBase
 from lsst.afw.fits import readMetadata
-import lsst.afw.image as afwImage
+from lsst.afw.geom import makeSkyWcs
 import lsst.skypix as skypix
 
 
@@ -139,7 +139,7 @@ def processRaft(raftDir, conn, done, qsp):
             id = row[0]
             break
 
-        wcs = afwImage.makeWcs(md)
+        wcs = makeSkyWcs(md)
         poly = skypix.imageToPolygon(wcs,
                                      md.get("NAXIS1"), md.get("NAXIS2"),
                                      padRad=0.000075)  # about 15 arcsec
