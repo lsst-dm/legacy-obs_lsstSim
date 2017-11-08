@@ -327,6 +327,7 @@ class LsstSimMapper(CameraMapper):
 
 ###############################################################################
 
+
 for dsType in ("raw", "postISR"):
     setattr(LsstSimMapper, "std_" + dsType + "_md",
             lambda self, item, dataId: self._setAmpExposureId(item, dataId))

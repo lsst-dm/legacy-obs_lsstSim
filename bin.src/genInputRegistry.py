@@ -151,9 +151,10 @@ def processRaft(raftDir, conn, done, qsp):
 
         nProcessed += 1
 
-    print(raftDir, \
-        "... %d processed, %d skipped, %d unrecognized" % \
-        (nProcessed, nSkipped, nUnrecognized), file=sys.stderr)
+    print(raftDir,
+          "... %d processed, %d skipped, %d unrecognized" %
+          (nProcessed, nSkipped, nUnrecognized), file=sys.stderr)
+
 
 if __name__ == "__main__":
     parser = OptionParser(usage="""%prog [options] DIR ...
