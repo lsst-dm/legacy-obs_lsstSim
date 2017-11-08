@@ -34,6 +34,7 @@ except ImportError:
     import sqlite as sqlite3
 import sys
 import lsst.daf.base as dafBase
+from lsst.afw.fits import readMetadata
 import lsst.afw.image as afwImage
 import lsst.skypix as skypix
 
@@ -123,7 +124,7 @@ def processRaft(raftDir, conn, done, qsp):
             nSkipped += 1
             continue
 
-        md = afwImage.readMetadata(fits)
+        md = readMetadata(fits)
         expTime = md.get("EXPTIME")
         mjdObs = md.get("MJD-OBS")
         taiObs = dafBase.DateTime(mjdObs, dafBase.DateTime.MJD,
