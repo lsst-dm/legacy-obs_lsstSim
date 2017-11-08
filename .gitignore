@@ -8,6 +8,8 @@ config.log
 *.dylib
 *.cfgc
 *.pyc
+.cache/
+pytest_session.txt
 doc/html
 doc/*.tag
 doc/*.inc
