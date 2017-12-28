@@ -23,9 +23,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import astropy.units
+
 from lsst.afw.image import VisitInfo, RotType
 from lsst.afw.geom import degrees
 from lsst.afw.coord import Coord, IcrsCoord, Observatory, Weather
+from lsst.afw.coord.refraction import defaultWeather
 from lsst.obs.base import MakeRawVisitInfo
 
 __all__ = ["MakeLsstSimRawVisitInfo"]
@@ -62,13 +65,23 @@ class MakeLsstSimRawVisitInfo(MakeRawVisitInfo):
         argDict["boresightRotAngle"] = -self.popAngle(md, "ROTANG")
         argDict["rotType"] = RotType.SKY
         argDict["observatory"] = self.observatory
-        argDict["weather"] = Weather(
-            self.popFloat(md, "TEMPERA"),
-            self.pascalFromMmHg(self.popFloat(md, "PRESS")),
-            float("nan"),
-        )
+        weather = defaultWeather(self.observatory.getElevation())
+        temperature = self.defaultMetadata(self.popFloat(md, "TEMPERA"), weather.getAirTemperature(),
+                                           minimum=-10, maximum=40.)
+        pressure = self.defaultMetadata(self.pascalFromMmHg(self.popFloat(md, "PRESS")),
+                                        weather.getAirPressure(), minimum=50000., maximum=90000.)
+        humidity = 40.  # Not currently supplied by phosim, so set to a typical value.
+        argDict["weather"] = Weather(temperature, pressure, humidity)
+        longitude = argDict["observatory"].getLongitude()
+        RA = argDict["boresightRaDec"][0]
         # phosim doesn't supply LST, HA, or UT1, and the alt/az/ra/dec/time can be inconsistent.
         # We will leave ERA as NaN until a better answer is available.
+        try:
+            # Other simulation tools don't have the same problem, and need hour angle if it is available.
+            HA = self.popAngle(md, "HA", units=astropy.units.h)
+            argDict['era'] = HA + RA - longitude
+        except:
+            self.log.warn("Hour angle missing from metadata, will be NAN")
         return VisitInfo(**argDict)
 
     def getDateAvg(self, md, exposureTime):

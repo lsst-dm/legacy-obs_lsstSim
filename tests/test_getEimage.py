@@ -116,10 +116,11 @@ class GetEimageTestCase(lsst.utils.tests.TestCase):
             humid_bool = np.isnan(w1.getHumidity()) and np.isnan(w2.getHumidity())
             if not humid_bool:
                 humid_bool = (w1.getHumidity() == w2.getHumidity())
-            self.assertTrue(w1.getAirPressure() == w2.getAirPressure() and w1.getAirTemperature() ==
-                            w2.getAirTemperature() and humid_bool)
+            self.assertEqual(w1.getAirTemperature(), w2.getAirTemperature())
+            self.assertEqual(w1.getAirPressure(), w2.getAirPressure())
+            self.assertTrue(humid_bool)
 
-        weather = Weather(20, 69327.64145580001, np.nan)
+        weather = Weather(20, 69327.64145580001, 40.)
         test_weather(weather, self.visit_info.getWeather())
 
 

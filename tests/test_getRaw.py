@@ -53,6 +53,7 @@ class GetRawTestCase(lsst.utils.tests.TestCase):
         self.obs_elevation = 2663.0
         self.weath_airTemperature = 5.0
         self.weath_airPressure = MakeRawVisitInfo.pascalFromMmHg(520.0)
+        self.weath_humidity = 40.
 
     def tearDown(self):
         del self.butler
@@ -88,7 +89,7 @@ class GetRawTestCase(lsst.utils.tests.TestCase):
         weather = visitInfo.getWeather()
         self.assertAlmostEqual(weather.getAirTemperature(), self.weath_airTemperature)
         self.assertAlmostEqual(weather.getAirPressure(), self.weath_airPressure)
-        self.assertTrue(math.isnan(weather.getHumidity()))
+        self.assertAlmostEqual(weather.getHumidity(), self.weath_humidity)
 
 
 class MemoryTester(lsst.utils.tests.MemoryTestCase):
