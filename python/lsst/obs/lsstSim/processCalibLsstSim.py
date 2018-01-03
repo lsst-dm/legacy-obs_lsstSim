@@ -169,7 +169,7 @@ class ProcessCalibLsstSimTask(IsrTask):
             if detector.getId() > 8:
                 d.shift(0, height - 2*d.getBBox().getMinY()-d.getBBox().getHeight())
         # Should saturation be interpolated as well?
-        # sdl = self.isr.getDefectListFromMask(masterFrame, 'SAT', growFootprints=0)
+        # sdl = self.isr.getDefectListFromMask(masterFrame, 'SAT')
         # for d in sdl:
         #     dl.push_back(d)
         self.isr.maskPixelsFromDefectList(masterFrame, dl, maskName='BAD')
