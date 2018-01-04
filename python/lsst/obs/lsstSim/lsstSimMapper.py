@@ -287,12 +287,7 @@ class LsstSimMapper(CameraMapper):
 
     def std_eimage(self, item, dataId):
         """Standardize a eimage dataset by converting it to an Exposure instead of an Image"""
-        exposure = obsBase.exposureFromImage(item, logger=self.log)
-        exposureId = self._computeCcdExposureId(dataId)
-        md = exposure.getMetadata()
-        visitInfo = self.makeRawVisitInfo(md=md, exposureId=exposureId)
-        exposure.getInfo().setVisitInfo(visitInfo)
-        return self._standardizeExposure(self.exposures['eimage'], exposure, dataId, trimmed=True)
+        return self._standardizeExposure(self.exposures['eimage'], item, dataId, trimmed=True)
 
 ###############################################################################
 
