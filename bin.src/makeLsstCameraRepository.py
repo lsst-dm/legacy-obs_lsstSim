@@ -156,15 +156,15 @@ def makeAmpTables(segmentsFile, gainFile):
             ndatay = y1 - y0 + 1
             # Because in versions v3.3.2 and earlier there was no overscan, we use the extended register
             # as the overscan region
-            prescan = 1
-            hoverscan = 0
-            extended = 4
-            voverscan = 0
+            prescan = els[15]
+            hoverscan = els[16]
+            extended = els[17]
+            voverscan = els[18]
             rawBBox = afwGeom.Box2I(afwGeom.Point2I(0, 0),
                                     afwGeom.Extent2I(extended+ndatax+hoverscan, prescan+ndatay+voverscan))
             rawDataBBox = afwGeom.Box2I(afwGeom.Point2I(extended, prescan), afwGeom.Extent2I(ndatax, ndatay))
-            rawHorizontalOverscanBBox = afwGeom.Box2I(afwGeom.Point2I(0, prescan),
-                                                      afwGeom.Extent2I(extended, ndatay))
+            rawHorizontalOverscanBBox = afwGeom.Box2I(afwGeom.Point2I(extended+ndatax, prescan),
+                                                      afwGeom.Extent2I(hoverscan, ndatay))
             rawVerticalOverscanBBox = afwGeom.Box2I(afwGeom.Point2I(extended, prescan+ndatay),
                                                     afwGeom.Extent2I(ndatax, voverscan))
             rawPrescanBBox = afwGeom.Box2I(afwGeom.Point2I(extended, 0), afwGeom.Extent2I(ndatax, prescan))
