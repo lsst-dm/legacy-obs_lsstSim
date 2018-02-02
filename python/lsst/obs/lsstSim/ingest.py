@@ -43,11 +43,11 @@ class SimParseTask(ParseTask):
 
     def translate_ccd(self, md):
         sensor_str = md.get('CHIPID')
-        return ",".join(sensor_str[-2:])
+        return ",".join(sensor_str[5:7])
 
     def translate_sensor(self, md):
         sensor_str = md.get('CHIPID')
-        return ",".join(sensor_str[-2:])
+        return ",".join(sensor_str[5:7])
 
     def translate_raft(self, md):
         sensor_str = md.get('CHIPID')

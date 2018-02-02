@@ -154,17 +154,25 @@ def makeAmpTables(segmentsFile, gainFile):
 
             ndatax = x1 - x0 + 1
             ndatay = y1 - y0 + 1
-            # Because in versions v3.3.2 and earlier there was no overscan, we use the extended register
-            # as the overscan region
-            prescan = els[15]
-            hoverscan = els[16]
-            extended = els[17]
-            voverscan = els[18]
+
+            oprescan = int(els[15])
+            ohoverscan = int(els[16])
+            oextended = int(els[17])
+            ovoverscan = int(els[18])
+            # There is a bug in phosim that makes the long axis the serial direction, but that isn't the
+            # correct geometry for the LSST chips.  We will assume the correct orientation, but that means
+            # there is no overscan.  We can use the prescan for this.
+            # Reorganize for the correct orientation
+            prescan = oextended
+            hoverscan = ovoverscan
+            extended = oprescan
+            voverscan = ohoverscan
             rawBBox = afwGeom.Box2I(afwGeom.Point2I(0, 0),
                                     afwGeom.Extent2I(extended+ndatax+hoverscan, prescan+ndatay+voverscan))
             rawDataBBox = afwGeom.Box2I(afwGeom.Point2I(extended, prescan), afwGeom.Extent2I(ndatax, ndatay))
-            rawHorizontalOverscanBBox = afwGeom.Box2I(afwGeom.Point2I(extended+ndatax, prescan),
-                                                      afwGeom.Extent2I(hoverscan, ndatay))
+            # There is no overscan in this configuration so use the extended register
+            rawHorizontalOverscanBBox = afwGeom.Box2I(afwGeom.Point2I(0, prescan),
+                                                      afwGeom.Extent2I(extended, ndatay))
             rawVerticalOverscanBBox = afwGeom.Box2I(afwGeom.Point2I(extended, prescan+ndatay),
                                                     afwGeom.Extent2I(ndatax, voverscan))
             rawPrescanBBox = afwGeom.Box2I(afwGeom.Point2I(extended, 0), afwGeom.Extent2I(ndatax, prescan))
@@ -238,20 +246,21 @@ def makeDetectorConfigs(detectorLayoutFile, phosimVersion):
             detConfig.bbox_y0 = 0
             detConfig.bbox_x1 = int(els[5]) - 1
             detConfig.bbox_y1 = int(els[4]) - 1
-            detConfig.detectorType = detTypeMap[els[8]]
+            detConfig.detectorType = detTypeMap[els[9]]
             detConfig.serial = els[0]+"_"+phosimVersion
 
             # Convert from microns to mm.
-            detConfig.offset_x = float(els[1])/1000. + float(els[12])
-            detConfig.offset_y = float(els[2])/1000. + float(els[13])
+            detConfig.offset_x = float(els[1])/1000. + float(els[13])
+            detConfig.offset_y = float(els[2])/1000. + float(els[14])
 
+            # Do we also need a piston term?
             detConfig.refpos_x = (int(els[5]) - 1.)/2.
             detConfig.refpos_y = (int(els[4]) - 1.)/2.
             # TODO translate between John's angles and Orientation angles.
             # It's not an issue now because there is no rotation except about z in John's model.
-            detConfig.yawDeg = 90.*nQuarter + float(els[9])
-            detConfig.pitchDeg = float(els[10])
-            detConfig.rollDeg = float(els[11])
+            detConfig.yawDeg = 90.*nQuarter + float(els[10])
+            detConfig.pitchDeg = float(els[11])
+            detConfig.rollDeg = float(els[12])
             detConfig.pixelSize_x = float(els[3])/1000.
             detConfig.pixelSize_y = float(els[3])/1000.
             detConfig.transposeDetector = False
