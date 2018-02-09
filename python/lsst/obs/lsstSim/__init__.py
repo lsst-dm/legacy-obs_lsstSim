@@ -29,3 +29,4 @@ from .lsstSimIsrTask import *
 from .utils import *
 from ._edgeRolloffFunctor import *
 from .makeLsstSimRawVisitInfo import *
+from .simbutlerimage import *

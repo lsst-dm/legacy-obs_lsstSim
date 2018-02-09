@@ -243,6 +243,21 @@ datasets:
   dcrCoadd_forced_metadata:
     template: dcrCoadd_forced_metadata/%(filter)s/%(tract)d/%(patch)s.boost
 
+  # Focalplane summary plots
+  focalplane_summary_fits:
+    level: Visit
+    persistable: MaskedImageF
+    python: lsst.afw.image.MaskedImageFF
+    storage: FitsStorage
+    tables: raw
+    template: focalplane_summary/v%(visit)d-f%(filter)s-focalplane-summary.fits.gz
+  focalplane_summary_png:
+    level: Visit
+    persistable: None
+    python: builtins.str
+    storage: TextStorage
+    template: focalplane_summary/v%(visit)d-f%(filter)s-focalplane-summary.png
+
   # Plots for analysis QA
   plotCoadd:
     persistable: None
