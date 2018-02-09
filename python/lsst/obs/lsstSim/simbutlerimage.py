@@ -1,6 +1,7 @@
 from lsst.afw.cameraGeom.utils import ButlerImage, calcRawCcdBBox
 import lsst.afw.image as afwImage
 import lsst.afw.math as afwMath
+import lsst.afw.geom as afwGeom
 from lsst.afw.math import rotateImageBy90
 from lsst.daf.persistence.butlerExceptions import NoResults
 
@@ -33,6 +34,12 @@ class SimButlerImage(ButlerImage):
                 im.setMaskedImage(rotateImageBy90(im.getMaskedImage(), 2))
                 binned_im = afwMath.binImage(im.getMaskedImage(), sensor_bin_size)
                 self.butler.put(binned_im, 'binned_sensor_fits', **self.kwargs)
+                (x, y) = binned_im.getDimensions()
+                boxes = {'A':afwGeom.Box2I(afwGeom.PointI(0,y/2), afwGeom.ExtentI(x, y/2)),
+                         'B':afwGeom.Box2I(afwGeom.PointI(0,0), afwGeom.ExtentI(x, y/2))}
+                for half in ('A', 'B'):
+                    box = boxes[half]
+                    self.butler.put(afwImage.MaskedImageF(binned_im, box), 'binned_sensor_fits_halves', half=half, **self.kwargs)
             except (NoResults, RuntimeError):
                 pass
             self.kwargs['sensorBinSize'] = sensor_bin_size

@@ -250,14 +250,21 @@ datasets:
     python: lsst.afw.image.MaskedImageF
     storage: FitsStorage
     tables: raw
-    template: focalplane_summary/v%(visit)d-f%(filter)s-focalplane-summary.fits.gz
+    template: focalplane_summary/v%(visit)d-f%(filter)s-focalplane-summary.fz
   binned_sensor_fits:
     level: Visit
     persistable: MaskedImageF
     python: lsst.afw.image.MaskedImageF
     storage: FitsStorage
     tables: raw
-    template: binned_sensor/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits
+    template: binned_sensor/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fz
+  binned_sensor_fits_halves:
+    level: Visit
+    persistable: MaskedImageF
+    python: lsst.afw.image.MaskedImageF
+    storage: FitsStorage
+    tables: raw
+    template: binned_sensor_halves/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s_%(half)s.fz
   focalplane_summary_png:
     level: Visit
     persistable: None
