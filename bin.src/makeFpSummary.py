@@ -7,8 +7,9 @@ from lsst.afw.cameraGeom import utils as cgu
 from lsst.afw.display.rgb import ZScaleMapping, writeRGB
 
 class FocalplaneSummaryConfig(pexConfig.Config):
-    binSize = pexConfig.Field(dtype=int, default=50, doc="pixels to bin")
+    binSize = pexConfig.Field(dtype=int, default=50, doc="pixels to bin for the focalplane summary")
     contrast = pexConfig.Field(dtype=float, default=1, doc="contrast factor")
+    sensorBinSize = pexConfig.Field(dtype=int, default=4, doc="pixels to bin per sensor")
 
 
 class FocalplaneSummaryTask(pipeBase.CmdLineTask):
@@ -22,7 +23,7 @@ class FocalplaneSummaryTask(pipeBase.CmdLineTask):
     def run(self, expRef, butler):
         """Make summary plots of full focalplane images.
         """
-        sbi = SimButlerImage(butler, type='eimage', visit=expRef.dataId['visit'])
+        sbi = SimButlerImage(butler, type='eimage', sensorBinSize=self.config.sensorBinSize, visit=expRef.dataId['visit'])
         im = cgu.showCamera(butler.get('camera'), imageSource=sbi, binSize=self.config.binSize)
         butler.put(im, 'focalplane_summary_fits')
         zmap = ZScaleMapping(im, contrast=self.config.contrast)
