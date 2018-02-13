@@ -5,6 +5,8 @@ from lsst.pipe.drivers.utils import ButlerTaskRunner
 from lsst.obs.lsstSim import SimButlerImage
 from lsst.afw.cameraGeom import utils as cgu
 from lsst.afw.display.rgb import ZScaleMapping, writeRGB
+import lsst.afw.image as afwImage
+import lsst.afw.geom as afwGeom
 
 class FocalplaneSummaryConfig(pexConfig.Config):
     binSize = pexConfig.Field(dtype=int, default=50, doc="pixels to bin for the focalplane summary")
@@ -23,7 +25,29 @@ class FocalplaneSummaryTask(pipeBase.CmdLineTask):
     def run(self, expRef, butler):
         """Make summary plots of full focalplane images.
         """
-        sbi = SimButlerImage(butler, type='eimage', sensorBinSize=self.config.sensorBinSize, visit=expRef.dataId['visit'])
+        sbi = SimButlerImage(butler, type='eimage', visit=expRef.dataId['visit'])
+        # Get the per ccd images
+        def parse_name_to_dataId(name_str):
+            raft, sensor = name_str.split()
+            return {'raft':raft[-3:], 'sensor':sensor[-3:]}
+        for ccd in butler.get('camera'):
+            data_id = parse_name_to_dataId(ccd.getName())
+            data_id.update(expRef.dataId)
+            binned_im = sbi.getCcdImage(ccd, binSize=self.config.sensorBinSize, as_masked_image=True)[0]
+            try:
+                butler.put(binned_im, 'binned_sensor_fits', **data_id)
+            except RuntimeError:
+                # butler couldn't put the image
+                continue
+            butler.put(binned_im, 'binned_sensor_fits', **data_id)
+            (x, y) = binned_im.getDimensions()
+            boxes = {'A':afwGeom.Box2I(afwGeom.PointI(0,y/2), afwGeom.ExtentI(x, y/2)),
+                     'B':afwGeom.Box2I(afwGeom.PointI(0,0), afwGeom.ExtentI(x, y/2))}
+            for half in ('A', 'B'):
+                box = boxes[half]
+                butler.put(afwImage.MaskedImageF(binned_im, box), 'binned_sensor_fits_halves', half=half,
+                           **data_id)
+
         im = cgu.showCamera(butler.get('camera'), imageSource=sbi, binSize=self.config.binSize)
         butler.put(im, 'focalplane_summary_fits')
         zmap = ZScaleMapping(im, contrast=self.config.contrast)
