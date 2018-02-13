@@ -1,20 +1,27 @@
-from lsst.afw.cameraGeom.utils import ButlerImage, calcRawCcdBBox
+from lsst.afw.cameraGeom.utils import ButlerImage
 import lsst.afw.image as afwImage
-import lsst.afw.math as afwMath
-import lsst.afw.geom as afwGeom
 from lsst.afw.math import rotateImageBy90
 from lsst.daf.persistence.butlerExceptions import NoResults
 
 
 class SimButlerImage(ButlerImage):
 
-    def getCcdImage(self, ccd, imageFactory=afwImage.ImageF, binSize=1):
-        """Return an image of the specified ccd, and also the (possibly updated) ccd"""
+    def getCcdImage(self, ccd, imageFactory=afwImage.ImageF, binSize=1, as_masked_image=False):
+        """Return an image of the specified ccd, and also the (possibly updated) ccd
 
-        if self.isTrimmed:
-            bbox = ccd.getBBox()
-        else:
-            bbox = calcRawCcdBBox(ccd)
+        Parameters
+        ----------
+        ccd : `afwImage.CameraGeom.Detector`
+           Detector for the constructed image
+        imageFactory : `afwImage.Image`, optional
+           Image like factory for producing default images (`afwImage.ImageF` by default).
+        binSize : `int`, optional
+           Pixels to bin together.  Symmetric in x and y (1 by default)
+        as_masked_image : `bool`, optional
+           Return the image as an `afwImage.MaskedImage`? (False by default.  This returns an
+           `afwImage.Image`)
+        """
+        bbox = ccd.getBBox()
 
         def parse_name_to_dataId(name_str):
             raft, sensor = name_str.split()
@@ -25,30 +32,24 @@ class SimButlerImage(ButlerImage):
             im = None
             cid = ccd.getName()
             did = parse_name_to_dataId(cid)
-            # TODO override the constructor to handle this as state
-            sensor_bin_size = self.kwargs.pop('sensorBinSize')
             self.kwargs.update(did)
             try:
                 im = self.butler.get(self.type, **self.kwargs)
                 ccd = im.getDetector()  # possibly modified by assembleCcdTask
                 im.setMaskedImage(rotateImageBy90(im.getMaskedImage(), 2))
-                binned_im = afwMath.binImage(im.getMaskedImage(), sensor_bin_size)
-                self.butler.put(binned_im, 'binned_sensor_fits', **self.kwargs)
-                (x, y) = binned_im.getDimensions()
-                boxes = {'A':afwGeom.Box2I(afwGeom.PointI(0,y/2), afwGeom.ExtentI(x, y/2)),
-                         'B':afwGeom.Box2I(afwGeom.PointI(0,0), afwGeom.ExtentI(x, y/2))}
-                for half in ('A', 'B'):
-                    box = boxes[half]
-                    self.butler.put(afwImage.MaskedImageF(binned_im, box), 'binned_sensor_fits_halves', half=half, **self.kwargs)
             except (NoResults, RuntimeError):
                 pass
-            self.kwargs['sensorBinSize'] = sensor_bin_size
-
 
         if im is None:
-            return self._prepareImage(ccd, imageFactory(*bbox.getDimensions()), binSize), ccd
+            if not as_masked_image:
+                return self._prepareImage(ccd, imageFactory(*bbox.getDimensions()), binSize), ccd
+            else:
+                return self._prepareImage(ccd, afwImage.makeMaskedImage(imageFactory(*bbox.getDimensions())), binSize), ccd
 
         if self.type == "raw":
             raise ValueError("This class only handles ccd size images")
 
-        return self._prepareImage(ccd, im.getMaskedImage().getImage(), binSize), ccd
+        if not as_masked_image:
+            return self._prepareImage(ccd, im.getMaskedImage().getImage(), binSize), ccd
+        else:
+            return self._prepareImage(ccd, im.getMaskedImage(), binSize), ccd
