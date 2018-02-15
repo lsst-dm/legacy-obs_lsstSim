@@ -37,8 +37,8 @@ exposures:
     template: raw/v%(visit)d-f%(filter)s/E%(snap)03d/R%(raft)s/S%(sensor)s/imsim_%(visit)d_R%(raft)s_S%(sensor)s_C%(channel)s_E%(snap)03d.fits.gz
   eimage:
     level: Ccd
-    persistable: DecoratedImageU
-    python: lsst.afw.image.DecoratedImageU
+    persistable: DecoratedImageF
+    python: lsst.afw.image.DecoratedImageF
     storage: FitsStorage
     tables: raw
     template: eimage/v%(visit)d-f%(filter)s/E%(snap)03d/R%(raft)s/eimage_%(visit)d_R%(raft)s_S%(sensor)s_E%(snap)03d.fits.gz
@@ -242,6 +242,35 @@ datasets:
     template: config/dcrCoadd_forced.py
   dcrCoadd_forced_metadata:
     template: dcrCoadd_forced_metadata/%(filter)s/%(tract)d/%(patch)s.boost
+
+  # Focalplane summary plots
+  focalplane_summary_fits:
+    level: Visit
+    persistable: MaskedImageF
+    python: lsst.afw.image.MaskedImageF
+    storage: FitsStorage
+    tables: raw
+    template: focalplane_summary/v%(visit)d-f%(filter)s-focalplane-summary.fits
+  binned_sensor_fits:
+    level: Visit
+    persistable: MaskedImageF
+    python: lsst.afw.image.MaskedImageF
+    storage: FitsStorage
+    tables: raw
+    template: binned_sensor/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits
+  binned_sensor_fits_halves:
+    level: Visit
+    persistable: MaskedImageF
+    python: lsst.afw.image.MaskedImageF
+    storage: FitsStorage
+    tables: raw
+    template: binned_sensor_halves/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s_%(half)s.fits
+  focalplane_summary_png:
+    level: Visit
+    persistable: None
+    python: builtins.str
+    storage: TextStorage
+    template: focalplane_summary/v%(visit)d-f%(filter)s-focalplane-summary.png
 
   # Plots for analysis QA
   plotCoadd:

@@ -44,6 +44,11 @@ class EimageIsrConfig(pexConfig.Config):
     maskEdgeBorder = pexConfig.Field(dtype=int, default=0, doc="Set mask to EDGE for a border of x pixels")
     sat_val = pexConfig.Field(dtype=int, default=100000, doc="Value at which to detect saturation")
     interp_size = pexConfig.Field(dtype=float, default=0.5, doc="Size of interpolation kernel in arcsec")
+    datasetType = pexConfig.Field(
+        dtype=str,
+        doc="Dataset type for input data; users will typically leave this alone.",
+        default="eimage",
+    )
 
 
 class EimageIsrTask(pipeBase.Task):
