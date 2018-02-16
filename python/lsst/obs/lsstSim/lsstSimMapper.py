@@ -28,10 +28,9 @@ import re
 
 import lsst.obs.base as obsBase
 import lsst.daf.base as dafBase
-import lsst.afw.image as afwImage
+from lsst.afw.geom import makeSkyWcs
 import lsst.afw.image.utils as afwImageUtils
 import lsst.afw.coord as afwCoord
-import lsst.afw.geom as afwGeom
 import lsst.daf.persistence as dafPersist
 from .makeLsstSimRawVisitInfo import MakeLsstSimRawVisitInfo
 
@@ -274,13 +273,8 @@ class LsstSimMapper(CameraMapper):
             wcs = exposure.getWcs()
             origin = wcs.getSkyOrigin()
             refCoord = afwCoord.Fk5Coord(
-                origin.getLongitude(), origin.getLatitude(), epoch)
-            newRefCoord = refCoord.precess(2000.)
-            crval = afwGeom.PointD()
-            crval.setX(newRefCoord.getRa().asDegrees())
-            crval.setY(newRefCoord.getDec().asDegrees())
-            wcs = afwImage.Wcs(crval, wcs.getPixelOrigin(),
-                               wcs.getCDMatrix())
+                origin.getLongitude(), origin.getLatitude(), epoch).toIcrs()
+            wcs = makeSkyWcs(crpix=wcs.getPixelOrigin(), crval=refCoord, cdMatrix=wcs.getCdMatrix())
             exposure.setWcs(wcs)
 
         return exposure
@@ -326,6 +320,7 @@ class LsstSimMapper(CameraMapper):
         return {"ccdExposureId": ccdExposureId, "sdqaRatingScope": "CCD"}
 
 ###############################################################################
+
 
 for dsType in ("raw", "postISR"):
     setattr(LsstSimMapper, "std_" + dsType + "_md",

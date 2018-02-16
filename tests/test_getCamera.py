@@ -40,7 +40,7 @@ class GetCameraTestCase(unittest.TestCase):
     def testCamera(self):
         """Test retrieval of the camera from the butler"""
         camera = self.butler.get("camera", immediate=True)
-        self.assertEquals(len(camera), 205)
+        self.assertEqual(len(camera), 205)
 
 
 class MemoryTester(lsst.utils.tests.MemoryTestCase):
