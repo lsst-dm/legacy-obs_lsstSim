@@ -5,7 +5,7 @@ from lsst.pipe.drivers.utils import ButlerTaskRunner
 from lsst.obs.lsstSim import SimButlerImage
 from lsst.afw.cameraGeom import utils as cgu
 from lsst.afw.display.rgb import ZScaleMapping, writeRGB
-from lsst.afw.math import rotateImageBy90
+from lsst.afw.math import rotateImageBy90, flipImage
 import lsst.afw.image as afwImage
 import lsst.afw.geom as afwGeom
 import lsst.afw.fits
@@ -53,6 +53,7 @@ class FocalplaneSummaryTask(pipeBase.CmdLineTask):
 
         im = cgu.showCamera(butler.get('camera'), imageSource=sbi, binSize=self.config.binSize)
         butler.put(im, 'focalplane_summary_fits')
+        im  = flipImage(im, False, True)
         zmap = ZScaleMapping(im, contrast=self.config.contrast)
         rgb = zmap.makeRgbImage(im, im, im)
         file_name = expRef.get('focalplane_summary_png_filename')
