@@ -5,8 +5,11 @@ from lsst.pipe.drivers.utils import ButlerTaskRunner
 from lsst.obs.lsstSim import SimButlerImage
 from lsst.afw.cameraGeom import utils as cgu
 from lsst.afw.display.rgb import ZScaleMapping, writeRGB
+from lsst.afw.math import rotateImageBy90
 import lsst.afw.image as afwImage
 import lsst.afw.geom as afwGeom
+import lsst.afw.fits
+lsst.afw.fits.setAllowImageCompression(False)
 
 class FocalplaneSummaryConfig(pexConfig.Config):
     binSize = pexConfig.Field(dtype=int, default=50, doc="pixels to bin for the focalplane summary")
@@ -34,12 +37,12 @@ class FocalplaneSummaryTask(pipeBase.CmdLineTask):
             data_id = parse_name_to_dataId(ccd.getName())
             data_id.update(expRef.dataId)
             binned_im = sbi.getCcdImage(ccd, binSize=self.config.sensorBinSize, as_masked_image=True)[0]
+            binned_im = rotateImageBy90(binned_im, ccd.getOrientation().getNQuarter())
             try:
                 butler.put(binned_im, 'binned_sensor_fits', **data_id)
             except RuntimeError:
                 # butler couldn't put the image
                 continue
-            butler.put(binned_im, 'binned_sensor_fits', **data_id)
             (x, y) = binned_im.getDimensions()
             boxes = {'A':afwGeom.Box2I(afwGeom.PointI(0,y/2), afwGeom.ExtentI(x, y/2)),
                      'B':afwGeom.Box2I(afwGeom.PointI(0,0), afwGeom.ExtentI(x, y/2))}
