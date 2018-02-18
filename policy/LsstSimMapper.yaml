@@ -265,7 +265,6 @@ datasets:
     storage: FitsStorage
     tables: raw
     template: binned_sensor_halves/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s_%(half)s.fits
-    recipe: noCompression
   focalplane_summary_png:
     level: Visit
     persistable: None
