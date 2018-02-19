@@ -63,9 +63,13 @@ class FocalplaneSummaryTask(pipeBase.CmdLineTask):
     def _makeArgumentParser(cls, *args, **kwargs):
         # Pop doBatch keyword before passing it along to the argument parser
         kwargs.pop("doBatch", False)
+
+        dstype = pipeBase.DatasetArgument('--dstype',default='eimage',
+                                          help="dataset type to process from input data repository (i.e., 'eimage', 'calexp')")
+
         parser = pipeBase.ArgumentParser(name="focalplaneSummary",
                                          *args, **kwargs)
-        parser.add_id_argument("--id", datasetType="eimage", level="visit",
+        parser.add_id_argument("--id", datasetType=dstype, level="visit",
                                help="data ID, e.g. --id visit=12345")
         return parser
 
