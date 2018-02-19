@@ -66,17 +66,8 @@ exposures:
     template: deepCoadd/%(filter)s/%(tract)d/%(patch)stempExp/v%(visit)d-f%(filter)s.fits
   deepCoadd_psfMatchedWarp:
     template: deepCoadd/%(filter)s/%(tract)d/%(patch)stempExp/psfMatched-v%(visit)d-f%(filter)s.fits
-  wcs:
+  wcs:  # deprecated in favor of jointcal_wcs; retained to read old outputs
     template: wcs/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.wcs.fits
-  fcr:
-    level: Ccd
-    persistable: ExposureI
-    python: lsst.afw.image.ExposureI
-    storage: FitsStorage
-    tables:
-    - raw
-    - raw_visit
-    template: fcr/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fcr.fits
   dcrCoadd_directWarp:
     template: dcrCoadd/%(filter)s%(subfilter)s/%(tract)d/%(patch)stempExp/v%(visit)d-f%(filter)s%(subfilter)s.fits
   deepDiff_differenceExp:
@@ -163,8 +154,12 @@ datasets:
     storage: FitsCatalogStorage
     tables: raw
     template: icMatch/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits
-  photoCalib:
+  photoCalib:   # deprecated in favor of jointcal_photoCalib; retained to read old outputs.
     template: jointcal-results/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.photoCalib.fits
+  jointcal_wcs:  # astrometric calibration produced by jointcal
+    template: 'jointcal-results/%(filter)s/%(tract)04d/jointcal_wcs-v%(visit)d_R%(raft)s_S%(sensor)s.fits'
+  jointcal_photoCalib:  # photometric calibration produced by jointcal
+    template: 'jointcal-results/%(filter)s/%(tract)04d/jointcal_photoCalib-v%(visit)d_R%(raft)s_S%(sensor)s.fits'
   srcMatch:
     template: srcMatch/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits
   srcMatchFull:
