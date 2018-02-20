@@ -2,8 +2,20 @@
 """
 from __future__ import print_function
 from lsst.obs.lsstSim import LsstSimIsrTask
-
 config.isr.retarget(LsstSimIsrTask)
+config.isr.doBias=False
+config.isr.doDark=False
+config.isr.doFlat=True
+config.isr.doFringe=False
+config.isr.doDefect=False
+config.isr.doSnapCombine=False
+config.isr.doAssembleCcd=False # we are doing this by hand
+config.charImage.doMeasurePsf=False
+config.calibrate.doAstrometry=False
+config.calibrate.doPhotoCal=False
+config.charImage.doApCorr=False
+config.calibrate.doApCorr=False
+
 # this was the default prior to DM-11521.  New default is 2000.
 config.calibrate.deblend.maxFootprintSize=0
 

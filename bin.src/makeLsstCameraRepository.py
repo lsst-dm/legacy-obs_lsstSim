@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 #
 # LSST Data Management System
 # Copyright 2014-2016 LSST Corporation.
@@ -163,10 +163,10 @@ def makeAmpTables(segmentsFile, gainFile):
             # correct geometry for the LSST chips.  We will assume the correct orientation, but that means
             # there is no overscan.  We can use the prescan for this.
             # Reorganize for the correct orientation
-            prescan = oextended
+            prescan = ohoverscan
             hoverscan = ovoverscan
             extended = oprescan
-            voverscan = ohoverscan
+            voverscan = oextended
             rawBBox = afwGeom.Box2I(afwGeom.Point2I(0, 0),
                                     afwGeom.Extent2I(extended+ndatax+hoverscan, prescan+ndatay+voverscan))
             rawDataBBox = afwGeom.Box2I(afwGeom.Point2I(extended, prescan), afwGeom.Extent2I(ndatax, ndatay))

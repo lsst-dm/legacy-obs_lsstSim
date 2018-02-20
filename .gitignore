@@ -24,3 +24,5 @@ bin/makeDefectMaps.py
 bin/makeLsstCameraRepository.py
 bin/processCalibLsstSim.py
 bin/processEimage.py
+bin/makeGainImages.py
+bin/processSimCcd.py

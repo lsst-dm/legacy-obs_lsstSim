@@ -1,5 +1,5 @@
 from glob import glob
-from lsst.pipe.tasks.ingest import ParseTask
+from lsst.pipe.tasks.ingestCalibs import CalibsParseTask
 from lsst.pipe.tasks.ingest import IngestTask
 
 __all__ = ['SimIngestTask', 'SimParseTask']
@@ -39,8 +39,8 @@ class SimIngestTask(IngestTask):
             self.register.addVisits(registry, dryrun=args.dryrun)
 
 
-class SimParseTask(ParseTask):
-
+# This can be used in general because CalibsParseTask inherits from ParseTask
+class SimCalibsParseTask(CalibsParseTask):
     def translate_ccd(self, md):
         sensor_str = md.get('CHIPID')
         return ",".join(sensor_str[5:7])
@@ -56,6 +56,11 @@ class SimParseTask(ParseTask):
     def translate_taiobs(self, md):
         import lsst.daf.base as dafBase
         return dafBase.DateTime(md.get('MJD-OBS'), dafBase.DateTime.MJD,
+                                dafBase.DateTime.TAI).toString(dafBase.DateTime.UTC)[:-1]
+
+    def translate_calibDate(self, md):
+        import lsst.daf.base as dafBase
+        return dafBase.DateTime(md.get('CALDATE'), dafBase.DateTime.MJD,
                                 dafBase.DateTime.TAI).toString(dafBase.DateTime.UTC)[:-1]
 
     def translate_channel(self, md):
@@ -75,6 +80,7 @@ class SimParseTask(ParseTask):
         else:
             return int(filename_str[-3:])
 
+class SimParseTask(SimCalibsParseTask):
     def getDestination(self, butler, info, filename):
         """Get destination for the file
 
@@ -90,3 +96,4 @@ class SimParseTask(ParseTask):
             return butler.get("eimage_filename", info)[0]
         else:
             raise RuntimeError('unrecognized filename: %s'%(filename))
+

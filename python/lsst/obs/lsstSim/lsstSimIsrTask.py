@@ -79,6 +79,7 @@ class LsstSimIsrTask(IsrTask):
     </DL>
     """
     ConfigClass = LsstSimIsrConfig
+    _DefaultName = 'LsstSimIsrTask'
 
     def __init__(self, **kwargs):
         IsrTask.__init__(self, **kwargs)
@@ -125,13 +126,27 @@ class LsstSimIsrTask(IsrTask):
         """
         self.log.info("Performing ISR on sensor %s", sensorRef.dataId)
         snapDict = dict()
+        amp_map=['0,0', '0,1', '0,2', '0,3', '0,4', '0,5', '0,6', '0,7',
+                 '1,0', '1,1', '1,2', '1,3', '1,4', '1,5', '1,6', '1,7']
         for snapRef in sensorRef.subItems(level="snap"):
             snapId = snapRef.dataId['snap']
             if snapId not in (0, 1):
                 raise RuntimeError("Unrecognized snapId=%s" % (snapId,))
 
             self.log.info("Performing ISR on snap %s", snapRef.dataId)
-            ccdExposure = snapRef.get('raw')
+            ampDict = {}
+            for channel in range(16):
+                snapRef.dataId['channel'] = amp_map[channel]  # to get the correct channel
+                ampExposure = snapRef.get('raw', immediate=True)
+                ampExposure = self.convertIntToFloat(ampExposure)
+                amp = ampExposure.getDetector()[amp_map[channel]]
+                self.saturationDetection(ampExposure, amp)
+                self.overscanCorrection(ampExposure, amp)
+                
+                ampDict[amp.getName()] = ampExposure
+
+            ccdExposure = self.assembleCcd.assembleCcd(ampDict)
+
             isrData = self.readIsrData(snapRef, ccdExposure)
             ccdExposure = self.run(ccdExposure, **isrData.getDict()).exposure
             snapDict[snapId] = ccdExposure

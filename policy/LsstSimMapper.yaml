@@ -119,10 +119,9 @@ calibrations:
     - sensor
     - visit
     - filter
-    - channel
     reference: raw
     storage: FitsStorage
-    template: flat/v2-f%(filter)s/R%(raft)s/S%(sensor)s/imsim_2_R%(raft)s_S%(sensor)s_C%(channel)s.fits
+    template: flat/v2-f%(filter)s/R%(raft)s/S%(sensor)s/imsim_2_R%(raft)s_S%(sensor)s.fits
   fringe:
     columns: filter
     level: Amp
@@ -186,6 +185,11 @@ datasets:
     template: metadata/Mosaic.boost
   processCcd_metadata:
     template: processCcd_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost
+  processSimCcd_config:
+    persistable: Config
+    python: lsst.pipe.tasks.processCcd.ProcessCcdConfig
+    storage: ConfigStorage
+    template: config/processSimCcd.py
   isr_config:
     python: lsst.obs.lsstSim.LsstSimIsrConfig
   isr_metadata:

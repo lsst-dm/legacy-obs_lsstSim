@@ -1,5 +1,3 @@
-from builtins import map
-from past.builtins import basestring
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010, 2011, 2012, 2013 LSST Corporation.
@@ -26,7 +24,6 @@ import math
 import os
 import re
 
-import lsst.obs.base as obsBase
 import lsst.daf.base as dafBase
 import lsst.afw.image as afwImage
 import lsst.afw.image.utils as afwImageUtils
@@ -135,7 +132,7 @@ class LsstSimMapper(CameraMapper):
             if component not in dataId:
                 continue
             val = dataId[component]
-            if not isinstance(val, basestring):
+            if not isinstance(val, str):
                 raise RuntimeError(
                     "%s identifier should be type str, not %s: %r" % (component.title(), type(val), val))
             if component == "sensor":
@@ -266,6 +263,8 @@ class LsstSimMapper(CameraMapper):
     def std_raw(self, item, dataId):
         exposure = super(LsstSimMapper, self).std_raw(item, dataId)
         md = exposure.getMetadata()
+        # I think this is fixed.  Commenting out, will remove if possible.
+        '''
         if md.exists("VERSION") and md.getInt("VERSION") < 16952:
             # Precess crval of WCS from date of observation to J2000
             epoch = exposure.getInfo().getVisitInfo().getDate().get(dafBase.DateTime.EPOCH)
@@ -281,7 +280,7 @@ class LsstSimMapper(CameraMapper):
             crval.setY(newRefCoord.getDec().asDegrees())
             wcs = afwImage.Wcs(crval, wcs.getPixelOrigin(),
                                wcs.getCDMatrix())
-            exposure.setWcs(wcs)
+            exposure.setWcs(wcs)'''
 
         return exposure
 

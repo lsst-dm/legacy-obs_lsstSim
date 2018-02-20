@@ -20,6 +20,6 @@
 # the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
-from lsst.obs.lsstSim.processEimage import ProcessEimageTask
+from lsst.obs.lsstSim.processSimCcd import ProcessSimCcdTask
 
-ProcessEimageTask.parseAndRun()
+ProcessSimCcdTask.parseAndRun()
