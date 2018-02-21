@@ -36,7 +36,13 @@ class SimButlerImage(ButlerImage):
             try:
                 im = self.butler.get(self.type, **self.kwargs)
                 ccd = im.getDetector()  # possibly modified by assembleCcdTask
-                im.setMaskedImage(rotateImageBy90(im.getMaskedImage(), 2))
+                if self.type == 'eimage':
+                    im.setMaskedImage(rotateImageBy90(im.getMaskedImage(), 2))
+                elif self.type == 'calexp':
+                    im.setMaskedImage(rotateImageBy90(im.getMaskedImage(), ccd.getOrientation().getNQuarter()))
+                else:
+                    raise ValueError("Only valid dataset types are 'eimage' and 'calexp'")
+               
             except (NoResults, RuntimeError):
                 pass
 

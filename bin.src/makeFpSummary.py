@@ -28,7 +28,7 @@ class FocalplaneSummaryTask(pipeBase.CmdLineTask):
     def run(self, expRef, butler):
         """Make summary plots of full focalplane images.
         """
-        sbi = SimButlerImage(butler, type='eimage', visit=expRef.dataId['visit'])
+        sbi = SimButlerImage(butler, type=expRef.butlerSubset.datasetType, visit=expRef.dataId['visit'])
         # Get the per ccd images
         def parse_name_to_dataId(name_str):
             raft, sensor = name_str.split()
