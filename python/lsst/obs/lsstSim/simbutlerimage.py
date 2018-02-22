@@ -28,23 +28,22 @@ class SimButlerImage(ButlerImage):
             return {'raft':raft[-3:], 'sensor':sensor[-3:]}
 
         im = None
-        if self.butler is not None:
-            im = None
-            cid = ccd.getName()
-            did = parse_name_to_dataId(cid)
+        cid = ccd.getName()
+        did = parse_name_to_dataId(cid)
+        if self.butler is not None and did['raft'] not in ['0,0', '0,4', '4,0', '4,4']:
             self.kwargs.update(did)
             try:
                 im = self.butler.get(self.type, **self.kwargs)
                 ccd = im.getDetector()  # possibly modified by assembleCcdTask
-                if self.type == 'eimage':
+                if self.type == 'eimage' or self.type == 'calexp':
                     im.setMaskedImage(rotateImageBy90(im.getMaskedImage(), 2))
-                elif self.type == 'calexp':
-                    im.setMaskedImage(rotateImageBy90(im.getMaskedImage(), ccd.getOrientation().getNQuarter()))
                 else:
                     raise ValueError("Only valid dataset types are 'eimage' and 'calexp'")
                
             except (NoResults, RuntimeError):
                 pass
+        else:
+            return None
 
         if im is None:
             if not as_masked_image:

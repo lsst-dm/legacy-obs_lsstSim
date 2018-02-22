@@ -36,12 +36,12 @@ class FocalplaneSummaryTask(pipeBase.CmdLineTask):
         for ccd in butler.get('camera'):
             data_id = parse_name_to_dataId(ccd.getName())
             data_id.update(expRef.dataId)
-            binned_im = sbi.getCcdImage(ccd, binSize=self.config.sensorBinSize, as_masked_image=True)[0]
-            binned_im = rotateImageBy90(binned_im, ccd.getOrientation().getNQuarter())
             try:
+                binned_im = sbi.getCcdImage(ccd, binSize=self.config.sensorBinSize, as_masked_image=True)[0]
+                binned_im = rotateImageBy90(binned_im, ccd.getOrientation().getNQuarter())
                 butler.put(binned_im, 'binned_sensor_fits', **data_id)
-            except RuntimeError:
-                # butler couldn't put the image
+            except (TypeError, RuntimeError):
+                # butler couldn't put the image or there was no image to put
                 continue
             (x, y) = binned_im.getDimensions()
             boxes = {'A':afwGeom.Box2I(afwGeom.PointI(0,y/2), afwGeom.ExtentI(x, y/2)),
