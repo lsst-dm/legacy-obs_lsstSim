@@ -49,8 +49,7 @@ class EdgeRolloffFunctorTestCase(unittest.TestCase):
 
     def tearDown(self):
         while self.funcs:
-            func = self.funcs.pop()
-            del func
+            self.funcs.pop()
 
     def testDerivatives(self):
         for func in self.funcs:

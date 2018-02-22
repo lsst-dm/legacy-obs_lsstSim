@@ -48,17 +48,17 @@ class GetEimageTestCase(lsst.utils.tests.TestCase):
     are tested separately to simplify error reporting.
     """
     @classmethod
-    def setUpClass(self):
+    def setUpClass(cls):
         # For lsstSim specific reasons, we need to specify the raft and sensor
         dataId = dict(visit=840, raft='2,2', sensor='1,1')
         butler = dafPersistence.Butler(InputDir)
-        self.exposure = butler.get('eimage', dataId=dataId)
-        self.visit_info = self.exposure.getInfo().getVisitInfo()
+        cls.exposure = butler.get('eimage', dataId=dataId)
+        cls.visit_info = cls.exposure.getInfo().getVisitInfo()
 
     @classmethod
-    def tearDownClass(self):
-        del self.exposure
-        del self.visit_info
+    def tearDownClass(cls):
+        del cls.exposure
+        del cls.visit_info
 
     def test_getWcs(self):
         """Test whether the Exposure has a Wcs attached."""

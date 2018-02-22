@@ -124,6 +124,7 @@ class LsstSimIsrTask(IsrTask):
         - exposure: the exposure after application of ISR
         """
         self.log.info("Performing ISR on sensor %s", sensorRef.dataId)
+        camera = sensorRef.get("camera")
         snapDict = dict()
         for snapRef in sensorRef.subItems(level="snap"):
             snapId = snapRef.dataId['snap']
@@ -133,7 +134,7 @@ class LsstSimIsrTask(IsrTask):
             self.log.info("Performing ISR on snap %s", snapRef.dataId)
             ccdExposure = snapRef.get('raw')
             isrData = self.readIsrData(snapRef, ccdExposure)
-            ccdExposure = self.run(ccdExposure, **isrData.getDict()).exposure
+            ccdExposure = self.run(ccdExposure, camera=camera, **isrData.getDict()).exposure
             snapDict[snapId] = ccdExposure
 
             if self.config.doWriteSnaps:

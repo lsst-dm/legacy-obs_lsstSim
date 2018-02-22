@@ -34,7 +34,8 @@ except ImportError:
     import sqlite as sqlite3
 import sys
 import lsst.daf.base as dafBase
-import lsst.afw.image as afwImage
+from lsst.afw.fits import readMetadata
+from lsst.afw.geom import makeSkyWcs
 import lsst.skypix as skypix
 
 
@@ -123,7 +124,7 @@ def processRaft(raftDir, conn, done, qsp):
             nSkipped += 1
             continue
 
-        md = afwImage.readMetadata(fits)
+        md = readMetadata(fits)
         expTime = md.get("EXPTIME")
         mjdObs = md.get("MJD-OBS")
         taiObs = dafBase.DateTime(mjdObs, dafBase.DateTime.MJD,
@@ -138,7 +139,7 @@ def processRaft(raftDir, conn, done, qsp):
             id = row[0]
             break
 
-        wcs = afwImage.makeWcs(md)
+        wcs = makeSkyWcs(md)
         poly = skypix.imageToPolygon(wcs,
                                      md.get("NAXIS1"), md.get("NAXIS2"),
                                      padRad=0.000075)  # about 15 arcsec
@@ -151,9 +152,10 @@ def processRaft(raftDir, conn, done, qsp):
 
         nProcessed += 1
 
-    print(raftDir, \
-        "... %d processed, %d skipped, %d unrecognized" % \
-        (nProcessed, nSkipped, nUnrecognized), file=sys.stderr)
+    print(raftDir,
+          "... %d processed, %d skipped, %d unrecognized" %
+          (nProcessed, nSkipped, nUnrecognized), file=sys.stderr)
+
 
 if __name__ == "__main__":
     parser = OptionParser(usage="""%prog [options] DIR ...
