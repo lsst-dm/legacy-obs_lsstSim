@@ -1,9 +1,12 @@
 from lsst.meas.algorithms import LoadIndexedReferenceObjectsTask
 import os.path
 from lsst.utils import getPackageDir
-config.charImage.refObjLoader.retarget(LoadIndexedReferenceObjectsTask)
-config.calibrate.astromRefObjLoader.retarget(LoadIndexedReferenceObjectsTask)
-config.calibrate.photoRefObjLoader.retarget(LoadIndexedReferenceObjectsTask)
+# Astrometry (copied from lsst:obs_subaru/config/processCcd.py)
+for refObjLoader in (config.charImage.refObjLoader,
+                     config.calibrate.astromRefObjLoader,
+                     config.calibrate.photoRefObjLoader):
+    refObjLoader.retarget(LoadIndexedReferenceObjectsTask)
+    refObjLoader.load(os.path.join(getPackageDir('obs_lsstSim'), 'config', 'filterMap.py'))
 
 config.charImage.repair.doCosmicRay=True
 
