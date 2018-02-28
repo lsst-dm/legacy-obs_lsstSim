@@ -67,7 +67,7 @@ exposures:
   deepCoadd_psfMatchedWarp:
     template: deepCoadd/%(filter)s/%(tract)d/%(patch)stempExp/psfMatched-v%(visit)d-f%(filter)s.fits
   wcs:
-    template: wcs/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.wcs.fits
+    template: jointcal-results/%(tract)d/v%(visit)d-f%(filter)s/R%(raft)s/wcs-S%(sensor)s.fits
   fcr:
     level: Ccd
     persistable: ExposureI
@@ -164,7 +164,7 @@ datasets:
     tables: raw
     template: icMatch/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits
   photoCalib:
-    template: jointcal-results/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.photoCalib.fits
+    template: jointcal-results/%(tract)d/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.photoCalib.fits
   srcMatch:
     template: srcMatch/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits
   srcMatchFull:
