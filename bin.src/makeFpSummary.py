@@ -52,7 +52,7 @@ class FocalplaneSummaryTask(pipeBase.CmdLineTask):
                            **data_id)
 
         im = cgu.showCamera(butler.get('camera'), imageSource=sbi, binSize=self.config.binSize)
-        butler.put(im, 'focalplane_summary_fits')
+        expRef.put(im, 'focalplane_summary_fits')
         im  = flipImage(im, False, True)
         zmap = ZScaleMapping(im, contrast=self.config.contrast)
         rgb = zmap.makeRgbImage(im, im, im)
