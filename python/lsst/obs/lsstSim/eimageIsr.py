@@ -43,7 +43,9 @@ class EimageIsrConfig(pexConfig.Config):
     varianceValue = pexConfig.Field(dtype=float, default=0.01, doc="Value to use in the variance plane.")
     maskEdgeBorder = pexConfig.Field(dtype=int, default=0, doc="Set mask to EDGE for a border of x pixels")
     sat_val = pexConfig.Field(dtype=int, default=100000, doc="Value at which to detect saturation")
-    interp_size = pexConfig.Field(dtype=float, default=0.5, doc="Size of interpolation kernel in arcsec")
+    interp_size = pexConfig.Field(dtype=float, default=1, doc="Size of interpolation kernel in arcsec")
+    growSaturationFootprintSize = pexConfig.Field(dtype=int, default=1,
+                            doc="Number of pixels by which to grow the saturation footprints")
     datasetType = pexConfig.Field(
         dtype=str,
         doc="Dataset type for input data; users will typically leave this alone.",
@@ -105,7 +107,7 @@ class EimageIsrTask(pipeBase.Task):
         isr.interpolateFromMask(
             maskedImage=mi,
             fwhm=self.config.interp_size,
-            growFootprints=0,
+            growFootprints=self.config.growSaturationFootprintSize,
             maskName='SAT',
         )
         inputExposure.setMaskedImage(isr.transposeMaskedImage(mi))
