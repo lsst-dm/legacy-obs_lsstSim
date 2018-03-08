@@ -35,8 +35,6 @@ except ImportError:
 import sys
 import lsst.daf.base as dafBase
 from lsst.afw.fits import readMetadata
-from lsst.afw.geom import makeSkyWcs
-import lsst.skypix as skypix
 
 
 def process(dirList, inputRegistry, outputRegistry="registry.sqlite3"):
@@ -72,15 +70,13 @@ def process(dirList, inputRegistry, outputRegistry="registry.sqlite3"):
         for row in conn.execute(cmd):
             done[row[0]] = True
 
-    qsp = skypix.createQuadSpherePixelization()
-
     try:
         for dir in dirList:
             if os.path.exists(os.path.join(dir, "raw")):
                 for visitDir in glob.glob(os.path.join(dir, "raw", "v*-f*",)):
-                    processVisit(visitDir, conn, done, qsp)
+                    processVisit(visitDir, conn, done)
             else:
-                processVisit(dir, conn, done, qsp)
+                processVisit(dir, conn, done)
     finally:
         print("Cleaning up...", file=sys.stderr)
         conn.execute("DELETE FROM raw_visit")
@@ -103,7 +99,7 @@ def processVisit(visitDir, conn, done, qsp):
     print(visitDir, "... completed", file=sys.stderr)
 
 
-def processRaft(raftDir, conn, done, qsp):
+def processRaft(raftDir, conn, done):
     nProcessed = 0
     nSkipped = 0
     nUnrecognized = 0
@@ -134,19 +130,6 @@ def processRaft(raftDir, conn, done, qsp):
                      (visit, filter, snap, "%s,%s" % (raft1, raft2),
                       "%s,%s" % (sensor1, sensor2),
                       "%s,%s" % (channel1, channel2), taiObs, expTime))
-
-        for row in conn.execute("SELECT last_insert_rowid()"):
-            id = row[0]
-            break
-
-        wcs = makeSkyWcs(md)
-        poly = skypix.imageToPolygon(wcs,
-                                     md.get("NAXIS1"), md.get("NAXIS2"),
-                                     padRad=0.000075)  # about 15 arcsec
-        pix = qsp.intersect(poly)
-        for skyTileId in pix:
-            conn.execute("INSERT INTO raw_skyTile VALUES(?, ?)",
-                         (id, skyTileId))
 
         conn.commit()
 
