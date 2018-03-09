@@ -237,6 +237,10 @@ datasets:
     template: config/dcrCoadd_forced.py
   dcrCoadd_forced_metadata:
     template: dcrCoadd_forced_metadata/%(filter)s/%(tract)d/%(patch)s.boost
+  deep_dcrAssembleCoadd_config:
+    template: config/deep_dcrAssembleCoadd.py
+  deep_dcrAssembleCoadd_metadata:
+    template: deepCoadd/%(filter)s/%(tract)d/%(patch)s/assembleCoaddMD.boost
 
   # Plots for analysis QA
   plotCoadd:
