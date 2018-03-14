@@ -143,6 +143,13 @@ class LsstSimIsrTask(IsrTask):
                 self.saturationDetection(ampExposure, amp)
                 self.overscanCorrection(ampExposure, amp)
                 
+                #### This is a hack for v3.6 of phosim.  It should be removed if using phosim >= 3.7
+                md = ampExposure.getMetadata()
+                md.set('RADESYS', 'ICRS')
+                md.set('CTYPE1', 'RA---TAN')
+                ampExposure.setMetadata(md)
+                ######
+
                 ampDict[amp.getName()] = ampExposure
 
             ccdExposure = self.assembleCcd.assembleCcd(ampDict)

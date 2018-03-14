@@ -185,6 +185,11 @@ datasets:
     template: metadata/Mosaic.boost
   processCcd_metadata:
     template: processCcd_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost
+  processSimCcd_metadata:
+    persistable: PropertySet
+    python: lsst.daf.base.PropertySet
+    storage: BoostStorage
+    template: processSimCcd_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost
   processSimCcd_config:
     persistable: Config
     python: lsst.pipe.tasks.processCcd.ProcessCcdConfig
