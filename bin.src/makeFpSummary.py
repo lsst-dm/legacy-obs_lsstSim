@@ -15,6 +15,7 @@ class FocalplaneSummaryConfig(pexConfig.Config):
     binSize = pexConfig.Field(dtype=int, default=50, doc="pixels to bin for the focalplane summary")
     contrast = pexConfig.Field(dtype=float, default=1, doc="contrast factor")
     sensorBinSize = pexConfig.Field(dtype=int, default=4, doc="pixels to bin per sensor")
+    putFullSensors = pexConfig.Field(dtype=bool, default=False, doc="persist the full size binned sensor?")
 
 
 class FocalplaneSummaryTask(pipeBase.CmdLineTask):
@@ -39,7 +40,8 @@ class FocalplaneSummaryTask(pipeBase.CmdLineTask):
             try:
                 binned_im = sbi.getCcdImage(ccd, binSize=self.config.sensorBinSize, as_masked_image=True)[0]
                 binned_im = rotateImageBy90(binned_im, ccd.getOrientation().getNQuarter())
-                butler.put(binned_im, 'binned_sensor_fits', **data_id)
+                if self.config.putFullSensors:
+                    butler.put(binned_im, 'binned_sensor_fits', **data_id)
             except (TypeError, RuntimeError):
                 # butler couldn't put the image or there was no image to put
                 continue
