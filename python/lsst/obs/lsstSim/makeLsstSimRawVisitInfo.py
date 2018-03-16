@@ -80,7 +80,7 @@ class MakeLsstSimRawVisitInfo(MakeRawVisitInfo):
             # Other simulation tools don't have the same problem, and need hour angle if it is available.
             HA = self.popAngle(md, "HA", units=astropy.units.h)
             argDict['era'] = HA + RA - longitude
-        except:
+        except Exception:
             self.log.warn("Hour angle missing from metadata, will be NAN")
         return VisitInfo(**argDict)
 

@@ -25,7 +25,6 @@ from past.builtins import basestring
 import os
 import re
 
-import lsst.obs.base as obsBase
 import lsst.daf.base as dafBase
 import lsst.afw.image.utils as afwImageUtils
 import lsst.daf.persistence as dafPersist
