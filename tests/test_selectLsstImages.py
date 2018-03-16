@@ -23,7 +23,6 @@ from __future__ import absolute_import, division, print_function
 import sys
 import unittest
 
-import lsst.afw.coord as afwCoord
 import lsst.afw.geom as afwGeom
 from lsst.daf.persistence import DbAuth
 from lsst.obs.lsstSim.selectLsstImages import SelectLsstImagesTask
@@ -41,7 +40,7 @@ def getCoordList(minRa, minDec, maxRa, maxDec):
         (maxRa, maxDec),
         (minRa, maxDec),
     )
-    return tuple(afwCoord.IcrsCoord(afwGeom.Point2D(d[0], d[1]), afwGeom.degrees) for d in degList)
+    return tuple(afwGeom.SpherePoint(d[0], d[1], afwGeom.degrees) for d in degList)
 
 
 class LsstMapperTestCase(unittest.TestCase):

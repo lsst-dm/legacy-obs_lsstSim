@@ -22,7 +22,6 @@ from builtins import range
 #
 import MySQLdb
 
-from lsst.afw.coord import IcrsCoord
 import lsst.afw.geom as afwGeom
 from lsst.daf.persistence import DbAuth
 import lsst.pipe.base as pipeBase
@@ -48,7 +47,7 @@ class FluxMagInfo(BaseExposureInfo):
 
     Data includes:
     - dataId: data ID of exposure (a dict)
-    - coordList: a list of corner coordinates of the exposure (list of IcrsCoord)
+    - coordList: a list of corner coordinates of the exposure (list of lsst.afw.geom.SpherePoint)
     - fluxMag0: float
     - fluxMag0Sigma: float
     """
@@ -64,8 +63,7 @@ class FluxMagInfo(BaseExposureInfo):
             filter=result.pop(0),
         )
 
-        coordList = [IcrsCoord(afwGeom.Angle(result.pop(0), afwGeom.degrees),
-                               afwGeom.Angle(result.pop(0), afwGeom.degrees)) for i in range(4)]
+        coordList = [afwGeom.SpherePoint(result.pop(0), result.pop(0), afwGeom.degrees) for i in range(4)]
 
         BaseExposureInfo.__init__(self, dataId=dataId, coordList=coordList)
         self.fluxMag0 = result.pop(0)

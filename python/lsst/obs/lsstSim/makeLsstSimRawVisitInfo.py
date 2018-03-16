@@ -26,8 +26,8 @@ from __future__ import print_function
 import astropy.units
 
 from lsst.afw.image import VisitInfo, RotType
-from lsst.afw.geom import degrees
-from lsst.afw.coord import Coord, IcrsCoord, Observatory, Weather
+from lsst.afw.geom import degrees, SpherePoint
+from lsst.afw.coord import Observatory, Weather
 from lsst.afw.coord.refraction import defaultWeather
 from lsst.obs.base import MakeRawVisitInfo
 
@@ -53,11 +53,11 @@ class MakeLsstSimRawVisitInfo(MakeRawVisitInfo):
         """
         MakeRawVisitInfo.setArgDict(self, md, argDict)
         argDict["darkTime"] = self.popFloat(md, "DARKTIME")
-        argDict["boresightAzAlt"] = Coord(
+        argDict["boresightAzAlt"] = SpherePoint(
             self.popAngle(md, "AZIMUTH"),
             self.altitudeFromZenithDistance(self.popAngle(md, "ZENITH")),
         )
-        argDict["boresightRaDec"] = IcrsCoord(
+        argDict["boresightRaDec"] = SpherePoint(
             self.popAngle(md, "RA_DEG"),
             self.popAngle(md, "DEC_DEG"),
         )

@@ -35,7 +35,7 @@ import lsst.afw.geom as afwGeom
 from lsst.afw.image import RotType
 import lsst.utils.tests
 import lsst.daf.persistence as dafPersistence
-from lsst.afw.coord import Coord, IcrsCoord, Observatory, Weather
+from lsst.afw.coord import Observatory, Weather
 from lsst.daf.base import DateTime
 
 obsLsstSimDir = lsst.utils.getPackageDir('obs_lsstSim')
@@ -70,11 +70,11 @@ class GetEimageTestCase(lsst.utils.tests.TestCase):
         self.assertEqual(1.00015190967402, self.visit_info.getBoresightAirmass())
 
     def test_getBoresightAzAlt(self):
-        coord = Coord(afwGeom.Point2D(0.0, 89.0), afwGeom.degrees, 2000.0)
+        coord = afwGeom.SpherePoint(0.0, 89.0, afwGeom.degrees)
         self.assertEqual(coord, self.visit_info.getBoresightAzAlt())
 
     def test_getBoresightRaDec(self):
-        coord = IcrsCoord(afwGeom.Point2D(53.0091385, -27.4389488), afwGeom.degrees)
+        coord = afwGeom.SpherePoint(53.0091385, -27.4389488, afwGeom.degrees)
         self.assertEqual(coord, self.visit_info.getBoresightRaDec())
 
     def test_getBoresightRotAngle(self):
