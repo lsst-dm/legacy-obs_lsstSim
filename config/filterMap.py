@@ -1,1 +1,1 @@
-config.filterMap = {'lsst_{}_smeared'.format(band): band for band in 'ugrizy'}
+config.filterMap = {band: 'lsst_{}_smeared'.format(band) for band in 'ugrizy'}
