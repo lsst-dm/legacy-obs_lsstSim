@@ -237,6 +237,8 @@ datasets:
     template: config/dcrCoadd_forced.py
   dcrCoadd_forced_metadata:
     template: dcrCoadd_forced_metadata/%(filter)s/%(tract)d/%(patch)s.boost
+  apPipe_metadata:
+    template: apPipe_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost
 
   # Plots for analysis QA
   plotCoadd:
