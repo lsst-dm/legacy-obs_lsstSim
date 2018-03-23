@@ -22,15 +22,11 @@ from past.builtins import basestring
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-import math
 import os
 import re
 
-import lsst.obs.base as obsBase
 import lsst.daf.base as dafBase
-from lsst.afw.geom import makeSkyWcs
 import lsst.afw.image.utils as afwImageUtils
-import lsst.afw.coord as afwCoord
 import lsst.daf.persistence as dafPersist
 from .makeLsstSimRawVisitInfo import MakeLsstSimRawVisitInfo
 
@@ -263,21 +259,19 @@ class LsstSimMapper(CameraMapper):
 ###############################################################################
 
     def std_raw(self, item, dataId):
-        exposure = super(LsstSimMapper, self).std_raw(item, dataId)
-        md = exposure.getMetadata()
+        md = item.getMetadata()
         if md.exists("VERSION") and md.getInt("VERSION") < 16952:
-            # Precess crval of WCS from date of observation to J2000
-            epoch = exposure.getInfo().getVisitInfo().getDate().get(dafBase.DateTime.EPOCH)
-            if math.isnan(epoch):
-                raise RuntimeError("Date not found in raw exposure %s" % (dataId,))
-            wcs = exposure.getWcs()
-            origin = wcs.getSkyOrigin()
-            refCoord = afwCoord.Fk5Coord(
-                origin.getLongitude(), origin.getLatitude(), epoch).toIcrs()
-            wcs = makeSkyWcs(crpix=wcs.getPixelOrigin(), crval=refCoord, cdMatrix=wcs.getCdMatrix())
-            exposure.setWcs(wcs)
-
-        return exposure
+            # CRVAL is FK5 at date of observation
+            dateObsTaiMjd = md.get("TAI")
+            dateObs = dafBase.DateTime(dateObsTaiMjd,
+                                       system=dafBase.DateTime.MJD,
+                                       scale=dafBase.DateTime.TAI)
+            correctedEquinox = dateObs.get(system=dafBase.DateTime.EPOCH,
+                                           scale=dafBase.DateTime.TAI)
+            md.set("EQUINOX", correctedEquinox)
+            md.set("RADESYS", "FK5")
+            print("****** changing equinox to", correctedEquinox)
+        return super(LsstSimMapper, self).std_raw(item, dataId)
 
     def std_eimage(self, item, dataId):
         """Standardize a eimage dataset by converting it to an Exposure instead of an Image"""

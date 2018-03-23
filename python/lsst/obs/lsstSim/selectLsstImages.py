@@ -24,7 +24,6 @@
 from __future__ import print_function
 from builtins import range
 import MySQLdb
-from lsst.afw.coord import IcrsCoord
 import lsst.afw.geom as afwGeom
 from lsst.daf.persistence import DbAuth
 import lsst.pex.config as pexConfig
@@ -56,7 +55,7 @@ class ExposureInfo(BaseExposureInfo):
 
     Data includes:
     - dataId: data ID of exposure (a dict)
-    - coordList: a list of corner coordinates of the exposure (list of IcrsCoord)
+    - coordList: a list of corner coordinates of the exposure (list of lsst.afw.geom.SpherePoint)
     - fwhm: mean FWHM of exposure
     """
 
@@ -73,10 +72,7 @@ class ExposureInfo(BaseExposureInfo):
         coordList = []
         for i in range(4):
             coordList.append(
-                IcrsCoord(
-                    afwGeom.Angle(result[self._nextInd], afwGeom.degrees),
-                    afwGeom.Angle(result[self._nextInd], afwGeom.degrees),
-                )
+                afwGeom.SpherePoint(result[self._nextInd], result[self._nextInd], afwGeom.degrees)
             )
         self.fwhm = result[self._nextInd]
         BaseExposureInfo.__init__(self, dataId, coordList)
@@ -124,7 +120,7 @@ class SelectLsstImagesTask(BaseSelectImagesTask):
         @return a pipeBase Struct containing:
         - exposureInfoList: a list of ExposureInfo objects, which have the following fields:
             - dataId: data ID of exposure (a dict)
-            - coordList: a list of corner coordinates of the exposure (list of afwCoord.IcrsCoord)
+            - coordList: a list of corner coordinates of the exposure (list of lsst.afw.geom.SpherePoint)
             - fwhm: fwhm column
         """
         db = MySQLdb.connect(
@@ -197,10 +193,10 @@ if __name__ == "__main__":
     minDec = afwGeom.Angle(5, afwGeom.degrees)
     maxDec = afwGeom.Angle(6, afwGeom.degrees)
     coordList = [
-        IcrsCoord(minRa, minDec),
-        IcrsCoord(maxRa, minDec),
-        IcrsCoord(maxRa, maxDec),
-        IcrsCoord(minRa, maxDec),
+        afwGeom.SpherePoint(minRa, minDec),
+        afwGeom.SpherePoint(maxRa, minDec),
+        afwGeom.SpherePoint(maxRa, maxDec),
+        afwGeom.SpherePoint(minRa, maxDec),
     ]
     results = selectTask.run(coordList=coordList, filter='r')
     for ccdInfo in results.exposureInfoList:

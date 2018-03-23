@@ -30,8 +30,7 @@ import lsst.daf.persistence as dafPersist
 from lsst.obs.base import MakeRawVisitInfo
 import lsst.utils.tests
 from lsst.afw.image import RotType
-from lsst.afw.coord import IcrsCoord, Coord
-from lsst.afw.geom import degrees
+from lsst.afw.geom import degrees, SpherePoint
 
 
 class GetRawTestCase(lsst.utils.tests.TestCase):
@@ -43,8 +42,8 @@ class GetRawTestCase(lsst.utils.tests.TestCase):
         self.darkTime = 15.0
         dateObs = DateTime(49552.28496, DateTime.MJD, DateTime.TAI)
         self.dateAvg = DateTime(dateObs.nsecs(DateTime.TAI) + int(0.5e9*self.exposureTime), DateTime.TAI)
-        self.boresightRaDec = IcrsCoord(359.936019771151*degrees, -2.3356222648145*degrees)
-        self.boresightAzAlt = Coord(127.158246182602*degrees, (90 - 40.6736117075876)*degrees)
+        self.boresightRaDec = SpherePoint(359.936019771151, -2.3356222648145, degrees)
+        self.boresightAzAlt = SpherePoint(127.158246182602, 90 - 40.6736117075876, degrees)
         self.boresightAirmass = 1.31849492005496
         self.boresightRotAngle = -3.43228*degrees
         self.rotType = RotType.SKY
@@ -68,17 +67,17 @@ class GetRawTestCase(lsst.utils.tests.TestCase):
         self.assertEqual(raw.getDetector().getName(), "R:0,3 S:0,1")
         origin = raw.getWcs().getSkyOrigin()
         self.assertAlmostEqual(
-            origin.getLongitude().asDegrees(), 0.005865, 6)
+            origin.getLongitude().asDegrees(), 0.0058520, 6)
         self.assertAlmostEqual(
-            origin.getLatitude().asDegrees(), -2.305262, 6)
+            origin.getLatitude().asDegrees(), -2.3052624, 6)
         visitInfo = raw.getInfo().getVisitInfo()
         self.assertAlmostEqual(visitInfo.getDate().get(), self.dateAvg.get())
         # Explicit test for NaN here, because phosim output may not have consistent alt/az/ra/dec/time
         self.assertTrue(math.isnan(visitInfo.getEra()))
         self.assertAlmostEqual(visitInfo.getExposureTime(), self.exposureTime)
         self.assertAlmostEqual(visitInfo.getDarkTime(), self.darkTime)
-        self.assertCoordsAlmostEqual(visitInfo.getBoresightRaDec(), self.boresightRaDec)
-        self.assertCoordsAlmostEqual(visitInfo.getBoresightAzAlt(), self.boresightAzAlt)
+        self.assertSpherePointsAlmostEqual(visitInfo.getBoresightRaDec(), self.boresightRaDec)
+        self.assertSpherePointsAlmostEqual(visitInfo.getBoresightAzAlt(), self.boresightAzAlt)
         self.assertAlmostEqual(visitInfo.getBoresightAirmass(), self.boresightAirmass)
         self.assertAnglesAlmostEqual(visitInfo.getBoresightRotAngle(), self.boresightRotAngle)
         self.assertEqual(visitInfo.getRotType(), self.rotType)
