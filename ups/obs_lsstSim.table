@@ -7,7 +7,6 @@ setupRequired(meas_algorithms)
 setupRequired(ip_isr)
 setupRequired(pipe_tasks)
 setupRequired(pybind11)
-setupRequired(python_mysqlclient)
 setupRequired(utils)
 
 envPrepend(LD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
