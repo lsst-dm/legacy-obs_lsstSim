@@ -22,6 +22,8 @@ from past.builtins import basestring
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
+__all__ = ["LsstSimMapper"]
+
 import os
 import re
 
