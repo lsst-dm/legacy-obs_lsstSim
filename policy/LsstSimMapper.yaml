@@ -165,6 +165,10 @@ datasets:
     template: icMatch/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits
   photoCalib:
     template: jointcal-results/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.photoCalib.fits
+  jointcal_wcs:  # Astrometric calibration produced by meas_mosaic/jointcal
+    template: jointcal-results/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s/jointcal_wcs-%(visit)d-R%(raft)s-S%(sensor)s.fits
+  jointcal_photoCalib:  # Photometric calibration produced by meas_mosaic/jointcal
+template: jointcal-results/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s/jointcal_photoCalib-%(visit)d-R%(raft)s-S%(sensor)s.fits
   srcMatch:
     template: srcMatch/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits
   srcMatchFull:
