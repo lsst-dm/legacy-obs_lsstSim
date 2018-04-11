@@ -20,6 +20,9 @@
 # the GNU General Public License along with this program.  If not,
 # see <https://www.lsstcorp.org/LegalNotices/>.
 #
+
+__all__ = ["ProcessEimageConfig", "ProcessEimageTask"]
+
 from lsst.pex.config import Field
 from lsst.pipe.base.argumentParser import ArgumentParser
 from lsst.pipe.tasks.processCcd import ProcessCcdTask
