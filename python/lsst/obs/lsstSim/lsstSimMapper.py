@@ -22,16 +22,13 @@ from past.builtins import basestring
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-import math
+__all__ = ["LsstSimMapper"]
+
 import os
 import re
 
-import lsst.obs.base as obsBase
 import lsst.daf.base as dafBase
-from lsst.afw.geom import makeSkyWcs
-import lsst.afw.image as afwImage
 import lsst.afw.image.utils as afwImageUtils
-import lsst.afw.coord as afwCoord
 import lsst.daf.persistence as dafPersist
 from .makeLsstSimRawVisitInfo import MakeLsstSimRawVisitInfo
 
@@ -64,12 +61,13 @@ class LsstSimMapper(CameraMapper):
 
         # The LSST Filters from L. Jones 04/07/10
         afwImageUtils.resetFilters()
-        afwImageUtils.defineFilter('u', 364.59)
-        afwImageUtils.defineFilter('g', 476.31)
-        afwImageUtils.defineFilter('r', 619.42)
-        afwImageUtils.defineFilter('i', 752.06)
-        afwImageUtils.defineFilter('z', 866.85)
-        afwImageUtils.defineFilter('y', 971.68, alias=['y4'])  # official y filter
+        afwImageUtils.defineFilter('u', lambdaEff=364.59, lambdaMin=324.0, lambdaMax=395.0)
+        afwImageUtils.defineFilter('g', lambdaEff=476.31, lambdaMin=405.0, lambdaMax=552.0)
+        afwImageUtils.defineFilter('r', lambdaEff=619.42, lambdaMin=552.0, lambdaMax=691.0)
+        afwImageUtils.defineFilter('i', lambdaEff=752.06, lambdaMin=818.0, lambdaMax=921.0)
+        afwImageUtils.defineFilter('z', lambdaEff=866.85, lambdaMin=922.0, lambdaMax=997.0)
+        # official y filter
+        afwImageUtils.defineFilter('y', lambdaEff=971.68, lambdaMin=975.0, lambdaMax=1075.0, alias=['y4'])
         # If/when y3 sim data becomes available, uncomment this and
         # modify the schema appropriately
         # afwImageUtils.defineFilter('y3', 1002.44) # candidate y-band
@@ -242,7 +240,7 @@ class LsstSimMapper(CameraMapper):
         oid = (((tract << LsstSimMapper._nbit_patch) + patchX) << LsstSimMapper._nbit_patch) + patchY
         if singleFilter:
             return (oid << LsstSimMapper._nbit_filter) + \
-                afwImage.Filter(dataId['filter']).getId()
+                afwImageUtils.Filter(dataId['filter']).getId()
         return oid
 
     def bypass_deepMergedCoaddId_bits(self, *args, **kwargs):
@@ -278,21 +276,19 @@ class LsstSimMapper(CameraMapper):
 ###############################################################################
 
     def std_raw(self, item, dataId):
-        exposure = super(LsstSimMapper, self).std_raw(item, dataId)
-        md = exposure.getMetadata()
+        md = item.getMetadata()
         if md.exists("VERSION") and md.getInt("VERSION") < 16952:
-            # Precess crval of WCS from date of observation to J2000
-            epoch = exposure.getInfo().getVisitInfo().getDate().get(dafBase.DateTime.EPOCH)
-            if math.isnan(epoch):
-                raise RuntimeError("Date not found in raw exposure %s" % (dataId,))
-            wcs = exposure.getWcs()
-            origin = wcs.getSkyOrigin()
-            refCoord = afwCoord.Fk5Coord(
-                origin.getLongitude(), origin.getLatitude(), epoch).toIcrs()
-            wcs = makeSkyWcs(crpix=wcs.getPixelOrigin(), crval=refCoord, cdMatrix=wcs.getCdMatrix())
-            exposure.setWcs(wcs)
-
-        return exposure
+            # CRVAL is FK5 at date of observation
+            dateObsTaiMjd = md.get("TAI")
+            dateObs = dafBase.DateTime(dateObsTaiMjd,
+                                       system=dafBase.DateTime.MJD,
+                                       scale=dafBase.DateTime.TAI)
+            correctedEquinox = dateObs.get(system=dafBase.DateTime.EPOCH,
+                                           scale=dafBase.DateTime.TAI)
+            md.set("EQUINOX", correctedEquinox)
+            md.set("RADESYS", "FK5")
+            print("****** changing equinox to", correctedEquinox)
+        return super(LsstSimMapper, self).std_raw(item, dataId)
 
     def std_eimage(self, item, dataId):
         """Standardize a eimage dataset by converting it to an Exposure instead of an Image"""
