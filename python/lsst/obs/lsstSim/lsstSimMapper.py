@@ -72,6 +72,19 @@ class LsstSimMapper(CameraMapper):
         # modify the schema appropriately
         # afwImageUtils.defineFilter('y3', 1002.44) # candidate y-band
 
+        # FTaken from hscMapper.py
+        # The number of bits allocated for fields in object IDs, appropriate for
+        # the default-configured Rings skymap.
+        #
+        # This shouldn't be the mapper's job at all; see #2797.
+        LsstSimMapper._nbit_tract = 16
+        LsstSimMapper._nbit_patch = 5
+        LsstSimMapper._nbit_filter = 6
+        LsstSimMapper._nbit_id = 64 - (LsstSimMapper._nbit_tract + \
+                                       2 * LsstSimMapper._nbit_patch + \
+                                       LsstSimMapper._nbit_filter)
+
+
     def _transformId(self, dataId):
         """Transform an ID dict into standard form for LSST
 
@@ -215,19 +228,20 @@ class LsstSimMapper(CameraMapper):
                                    filter coadd, in which case dataId
                                    must contain filter.
         """
+                # taken from hscMapper.py                                                                                     |
         tract = int(dataId['tract'])
-        if tract < 0 or tract >= 128:
-            raise RuntimeError('tract not in range [0,128)')
-        patchX, patchY = list(map(int, dataId['patch'].split(',')))
+        if tract < 0 or tract >= 2**LsstSimMapper._nbit_tract:
+            raise RuntimeError('tract not in range [0,%d)' % (2**LsstSimMapper._nbit_tract))
+        patchX, patchY = [int(patch) for patch in dataId['patch'].split(',')]
         for p in (patchX, patchY):
-            if p < 0 or p >= 2**13:
-                raise RuntimeError('patch component not in range [0, 8192)')
-        id = (tract * 2**13 + patchX) * 2**13 + patchY
+            if p < 0 or p >= 2**LsstSimMapper._nbit_patch:
+                raise RuntimeError('patch component not in range [0, %d)' % \
+                                   2**LsstSimMapper._nbit_patch)
+        oid = (((tract << LsstSimMapper._nbit_patch) + patchX) << LsstSimMapper._nbit_patch) + patchY
         if singleFilter:
-            return id * 8 + self.filterIdMap[dataId['filter']]
-        return id
-
-    _nbit_id = 30
+            return (oid << LsstSimMapper._nbit_filter) + \
+                afwImageUtils.Filter(dataId['filter']).getId()
+        return oid
 
     def bypass_deepMergedCoaddId_bits(self, *args, **kwargs):
         """The number of bits used up for patch ID bits"""
