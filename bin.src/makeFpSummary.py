@@ -11,6 +11,7 @@ import lsst.afw.geom as afwGeom
 import lsst.afw.fits
 lsst.afw.fits.setAllowImageCompression(False)
 
+
 class FocalplaneSummaryConfig(pexConfig.Config):
     binSize = pexConfig.Field(dtype=int, default=50, doc="pixels to bin for the focalplane summary")
     contrast = pexConfig.Field(dtype=float, default=1, doc="contrast factor")
@@ -30,10 +31,11 @@ class FocalplaneSummaryTask(pipeBase.CmdLineTask):
         """Make summary plots of full focalplane images.
         """
         sbi = SimButlerImage(butler, type=expRef.butlerSubset.datasetType, visit=expRef.dataId['visit'])
+
         # Get the per ccd images
         def parse_name_to_dataId(name_str):
             raft, sensor = name_str.split()
-            return {'raft':raft[-3:], 'sensor':sensor[-3:]}
+            return {'raft': raft[-3:], 'sensor': sensor[-3:]}
         for ccd in butler.get('camera'):
             data_id = parse_name_to_dataId(ccd.getName())
             data_id.update(expRef.dataId)
@@ -46,8 +48,8 @@ class FocalplaneSummaryTask(pipeBase.CmdLineTask):
                 # butler couldn't put the image or there was no image to put
                 continue
             (x, y) = binned_im.getDimensions()
-            boxes = {'A':afwGeom.Box2I(afwGeom.PointI(0,y/2), afwGeom.ExtentI(x, y/2)),
-                     'B':afwGeom.Box2I(afwGeom.PointI(0,0), afwGeom.ExtentI(x, y/2))}
+            boxes = {'A': afwGeom.Box2I(afwGeom.PointI(0, y/2), afwGeom.ExtentI(x, y/2)),
+                     'B': afwGeom.Box2I(afwGeom.PointI(0, 0), afwGeom.ExtentI(x, y/2))}
             for half in ('A', 'B'):
                 box = boxes[half]
                 butler.put(afwImage.MaskedImageF(binned_im, box), 'binned_sensor_fits_halves', half=half,
@@ -55,7 +57,7 @@ class FocalplaneSummaryTask(pipeBase.CmdLineTask):
 
         im = cgu.showCamera(butler.get('camera'), imageSource=sbi, binSize=self.config.binSize)
         expRef.put(im, 'focalplane_summary_fits')
-        im  = flipImage(im, False, True)
+        im = flipImage(im, False, True)
         zmap = ZScaleMapping(im, contrast=self.config.contrast)
         rgb = zmap.makeRgbImage(im, im, im)
         file_name = expRef.get('focalplane_summary_png_filename')
@@ -66,8 +68,9 @@ class FocalplaneSummaryTask(pipeBase.CmdLineTask):
         # Pop doBatch keyword before passing it along to the argument parser
         kwargs.pop("doBatch", False)
 
-        dstype = pipeBase.DatasetArgument('--dstype',default='eimage',
-                                          help="dataset type to process from input data repository (i.e., 'eimage', 'calexp')")
+        dstype = pipeBase.DatasetArgument('--dstype', default='eimage',
+                                          help="dataset type to process from input data repository"
+                                               "(i.e., 'eimage', 'calexp')")
 
         parser = pipeBase.ArgumentParser(name="focalplaneSummary",
                                          *args, **kwargs)
@@ -80,6 +83,7 @@ class FocalplaneSummaryTask(pipeBase.CmdLineTask):
 
     def _getMetadataName(self):
         return None
+
 
 if __name__ == "__main__":
     FocalplaneSummaryTask.parseAndRun()

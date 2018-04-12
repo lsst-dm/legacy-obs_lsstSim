@@ -25,7 +25,7 @@ class SimButlerImage(ButlerImage):
 
         def parse_name_to_dataId(name_str):
             raft, sensor = name_str.split()
-            return {'raft':raft[-3:], 'sensor':sensor[-3:]}
+            return {'raft': raft[-3:], 'sensor': sensor[-3:]}
 
         im = None
         cid = ccd.getName()
@@ -39,7 +39,6 @@ class SimButlerImage(ButlerImage):
                     im.setMaskedImage(rotateImageBy90(im.getMaskedImage(), 2))
                 else:
                     raise ValueError("Only valid dataset types are 'eimage' and 'calexp'")
-               
             except (NoResults, RuntimeError):
                 pass
         else:
@@ -49,7 +48,8 @@ class SimButlerImage(ButlerImage):
             if not as_masked_image:
                 return self._prepareImage(ccd, imageFactory(*bbox.getDimensions()), binSize), ccd
             else:
-                return self._prepareImage(ccd, afwImage.makeMaskedImage(imageFactory(*bbox.getDimensions())), binSize), ccd
+                return self._prepareImage(ccd, afwImage.makeMaskedImage(imageFactory(*bbox.getDimensions())),
+                                          binSize), ccd
 
         if self.type == "raw":
             raise ValueError("This class only handles ccd size images")
