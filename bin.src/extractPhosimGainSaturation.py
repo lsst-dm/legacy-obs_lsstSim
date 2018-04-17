@@ -39,12 +39,13 @@ from astropy.io import fits
 def read_files(path, verbose=False):
     """Return a dictionary of amp name: (gain, saturation) for all amp files in path."""
     amps = {}
-    files = glob.glob(os.path.join(path, 'lsst_*_R??_S??_C??*.fits.gz'))
+    files = glob.glob(os.path.join(path, 'lsst_a_*R??_S??_C??*.fits.gz'))
     for file in files:
         if verbose:
             print(file)
         header = fits.getheader(file)
         ampid = '_'.join((header['CCDID'], header['AMPID']))
+#        ampid = header['CHIPID']
         amps[ampid] = header['GAIN'], int(header['SATURATE'])
     return amps
 
