@@ -26,6 +26,7 @@ __all__ = ["ProcessEimageConfig", "ProcessEimageTask"]
 from lsst.pex.config import Field
 from lsst.pipe.base.argumentParser import ArgumentParser
 from lsst.pipe.tasks.processCcd import ProcessCcdTask
+import lsst.pipe.base as pipeBase
 from .eimageIsr import EimageIsrTask
 
 
@@ -59,5 +60,7 @@ class ProcessEimageTask(ProcessCcdTask):
         """Create an argument parser
         """
         parser = ArgumentParser(name=cls._DefaultName)
-        parser.add_id_argument("--id", "eimage", "data ID, e.g. visit=1 raft=2,2 sensor=1,1 snap=0")
+        parser.add_id_argument(name="--id",
+                               datasetType=pipeBase.ConfigDatasetType(name="isr.datasetType"),
+                               help="data IDs, e.g. --id visit=12345 ccd=1,2^0,3")
         return parser

@@ -28,3 +28,4 @@ from .lsstSimMapper import *
 from .lsstSimIsrTask import *
 from .utils import *
 from .makeLsstSimRawVisitInfo import *
+from .simbutlerimage import *
