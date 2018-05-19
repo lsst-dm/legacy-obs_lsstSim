@@ -9,6 +9,7 @@ config.log
 *.cfgc
 *.pyc
 .cache/
+.pytest_cache/
 pytest_session.txt
 doc/html
 doc/*.tag
