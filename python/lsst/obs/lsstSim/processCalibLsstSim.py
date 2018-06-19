@@ -149,8 +149,8 @@ class ProcessCalibLsstSimTask(IsrTask):
         outmetadata = exposure.getMetadata()
         cardsToCopy = ['CREATOR', 'VERSION', 'BRANCH', 'DATE', 'CCDID']
         for card in cardsToCopy:
-            outmetadata.add(card, metadata.get(card))
-        outmetadata.add('ID', outmetadata.get('CCDID'))
+            outmetadata.add(card, metadata.getScalar(card))
+        outmetadata.add('ID', outmetadata.getScalar('CCDID'))
 
     def fixDefectsAndSat(self, masterFrame, detector):
         fwhm = self.config.fwhm

@@ -40,9 +40,9 @@ class GetRawMetadataTestCase(unittest.TestCase):
         """Test retrieval of raw image metadata"""
         rawMd = self.butler.get("raw_md", visit=85471048, snap=0, raft='0,3',
                                 sensor='0,1', channel='1,0', immediate=True)
-        self.assertAlmostEqual(rawMd.get("AIRMASS"), 1.3184949200550, places=11)
-        self.assertEqual(rawMd.get("BITPIX"), 16)
-        self.assertEqual(rawMd.get("CCDID"), "R03_S01_C10")
+        self.assertAlmostEqual(rawMd.getScalar("AIRMASS"), 1.3184949200550, places=11)
+        self.assertEqual(rawMd.getScalar("BITPIX"), 16)
+        self.assertEqual(rawMd.getScalar("CCDID"), "R03_S01_C10")
 
 
 class MemoryTester(lsst.utils.tests.MemoryTestCase):

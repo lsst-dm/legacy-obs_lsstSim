@@ -265,7 +265,7 @@ class LsstSimMapper(CameraMapper):
         md = item.getMetadata()
         if md.exists("VERSION") and md.getInt("VERSION") < 16952:
             # CRVAL is FK5 at date of observation
-            dateObsTaiMjd = md.get("TAI")
+            dateObsTaiMjd = md.getScalar("TAI")
             dateObs = dafBase.DateTime(dateObsTaiMjd,
                                        system=dafBase.DateTime.MJD,
                                        scale=dafBase.DateTime.TAI)
