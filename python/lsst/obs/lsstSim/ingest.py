@@ -42,25 +42,25 @@ class SimIngestTask(IngestTask):
 class SimParseTask(ParseTask):
 
     def translate_ccd(self, md):
-        sensor_str = md.get('CHIPID')
+        sensor_str = md.getScalar('CHIPID')
         return ",".join(sensor_str[-2:])
 
     def translate_sensor(self, md):
-        sensor_str = md.get('CHIPID')
+        sensor_str = md.getScalar('CHIPID')
         return ",".join(sensor_str[-2:])
 
     def translate_raft(self, md):
-        sensor_str = md.get('CHIPID')
+        sensor_str = md.getScalar('CHIPID')
         return ",".join(sensor_str[1:3])
 
     def translate_taiobs(self, md):
         import lsst.daf.base as dafBase
-        return dafBase.DateTime(md.get('MJD-OBS'), dafBase.DateTime.MJD,
+        return dafBase.DateTime(md.getScalar('MJD-OBS'), dafBase.DateTime.MJD,
                                 dafBase.DateTime.TAI).toString(dafBase.DateTime.UTC)[:-1]
 
     def translate_channel(self, md):
         if 'AMPID' in md.names():
-            amp_str = md.get('AMPID')
+            amp_str = md.getScalar('AMPID')
             return ",".join(amp_str[-2:])
         else:
             # Must be processing an eimage so return nominal amp
@@ -69,7 +69,7 @@ class SimParseTask(ParseTask):
     def translate_snap(self, md):
         # HACK XXX this is just to work around the fact that we don't have
         # the correct header cards in the galsim images.
-        filename_str = md.get('OUTFILE')
+        filename_str = md.getScalar('OUTFILE')
         if filename_str.endswith('fits'):
             return int(filename_str[-8:-5])
         else:

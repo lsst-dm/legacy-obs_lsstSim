@@ -121,8 +121,8 @@ def processRaft(raftDir, conn, done):
             continue
 
         md = readMetadata(fits)
-        expTime = md.get("EXPTIME")
-        mjdObs = md.get("MJD-OBS")
+        expTime = md.getScalar("EXPTIME")
+        mjdObs = md.getScalar("MJD-OBS")
         taiObs = dafBase.DateTime(mjdObs, dafBase.DateTime.MJD,
                                   dafBase.DateTime.TAI).toString(dafBase.DateTime.UTC)[:-1]
         conn.execute("""INSERT INTO raw VALUES
