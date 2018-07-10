@@ -23,7 +23,7 @@
 from __future__ import absolute_import, division
 import numpy
 import time
-import pyfits
+from astropy.io import fits
 import lsst.afw.image as ai
 import lsst.afw.detection as afwDetection
 import lsst.afw.cameraGeom as cameraGeom
@@ -65,7 +65,7 @@ for f in fs.getFootprints():
         width.append(bbox.getWidth())
         height.append(bbox.getHeight())
 
-head = pyfits.Header()
+head = fits.Header()
 cmap = {'A': (0, 0), 'B': (0, 1)}
 if ha is not None:
     head.update('SERIAL', int('%i%i%i%i%i%i' %
@@ -77,14 +77,14 @@ else:
 head.update('CDATE', time.asctime(time.gmtime()), 'UTC of creation')
 
 # Need to transpose from the phosim on disk orientation
-col1 = pyfits.Column(name='y0', format='I', array=numpy.array(y0))
-col2 = pyfits.Column(name='x0', format='I', array=numpy.array(x0))
-col3 = pyfits.Column(name='width', format='I', array=numpy.array(width))
-col4 = pyfits.Column(name='height', format='I', array=numpy.array(height))
-cols = pyfits.ColDefs([col1, col2, col3, col4])
-tbhdu = pyfits.new_table(cols, header=head)
-hdu = pyfits.PrimaryHDU()
-thdulist = pyfits.HDUList([hdu, tbhdu])
+col1 = fits.Column(name='y0', format='I', array=numpy.array(y0))
+col2 = fits.Column(name='x0', format='I', array=numpy.array(x0))
+col3 = fits.Column(name='width', format='I', array=numpy.array(width))
+col4 = fits.Column(name='height', format='I', array=numpy.array(height))
+cols = fits.ColDefs([col1, col2, col3, col4])
+tbhdu = fits.new_table(cols, header=head)
+hdu = fits.PrimaryHDU()
+thdulist = fits.HDUList([hdu, tbhdu])
 if ha is None:
     thdulist.writeto("defects%i%i%i%i.fits"%(rx, ry, sx, sy))
 else:

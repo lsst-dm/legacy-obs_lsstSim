@@ -8,6 +8,7 @@ setupRequired(ip_isr)
 setupRequired(pipe_tasks)
 setupRequired(pybind11)
 setupRequired(utils)
+setupRequired(astropy)
 
 envPrepend(PYTHONPATH, ${PRODUCT_DIR}/python)
 envPrepend(PATH, ${PRODUCT_DIR}/bin)
