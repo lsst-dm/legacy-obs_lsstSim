@@ -29,7 +29,7 @@ import sqlite3
 import sys
 from lsst.obs.lsstSim import LsstSimMapper
 
-import pyfits
+from astropy.io import fits
 
 import lsst.utils
 
@@ -66,7 +66,7 @@ for filePath in glob.glob(os.path.join("rev_*", "defects*.fits")):
         continue
     print("Processing %r" % (filePath,))
 
-    fitsTable = pyfits.open(filePath)
+    fitsTable = fits.open(filePath)
     ccd = fitsTable[1].header["NAME"]
     serial = LsstSimMapper.getShortCcdName(ccd)+"_"+phosimVersion
     conn.execute(cmd, (
