@@ -74,6 +74,10 @@ exposures:
     template: deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/diffexp-S%(sensor)s.fits
   deepDiff_matchedExp:
     template: deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/matchexp-S%(sensor)s.fits
+  dcrDiff_differenceExp:
+    template: dcrDiff/v%(visit)d-f%(filter)s/R%(raft)s/diffexp-S%(sensor)s.fits
+  dcrDiff_matchedExp:
+    template: dcrDiff/v%(visit)d-f%(filter)s/R%(raft)s/matchexp-S%(sensor)s.fits
 
 calibrations:
   bias:
@@ -237,6 +241,14 @@ datasets:
     template: config/dcrCoadd_forced.py
   dcrCoadd_forced_metadata:
     template: dcrCoadd_forced_metadata/%(filter)s/%(tract)d/%(patch)s.boost
+  dcrDiff_diaSrc:
+    template: dcrDiff/v%(visit)d-f%(filter)s/R%(raft)s/diaSrc-S%(sensor)s.fits
+  dcrDiff_kernelSrc:
+    template: dcrDiff/v%(visit)d-f%(filter)s/R%(raft)s/kernelSrc-S%(sensor)s.fits
+  dcrDiff_config:
+    python: lsst.pex.config.Config
+  dcrDiff_metadata:
+    template: dcrDiff/v%(visit)d-f%(filter)s/R%(raft)s/metadata-S%(sensor)s.boost
   apPipe_metadata:
     template: apPipe_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost
 
