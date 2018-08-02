@@ -137,7 +137,7 @@ def makeAmpTables(segmentsFile, gainFile):
                 saturation = 65535
                 gain = float(els[7])
             readnoise = float(els[11])
-            bbox = afwGeom.Box2I(afwGeom.Point2I(x0, y0), afwGeom.Point2I(x1, y1))
+            bbox = afwGeom.Box2I(afwGeom.Point2I(x0, y0), afwGeom.Point2I(x1, y1), invert=False)
 
             if int(els[5]) == -1:
                 flipx = False
@@ -161,13 +161,18 @@ def makeAmpTables(segmentsFile, gainFile):
             extended = 4
             voverscan = 0
             rawBBox = afwGeom.Box2I(afwGeom.Point2I(0, 0),
-                                    afwGeom.Extent2I(extended+ndatax+hoverscan, prescan+ndatay+voverscan))
-            rawDataBBox = afwGeom.Box2I(afwGeom.Point2I(extended, prescan), afwGeom.Extent2I(ndatax, ndatay))
+                                    afwGeom.Extent2I(extended+ndatax+hoverscan, prescan+ndatay+voverscan),
+                                    invert=False)
+            rawDataBBox = afwGeom.Box2I(afwGeom.Point2I(extended, prescan), afwGeom.Extent2I(ndatax, ndatay),
+                                        invert=False)
             rawHorizontalOverscanBBox = afwGeom.Box2I(afwGeom.Point2I(0, prescan),
-                                                      afwGeom.Extent2I(extended, ndatay))
+                                                      afwGeom.Extent2I(extended, ndatay),
+                                                      invert=False)
             rawVerticalOverscanBBox = afwGeom.Box2I(afwGeom.Point2I(extended, prescan+ndatay),
-                                                    afwGeom.Extent2I(ndatax, voverscan))
-            rawPrescanBBox = afwGeom.Box2I(afwGeom.Point2I(extended, 0), afwGeom.Extent2I(ndatax, prescan))
+                                                    afwGeom.Extent2I(ndatax, voverscan),
+                                                    invert=False)
+            rawPrescanBBox = afwGeom.Box2I(afwGeom.Point2I(extended, 0), afwGeom.Extent2I(ndatax, prescan),
+                                           invert=False)
 
             extraRawX = extended + hoverscan
             extraRawY = prescan + voverscan
