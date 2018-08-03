@@ -63,7 +63,7 @@ class ProcessCalibLsstSimTask(IsrTask):
         self.isr = isr
 
     @pipeBase.timeMethod
-    def run(self, sensorRefList, calibType):
+    def runDataRef(self, sensorRefList, calibType):
         """Process a calibration frame.
 
         @param sensorRef: sensor-level butler data reference
