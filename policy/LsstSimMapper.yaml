@@ -174,25 +174,25 @@ datasets:
   forced_src_schema:
     template: schema/forced.fits
   forcedPhotCcd_metadata:
-    template: forcedPhotCcd_metadata/tract%(tract)d/%(visit)d-%(sensor)s.boost
+    template: forcedPhotCcd_metadata/tract%(tract)d/%(visit)d-%(sensor)s.yaml
   src:
     template: src/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits
   Mosaic_metadata:
     persistable: PropertySet
     python: lsst.daf.base.PropertySet
-    storage: BoostStorage
+    storage: YamlStorage
     tables: raw
-    template: metadata/Mosaic.boost
+    template: metadata/Mosaic.yaml
   processCcd_metadata:
-    template: processCcd_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost
+    template: processCcd_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.yaml
   isr_config:
     python: lsst.obs.lsstSim.LsstSimIsrConfig
   isr_metadata:
-    template: isr_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost
+    template: isr_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.yaml
   characterizeImage_metadata:
-    template: characterizeImage_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost
+    template: characterizeImage_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.yaml
   calibrate_metadata:
-    template: calibrate_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost
+    template: calibrate_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.yaml
   processEimage_config:
     persistable: Config
     python: lsst.obs.lsstSim.processEimage.ProcessEimageConfig
@@ -202,9 +202,9 @@ datasets:
   processEimage_metadata:
     persistable: PropertySet
     python: lsst.daf.base.PropertySet
-    storage: BoostStorage
+    storage: YamlStorage
     tables: raw
-    template: processEimage_metadata/v%(visit)d-f%(filter)s/s%(snap)i/R%(raft)s/S%(sensor)s.boost
+    template: processEimage_metadata/v%(visit)d-f%(filter)s/s%(snap)i/R%(raft)s/S%(sensor)s.yaml
   deep_measureMulti_config:
     persistable: Config
     python: lsst.meas.multifit.measureMulti.MeasureMultiConfig
@@ -212,7 +212,7 @@ datasets:
     tables: raw
     template: config/deep_measureMulti.py
   deep_safeClipAssembleCoadd_metadata:
-    template: deep_safeClipAssembleCoadd_metadata/%(filter)s/%(tract)d/%(patch)s.boost
+    template: deep_safeClipAssembleCoadd_metadata/%(filter)s/%(tract)d/%(patch)s.yaml
   deepCoadd_measMatch:
     template: deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/srcMatch-%(filter)s-%(tract)d-%(patch)s.fits
   deepCoadd_measMatchFull:
@@ -222,7 +222,7 @@ datasets:
   deepCoadd_forced_config:
     template: config/deepCoadd_forced.py
   deepCoadd_forced_metadata:
-    template: deepCoadd_forced_metadata/%(filter)s/%(tract)d/%(patch)s.boost
+    template: deepCoadd_forced_metadata/%(filter)s/%(tract)d/%(patch)s.yaml
   deepDiff_diaSrc:
     template: deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/diaSrc-S%(sensor)s.fits
   deepDiff_kernelSrc:
@@ -230,7 +230,7 @@ datasets:
   deepDiff_config:
     python: lsst.pex.config.Config
   deepDiff_metadata:
-    template: deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/metadata-S%(sensor)s.boost
+    template: deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/metadata-S%(sensor)s.yaml
   dcrCoadd_measMatch:
     template: dcrCoadd-results/%(filter)s/%(tract)d/%(patch)s/srcMatch-%(filter)s-%(tract)d-%(patch)s.fits
   dcrCoadd_measMatchFull:
@@ -240,7 +240,7 @@ datasets:
   dcrCoadd_forced_config:
     template: config/dcrCoadd_forced.py
   dcrCoadd_forced_metadata:
-    template: dcrCoadd_forced_metadata/%(filter)s/%(tract)d/%(patch)s.boost
+    template: dcrCoadd_forced_metadata/%(filter)s/%(tract)d/%(patch)s.yaml
   dcrDiff_diaSrc:
     template: dcrDiff/v%(visit)d-f%(filter)s/R%(raft)s/diaSrc-S%(sensor)s.fits
   dcrDiff_kernelSrc:
@@ -248,9 +248,9 @@ datasets:
   dcrDiff_config:
     python: lsst.pex.config.Config
   dcrDiff_metadata:
-    template: dcrDiff/v%(visit)d-f%(filter)s/R%(raft)s/metadata-S%(sensor)s.boost
+    template: dcrDiff/v%(visit)d-f%(filter)s/R%(raft)s/metadata-S%(sensor)s.yaml
   apPipe_metadata:
-    template: apPipe_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.boost
+    template: apPipe_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.yaml
 
   # Plots for analysis QA
   plotCoadd:
