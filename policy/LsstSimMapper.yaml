@@ -37,8 +37,8 @@ exposures:
     template: raw/v%(visit)d-f%(filter)s/E%(snap)03d/R%(raft)s/S%(sensor)s/imsim_%(visit)d_R%(raft)s_S%(sensor)s_C%(channel)s_E%(snap)03d.fits.gz
   eimage:
     level: Ccd
-    persistable: DecoratedImageU
-    python: lsst.afw.image.DecoratedImageU
+    persistable: DecoratedImageF
+    python: lsst.afw.image.DecoratedImageF
     storage: FitsStorage
     tables: raw
     template: eimage/v%(visit)d-f%(filter)s/E%(snap)03d/R%(raft)s/eimage_%(visit)d_R%(raft)s_S%(sensor)s_E%(snap)03d.fits.gz
