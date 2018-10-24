@@ -201,10 +201,6 @@ datasets:
     template: processEimage_metadata/v%(visit)d-f%(filter)s/s%(snap)i/R%(raft)s/S%(sensor)s.yaml
   deep_safeClipAssembleCoadd_metadata:
     template: deep_safeClipAssembleCoadd_metadata/%(filter)s/%(tract)d/%(patch)s.yaml
-  deepCoadd_measMatch:
-    template: deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/srcMatch-%(filter)s-%(tract)d-%(patch)s.fits
-  deepCoadd_measMatchFull:
-    template: deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/srcMatchFull-%(filter)s-%(tract)d-%(patch)s.fits
   deepCoadd_forced_src:
     template: deepCoadd-results/%(filter)s/%(tract)d/%(patch)s/forced-%(filter)s-%(tract)d-%(patch)s.fits
   deepCoadd_forced_config:
