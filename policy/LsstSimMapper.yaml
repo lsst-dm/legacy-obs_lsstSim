@@ -177,12 +177,6 @@ datasets:
     template: forcedPhotCcd_metadata/tract%(tract)d/%(visit)d-%(sensor)s.yaml
   src:
     template: src/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.fits
-  Mosaic_metadata:
-    persistable: PropertySet
-    python: lsst.daf.base.PropertySet
-    storage: YamlStorage
-    tables: raw
-    template: metadata/Mosaic.yaml
   processCcd_metadata:
     template: processCcd_metadata/v%(visit)d-f%(filter)s/R%(raft)s/S%(sensor)s.yaml
   isr_config:
