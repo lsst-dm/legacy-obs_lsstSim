@@ -60,7 +60,7 @@ class EimageIsrTask(pipeBase.Task):
 
     @pipeBase.timeMethod
     def runDataRef(self, sensorRef):
-        """Load the post instrument signature removal image
+        r"""Load the post instrument signature removal image
 
         \param[in]  sensorRef        sensor-level butler data reference
 
