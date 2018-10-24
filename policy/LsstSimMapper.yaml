@@ -199,12 +199,6 @@ datasets:
     storage: YamlStorage
     tables: raw
     template: processEimage_metadata/v%(visit)d-f%(filter)s/s%(snap)i/R%(raft)s/S%(sensor)s.yaml
-  deep_measureMulti_config:
-    persistable: Config
-    python: lsst.meas.multifit.measureMulti.MeasureMultiConfig
-    storage: ConfigStorage
-    tables: raw
-    template: config/deep_measureMulti.py
   deep_safeClipAssembleCoadd_metadata:
     template: deep_safeClipAssembleCoadd_metadata/%(filter)s/%(tract)d/%(patch)s.yaml
   deepCoadd_measMatch:
