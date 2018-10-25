@@ -56,7 +56,7 @@ class LsstSimIsrConfig(IsrTask.ConfigClass):
 
 class LsstSimIsrTask(IsrTask):
 
-    """
+    r"""
     \section obs_lsstSim_isr_Debug Debug variables
 
     The \link lsst.pipe.base.cmdLineTask.CmdLineTask command line task\endlink interface supports a
@@ -96,7 +96,7 @@ class LsstSimIsrTask(IsrTask):
         maskarr[idx] &= andMask
 
     def saturationInterpolation(self, ccdExposure):
-        """!Unmask hot pixels and interpolate over saturated pixels, in place
+        r"""!Unmask hot pixels and interpolate over saturated pixels, in place
 
         \param[in,out]  ccdExposure     exposure to process
 
