@@ -215,16 +215,6 @@ datasets:
     python: lsst.pex.config.Config
   deepDiff_metadata:
     template: deepDiff/v%(visit)d-f%(filter)s/R%(raft)s/metadata-S%(sensor)s.yaml
-  dcrCoadd_measMatch:
-    template: dcrCoadd-results/%(filter)s/%(tract)d/%(patch)s/srcMatch-%(filter)s-%(tract)d-%(patch)s.fits
-  dcrCoadd_measMatchFull:
-    template: dcrCoadd-results/%(filter)s/%(tract)d/%(patch)s/srcMatchFull-%(filter)s-%(tract)d-%(patch)s.fits
-  dcrCoadd_forced_src:
-    template: dcrCoadd-results/%(filter)s/%(tract)d/%(patch)s/forced-%(filter)s-%(tract)d-%(patch)s.fits
-  dcrCoadd_forced_config:
-    template: config/dcrCoadd_forced.py
-  dcrCoadd_forced_metadata:
-    template: dcrCoadd_forced_metadata/%(filter)s/%(tract)d/%(patch)s.yaml
   dcrDiff_diaSrc:
     template: dcrDiff/v%(visit)d-f%(filter)s/R%(raft)s/diaSrc-S%(sensor)s.fits
   dcrDiff_kernelSrc:
