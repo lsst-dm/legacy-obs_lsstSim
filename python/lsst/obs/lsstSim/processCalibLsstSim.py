@@ -118,14 +118,14 @@ class ProcessCalibLsstSimTask(IsrTask):
             exp.setDetector(ampDetector)
             exp.setWcs(None)
             exp.setCalib(expcalib)
-            if calibType is 'flat':
+            if calibType == 'flat':
                 exp.setFilter(expfilter)
-            if self.config.doWrite and calibType is not 'flat':
+            if self.config.doWrite and calibType != 'flat':
                 print("writing file %s" % dataId)
                 butler.put(exp, calibType, dataId=amp.dataId)
             masterExpList.append(exp)
             dataIdList.append(amp.dataId)
-        if self.config.doWrite and calibType is 'flat':
+        if self.config.doWrite and calibType == 'flat':
             self.normChipAmps(masterExpList)
             for exp, dataId in zip(masterExpList, dataIdList):
                 print("writing flat file %s" % dataId)
@@ -195,9 +195,9 @@ class ProcessCalibLsstSimTask(IsrTask):
     def combineMIList(self, miList, method='MEANCLIP'):
         combinedFrame = miList[0].Factory()
         try:
-            if method is 'MEANCLIP':
+            if method == 'MEANCLIP':
                 combinedFrame = afwMath.statisticsStack(miList, afwMath.MEANCLIP, self.statsCtrl)
-            elif method is 'MEDIAN':
+            elif method == 'MEDIAN':
                 combinedFrame = afwMath.statisticsStack(miList, afwMath.MEDIAN, self.statsCtrl)
             else:
                 raise ValueError("Method %s is not supported for combining frames" % (method))
