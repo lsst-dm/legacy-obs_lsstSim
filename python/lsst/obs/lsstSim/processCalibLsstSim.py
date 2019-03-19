@@ -92,7 +92,7 @@ class ProcessCalibLsstSimTask(IsrTask):
                     if expmeta is None:
                         expmeta = ampExposure.getMetadata()
                         expfilter = ampExposure.getFilter()
-                        expcalib = ampExposure.getCalib()
+                        expPhotoCalib = ampExposure.getPhotoCalib()
                     ampDetector = ampExposure.getDetector()
 
                     ampExposure = self.convertIntToFloat(ampExposure)
@@ -117,7 +117,7 @@ class ProcessCalibLsstSimTask(IsrTask):
             self.copyMetadata(exp, expmeta, calibType)
             exp.setDetector(ampDetector)
             exp.setWcs(None)
-            exp.setCalib(expcalib)
+            exp.setPhotoCalib(expPhotoCalib)
             if calibType == 'flat':
                 exp.setFilter(expfilter)
             if self.config.doWrite and calibType != 'flat':
