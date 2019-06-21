@@ -26,11 +26,15 @@ __all__ = ["LsstSimMapper"]
 
 import os
 import re
+from astropy.io import fits
 
+import lsst.afw.geom as afwGeom
 import lsst.daf.base as dafBase
 import lsst.afw.image.utils as afwImageUtils
 import lsst.daf.persistence as dafPersist
+from lsst.meas.algorithms import Defects
 from .makeLsstSimRawVisitInfo import MakeLsstSimRawVisitInfo
+from lsst.utils import getPackageDir
 
 from lsst.obs.base import CameraMapper
 
@@ -47,6 +51,12 @@ class LsstSimMapper(CameraMapper):
     def __init__(self, inputPolicy=None, **kwargs):
         policyFile = dafPersist.Policy.defaultPolicyFile(self.packageName, "LsstSimMapper.yaml", "policy")
         policy = dafPersist.Policy(policyFile)
+        repositoryDir = os.path.join(getPackageDir(self.packageName), 'policy')
+        self.defectRegistry = None
+        if 'defects' in policy:
+            self.defectPath = os.path.join(repositoryDir, policy['defects'])
+            defectRegistryLocation = os.path.join(self.defectPath, "defectRegistry.sqlite3")
+            self.defectRegistry = dafPersist.Registry.create(defectRegistryLocation)
 
         self.doFootprints = False
         if inputPolicy is not None:
@@ -227,6 +237,97 @@ class LsstSimMapper(CameraMapper):
             return id * 8 + self.filterIdMap[dataId['filter']]
         return id
 
+    def _defectLookup(self, dataId, dateKey='taiObs'):
+        """Find the defects for a given CCD.
+
+        Parameters
+        ----------
+        dataId : `dict`
+            Dataset identifier
+
+        Returns
+        -------
+        `str`
+            Path to the defects file or None if not available.
+        """
+        if self.defectRegistry is None:
+            return None
+        if self.registry is None:
+            raise RuntimeError("No registry for defect lookup")
+
+        ccdKey, ccdVal = self._getCcdKeyVal(dataId)
+
+        dataIdForLookup = {'visit': dataId['visit']}
+        # .lookup will fail in a posix registry because there is no template to provide.
+        rows = self.registry.lookup((dateKey), ('raw_visit'), dataIdForLookup)
+        if len(rows) == 0:
+            return None
+        assert len(rows) == 1
+        dayObs = rows[0][0]
+
+        # Lookup the defects for this CCD serial number that are valid at the exposure midpoint.
+        rows = self.defectRegistry.executeQuery(("path",), ("defect",),
+                                                [(ccdKey, "?")],
+                                                ("DATETIME(?)", "DATETIME(validStart)", "DATETIME(validEnd)"),
+                                                (ccdVal, dayObs))
+        if not rows or len(rows) == 0:
+            return None
+        if len(rows) == 1:
+            return os.path.join(self.defectPath, rows[0][0])
+        else:
+            raise RuntimeError("Querying for defects (%s, %s) returns %d files: %s" %
+                               (ccdVal, dayObs, len(rows), ", ".join([_[0] for _ in rows])))
+
+    def map_defects(self, dataId, write=False):
+        """Map defects dataset.
+
+        Returns
+        -------
+        `lsst.daf.butler.ButlerLocation`
+            Minimal ButlerLocation containing just the locationList field
+            (just enough information that bypass_defects can use it).
+        """
+        defectFitsPath = self._defectLookup(dataId=dataId)
+        if defectFitsPath is None:
+            raise RuntimeError("No defects available for dataId=%s" % (dataId,))
+
+        return dafPersist.ButlerLocation(None, None, None, defectFitsPath,
+                                         dataId, self,
+                                         storage=self.rootStorage)
+
+    def bypass_defects(self, datasetType, pythonType, butlerLocation, dataId):
+        """Return a defect based on the butler location returned by map_defects
+
+        Parameters
+        ----------
+        butlerLocation : `lsst.daf.persistence.ButlerLocation`
+            locationList = path to defects FITS file
+        dataId : `dict`
+            Butler data ID; "ccd" must be set.
+
+        Note: the name "bypass_XXX" means the butler makes no attempt to
+        convert the ButlerLocation into an object, which is what we want for
+        now, since that conversion is a bit tricky.
+        """
+        detectorName = self._extractDetectorName(dataId)
+        defectsFitsPath = butlerLocation.locationList[0]
+
+        with fits.open(defectsFitsPath) as hduList:
+            for hdu in hduList[1:]:
+                if hdu.header["name"] != detectorName:
+                    continue
+
+                defectList = Defects()
+                for data in hdu.data:
+                    bbox = afwGeom.Box2I(
+                        afwGeom.Point2I(int(data['x0']), int(data['y0'])),
+                        afwGeom.Extent2I(int(data['width']), int(data['height'])),
+                    )
+                    defectList.append(bbox)
+                return defectList
+
+        raise RuntimeError("No defects for ccd %s in %s" % (detectorName, defectsFitsPath))
+
     _nbit_id = 30
 
     def bypass_deepMergedCoaddId_bits(self, *args, **kwargs):
@@ -281,6 +382,14 @@ class LsstSimMapper(CameraMapper):
         return self._standardizeExposure(self.exposures['eimage'], item, dataId, trimmed=True)
 
 ###############################################################################
+
+    def _getCcdKeyVal(self, dataId):
+        """Return CCD key and value used to look a defect in the defect
+        registry
+
+        The default implementation simply returns ("ccd", full detector name)
+        """
+        return ("ccd", self._extractDetectorName(dataId))
 
     def bypass_ampExposureId(self, datasetType, pythonType, location, dataId):
         return self._computeAmpExposureId(dataId)
