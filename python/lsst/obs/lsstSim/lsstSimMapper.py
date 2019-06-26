@@ -379,6 +379,20 @@ class LsstSimMapper(CameraMapper):
         """Standardize a eimage dataset by converting it to an Exposure instead of an Image"""
         return self._standardizeExposure(self.exposures['eimage'], item, dataId, trimmed=True)
 
+    def _createInitialSkyWcs(self, exposure):
+        """Create a SkyWcs from the header metadata.
+
+        PhoSim data may not have self-consistent boresight and crval/crpix
+        values, and/or may have been written in FK5, so we just use the
+        metadata here, and ignore VisitInfo/CameraGeom.
+
+        Parameters
+        ----------
+        exposure : `lsst.afw.image.Exposure`
+            The exposure to get data from, and attach the SkyWcs to.
+        """
+        self._createSkyWcsFromMetadata(exposure)
+
 ###############################################################################
 
     def _getCcdKeyVal(self, dataId):
