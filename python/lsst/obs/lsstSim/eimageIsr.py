@@ -103,8 +103,8 @@ class EimageIsrTask(pipeBase.Task):
         isr.interpolateFromMask(
             maskedImage=mi,
             fwhm=self.config.interp_size,
-            growFootprints=0,
-            maskName='SAT',
+            growSaturatedFootprints=0,
+            maskNameList=['SAT'],
         )
         inputExposure.setMaskedImage(isr.transposeMaskedImage(mi))
         return pipeBase.Struct(exposure=inputExposure)
