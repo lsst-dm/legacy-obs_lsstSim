@@ -1,5 +1,3 @@
-from __future__ import print_function
-from builtins import zip
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010, 2011, 2012, 2013 LSST Corporation.

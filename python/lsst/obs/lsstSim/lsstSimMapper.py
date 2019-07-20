@@ -1,5 +1,3 @@
-from builtins import map
-from past.builtins import basestring
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010, 2011, 2012, 2013 LSST Corporation.
@@ -143,7 +141,7 @@ class LsstSimMapper(CameraMapper):
             if component not in dataId:
                 continue
             val = dataId[component]
-            if not isinstance(val, basestring):
+            if not isinstance(val, str):
                 raise RuntimeError(
                     "%s identifier should be type str, not %s: %r" % (component.title(), type(val), val))
             if component == "sensor":

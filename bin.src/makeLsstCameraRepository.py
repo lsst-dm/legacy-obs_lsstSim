@@ -26,9 +26,6 @@ Produce the camera description FITS files from phosim text files.
 Scons should have automatically run this when building obs_lsstSim. To produce
 the same files that scons would have, run with no arguments.
 """
-from __future__ import absolute_import, division
-from __future__ import print_function
-from builtins import range
 import argparse
 import os
 import re

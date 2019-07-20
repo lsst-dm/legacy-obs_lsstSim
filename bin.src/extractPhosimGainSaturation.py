@@ -28,7 +28,6 @@ You first have to run phosim to generate images for each amp. These can be the
 simplest no-background, no-source images, so long as they have a real gain and
 saturation threshold.
 """
-from __future__ import absolute_import, division, print_function
 
 import os
 import glob

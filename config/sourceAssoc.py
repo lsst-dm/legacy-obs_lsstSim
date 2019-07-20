@@ -1,4 +1,3 @@
-from __future__ import print_function
 config.inputLevel = "sensor"
 config.inputSourceDataset = "src"
 config.inputCalexpMetadataDataset = "calexp_md"
