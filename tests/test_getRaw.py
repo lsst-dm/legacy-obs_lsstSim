@@ -29,7 +29,7 @@ import lsst.daf.persistence as dafPersist
 from lsst.obs.base import MakeRawVisitInfo
 import lsst.utils.tests
 from lsst.afw.image import RotType
-from lsst.afw.geom import degrees, SpherePoint
+from lsst.geom import degrees, SpherePoint
 
 
 class GetRawTestCase(lsst.utils.tests.TestCase):

@@ -21,7 +21,7 @@
 #
 import lsst.afw.image as afwImage
 import lsst.afw.math as afwMath
-import lsst.afw.geom as afwGeom
+import lsst.geom as geom
 import lsst.meas.algorithms as measAlg
 import lsst.pex.config as pexConfig
 import lsst.pipe.base as pipeBase
@@ -178,8 +178,8 @@ class ProcessCalibLsstSimTask(IsrTask):
         retDefectList = measAlg.DefectListT()
         for defect in defectList:
             bbox = defect.getBBox()
-            nbbox = afwGeom.Box2I(afwGeom.Point2I(bbox.getMinY(), bbox.getMinX()),
-                                  afwGeom.Extent2I(bbox.getDimensions()[1], bbox.getDimensions()[0]))
+            nbbox = geom.Box2I(geom.Point2I(bbox.getMinY(), bbox.getMinX()),
+                               geom.Extent2I(bbox.getDimensions()[1], bbox.getDimensions()[0]))
             if checkBbox:
 
                 if checkBbox.overlaps(bbox):

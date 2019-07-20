@@ -22,9 +22,9 @@
 import astropy.units
 
 from lsst.afw.image import VisitInfo, RotType
-from lsst.afw.geom import degrees, SpherePoint
 from lsst.afw.coord import Observatory, Weather
 from lsst.afw.coord.refraction import defaultWeather
+from lsst.geom import degrees, SpherePoint
 from lsst.obs.base import MakeRawVisitInfo
 
 __all__ = ["MakeLsstSimRawVisitInfo"]

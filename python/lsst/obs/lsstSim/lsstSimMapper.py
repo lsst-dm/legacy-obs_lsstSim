@@ -26,9 +26,9 @@ import os
 import re
 from astropy.io import fits
 
-import lsst.afw.geom as afwGeom
 import lsst.daf.base as dafBase
 import lsst.afw.image.utils as afwImageUtils
+import lsst.geom as geom
 import lsst.daf.persistence as dafPersist
 from lsst.meas.algorithms import Defects
 from .makeLsstSimRawVisitInfo import MakeLsstSimRawVisitInfo
@@ -317,9 +317,9 @@ class LsstSimMapper(CameraMapper):
 
                 defectList = Defects()
                 for data in hdu.data:
-                    bbox = afwGeom.Box2I(
-                        afwGeom.Point2I(int(data['x0']), int(data['y0'])),
-                        afwGeom.Extent2I(int(data['width']), int(data['height'])),
+                    bbox = geom.Box2I(
+                        geom.Point2I(int(data['x0']), int(data['y0'])),
+                        geom.Extent2I(int(data['width']), int(data['height'])),
                     )
                     defectList.append(bbox)
                 return defectList
