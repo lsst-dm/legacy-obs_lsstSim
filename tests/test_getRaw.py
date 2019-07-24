@@ -19,7 +19,6 @@
 # the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
-from __future__ import absolute_import, division, print_function
 import math
 import os.path
 import sys
@@ -30,7 +29,7 @@ import lsst.daf.persistence as dafPersist
 from lsst.obs.base import MakeRawVisitInfo
 import lsst.utils.tests
 from lsst.afw.image import RotType
-from lsst.afw.geom import degrees, SpherePoint
+from lsst.geom import degrees, SpherePoint
 
 
 class GetRawTestCase(lsst.utils.tests.TestCase):

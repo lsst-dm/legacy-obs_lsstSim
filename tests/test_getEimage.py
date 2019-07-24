@@ -19,7 +19,6 @@
 # the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
-from __future__ import absolute_import, division, print_function
 
 """Test ability to get an eimage from the butler.
 **Note that this is an lsstSim specific test and
@@ -31,7 +30,7 @@ import unittest
 import numpy as np
 
 import lsst.utils
-import lsst.afw.geom as afwGeom
+import lsst.geom as geom
 from lsst.afw.image import RotType
 import lsst.utils.tests
 import lsst.daf.persistence as dafPersistence
@@ -70,16 +69,16 @@ class GetEimageTestCase(lsst.utils.tests.TestCase):
         self.assertEqual(1.00015190967402, self.visit_info.getBoresightAirmass())
 
     def test_getBoresightAzAlt(self):
-        coord = afwGeom.SpherePoint(0.0, 89.0, afwGeom.degrees)
+        coord = geom.SpherePoint(0.0, 89.0, geom.degrees)
         self.assertEqual(coord, self.visit_info.getBoresightAzAlt())
 
     def test_getBoresightRaDec(self):
-        coord = afwGeom.SpherePoint(53.0091385, -27.4389488, afwGeom.degrees)
+        coord = geom.SpherePoint(53.0091385, -27.4389488, geom.degrees)
         self.assertEqual(coord, self.visit_info.getBoresightRaDec())
 
     def test_getBoresightRotAngle(self):
         # Note test eimage header has ROTANG=236.983652.  boresightRotAngle is -ROTANG.
-        angle = afwGeom.Angle(-236.983652, afwGeom.degrees)
+        angle = geom.Angle(-236.983652, geom.degrees)
         self.assertAnglesAlmostEqual(angle, self.visit_info.getBoresightRotAngle())
 
     def test_getDarkTime(self):
@@ -100,8 +99,8 @@ class GetEimageTestCase(lsst.utils.tests.TestCase):
         self.assertEqual(30.0, self.visit_info.getExposureTime())
 
     def test_getObservatory(self):
-        observatory = Observatory(afwGeom.Angle(-70.749417, afwGeom.degrees),
-                                  afwGeom.Angle(-30.244633, afwGeom.degrees), 2663)
+        observatory = Observatory(geom.Angle(-70.749417, geom.degrees),
+                                  geom.Angle(-30.244633, geom.degrees), 2663)
         self.assertEqual(observatory, self.visit_info.getObservatory())
 
     def test_getRotType(self):

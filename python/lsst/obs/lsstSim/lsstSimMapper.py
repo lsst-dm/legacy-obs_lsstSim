@@ -1,5 +1,3 @@
-from builtins import map
-from past.builtins import basestring
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010, 2011, 2012, 2013 LSST Corporation.
@@ -28,9 +26,9 @@ import os
 import re
 from astropy.io import fits
 
-import lsst.afw.geom as afwGeom
 import lsst.daf.base as dafBase
 import lsst.afw.image.utils as afwImageUtils
+import lsst.geom as geom
 import lsst.daf.persistence as dafPersist
 from lsst.meas.algorithms import Defects
 from .makeLsstSimRawVisitInfo import MakeLsstSimRawVisitInfo
@@ -143,7 +141,7 @@ class LsstSimMapper(CameraMapper):
             if component not in dataId:
                 continue
             val = dataId[component]
-            if not isinstance(val, basestring):
+            if not isinstance(val, str):
                 raise RuntimeError(
                     "%s identifier should be type str, not %s: %r" % (component.title(), type(val), val))
             if component == "sensor":
@@ -319,9 +317,9 @@ class LsstSimMapper(CameraMapper):
 
                 defectList = Defects()
                 for data in hdu.data:
-                    bbox = afwGeom.Box2I(
-                        afwGeom.Point2I(int(data['x0']), int(data['y0'])),
-                        afwGeom.Extent2I(int(data['width']), int(data['height'])),
+                    bbox = geom.Box2I(
+                        geom.Point2I(int(data['x0']), int(data['y0'])),
+                        geom.Extent2I(int(data['width']), int(data['height'])),
                     )
                     defectList.append(bbox)
                 return defectList
