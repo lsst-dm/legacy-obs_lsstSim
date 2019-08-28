@@ -35,7 +35,8 @@ import lsst.utils
 import lsst.afw.geom as afwGeom
 import lsst.afw.table as afwTable
 from lsst.afw.cameraGeom import DetectorConfig, CameraConfig, \
-    TransformMapConfig, FIELD_ANGLE, FOCAL_PLANE, PIXELS, NullLinearityType
+    TransformMapConfig, FIELD_ANGLE, FOCAL_PLANE, PIXELS, NullLinearityType, \
+    ReadoutCorner, Amplifier
 import lsst.geom as geom
 from lsst.obs.lsstSim import LsstSimMapper
 
@@ -88,8 +89,12 @@ def makeAmpTables(segmentsFile, gainFile):
     # how to get this information.
     linearityCoeffs = (0., 1., 0., 0.)
     linearityType = NullLinearityType
-    readoutMap = {'LL': afwTable.LL, 'LR': afwTable.LR, 'UR': afwTable.UR, 'UL': afwTable.UL}
-    ampCatalog = None
+    readoutMap = {'LL': ReadoutCorner.LL,
+                  'LR': ReadoutCorner.LR,
+                  'UR': ReadoutCorner.UR,
+                  'UL': ReadoutCorner.UL}
+
+    ampCatalog = []
     detectorName = []  # set to a value that is an invalid dict key, to catch bugs
     correctY0 = False
     with open(segmentsFile) as fh:
@@ -99,18 +104,18 @@ def makeAmpTables(segmentsFile, gainFile):
 
             els = l.rstrip().split()
             if len(els) == 4:
-                if ampCatalog is not None:
+                if len(ampCatalog) != 0:
                     returnDict[detectorName] = ampCatalog
                 detectorName = expandDetectorName(els[0])
                 numy = int(els[2])
-                schema = afwTable.AmpInfoTable.makeMinimalSchema()
-                ampCatalog = afwTable.AmpInfoCatalog(schema)
+
+                ampCatalog = []
                 if len(els[0].split('_')) == 3:  # wavefront sensor
                     correctY0 = True
                 else:
                     correctY0 = False
                 continue
-            record = ampCatalog.addNew()
+            amplifier = Amplifier.Builder()
             name = els[0].split("_")[-1]
             name = '%s,%s'%(name[1], name[2])
             # Because of the camera coordinate system, we choose an
@@ -171,25 +176,26 @@ def makeAmpTables(segmentsFile, gainFile):
             extraRawY = prescan + voverscan
             rawx0 = x0 + extraRawX*(x0//ndatax)
             rawy0 = y0 + extraRawY*(y0//ndatay)
-            # Set the elements of the record for this amp
-            record.setBBox(bbox)
-            record.setName(name)
-            record.setReadoutCorner(readCorner)
-            record.setGain(gain)
-            record.setSaturation(saturation)
-            record.setSuspectLevel(float("nan"))
-            record.setReadNoise(readnoise)
-            record.setLinearityCoeffs(linearityCoeffs)
-            record.setLinearityType(linearityType)
-            record.setHasRawInfo(True)
-            record.setRawFlipX(flipx)
-            record.setRawFlipY(flipy)
-            record.setRawBBox(rawBBox)
-            record.setRawXYOffset(geom.Extent2I(rawx0, rawy0))
-            record.setRawDataBBox(rawDataBBox)
-            record.setRawHorizontalOverscanBBox(rawHorizontalOverscanBBox)
-            record.setRawVerticalOverscanBBox(rawVerticalOverscanBBox)
-            record.setRawPrescanBBox(rawPrescanBBox)
+            # Set the elements of the amplifier for this amp
+            amplifier.setBBox(bbox)
+            amplifier.setName(name)
+            amplifier.setReadoutCorner(readCorner)
+            amplifier.setGain(gain)
+            amplifier.setSaturation(saturation)
+            amplifier.setSuspectLevel(float("nan"))
+            amplifier.setReadNoise(readnoise)
+            amplifier.setLinearityCoeffs(linearityCoeffs)
+            amplifier.setLinearityType(linearityType)
+            #            amplifier.setHasRawInfo(True)
+            amplifier.setRawFlipX(flipx)
+            amplifier.setRawFlipY(flipy)
+            amplifier.setRawBBox(rawBBox)
+            amplifier.setRawXYOffset(geom.Extent2I(rawx0, rawy0))
+            amplifier.setRawDataBBox(rawDataBBox)
+            amplifier.setRawHorizontalOverscanBBox(rawHorizontalOverscanBBox)
+            amplifier.setRawVerticalOverscanBBox(rawVerticalOverscanBBox)
+            amplifier.setRawPrescanBBox(rawPrescanBBox)
+            ampCatalog.append(amplifier)
     returnDict[detectorName] = ampCatalog
     return returnDict
 
@@ -363,4 +369,11 @@ if __name__ == "__main__":
     for detectorName, ampTable in ampTableDict.items():
         shortDetectorName = LsstSimMapper.getShortCcdName(detectorName)
         ampInfoPath = os.path.join(outDir, shortDetectorName + ".fits")
-        ampTable.writeFits(ampInfoPath)
+        protoTypeSchema = lsst.afw.cameraGeom.Amplifier.getRecordSchema()
+        detectorTable = afwTable.BaseCatalog(protoTypeSchema)
+        for amp in ampTable:
+            record = detectorTable.makeRecord()
+            tempAmp = amp.finish()
+            tempAmp.toRecord(record)
+            detectorTable.append(record)
+        detectorTable.writeFits(filename=ampInfoPath)
