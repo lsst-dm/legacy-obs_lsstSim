@@ -1,5 +1,4 @@
 setupRequired(daf_base)
-setupRequired(pex_policy)
 setupRequired(afw)
 setupRequired(daf_persistence)
 setupRequired(obs_base)
