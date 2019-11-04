@@ -55,6 +55,7 @@ class LsstSimIsrTaskTestCase(unittest.TestCase):
         config.doFringe = False
         config.doAssembleCcd = False
         config.doSnapCombine = False
+        config.doLinearize = False
         lsstIsrTask = LsstSimIsrTask(config=config)
         exposure = lsstIsrTask.runDataRef(self.ampRef).exposure
         self.assertAlmostEqual(afwMath.makeStatistics(exposure.getMaskedImage(), afwMath.MEAN).getValue(),
@@ -70,6 +71,7 @@ class LsstSimIsrTaskTestCase(unittest.TestCase):
         config.doFringe = False
         config.doAssembleCcd = False
         config.doSnapCombine = False
+        config.doLinearize = False
         lsstIsrTask = LsstSimIsrTask(config=config)
         ampExp = self.ampRef.get('raw')
         camera = self.ampRef.get("camera")

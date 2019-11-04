@@ -293,6 +293,9 @@ class LsstSimMapper(CameraMapper):
                                          dataId, self,
                                          storage=self.rootStorage)
 
+    def map_linearizer(self, dataId, write=False):
+        return None
+
     def bypass_defects(self, datasetType, pythonType, butlerLocation, dataId):
         """Return a defect based on the butler location returned by map_defects
 
