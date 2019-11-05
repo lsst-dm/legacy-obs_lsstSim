@@ -170,7 +170,7 @@ class ProcessCalibLsstSimTask(IsrTask):
         # sdl = self.isr.getDefectListFromMask(masterFrame, 'SAT')
         # for d in sdl:
         #     dl.push_back(d)
-        self.isr.maskPixelsFromDefectList(masterFrame, dl, maskName='BAD')
+        masterFrame = measAlg.Defects(dl).maskPixels(masterFrame, maskName='BAD')
         self.isr.interpolateDefectList(masterFrame, dl, fwhm)
         return masterFrame
 
