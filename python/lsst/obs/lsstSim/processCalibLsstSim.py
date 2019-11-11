@@ -169,13 +169,13 @@ class ProcessCalibLsstSimTask(IsrTask):
         # Should saturation be interpolated as well?
         # sdl = self.isr.getDefectListFromMask(masterFrame, 'SAT')
         # for d in sdl:
-        #     dl.push_back(d)
-        masterFrame = measAlg.Defects(dl).maskPixels(masterFrame, maskName='BAD')
+        #     dl.append(d)
+        masterFrame = dl.maskPixels(masterFrame, maskName='BAD')
         self.isr.interpolateDefectList(masterFrame, dl, fwhm)
         return masterFrame
 
     def transposeDefectList(self, defectList, checkBbox=None):
-        retDefectList = measAlg.DefectListT()
+        retDefectList = measAlg.Defects()
         for defect in defectList:
             bbox = defect.getBBox()
             nbbox = geom.Box2I(geom.Point2I(bbox.getMinY(), bbox.getMinX()),
@@ -183,11 +183,11 @@ class ProcessCalibLsstSimTask(IsrTask):
             if checkBbox:
 
                 if checkBbox.overlaps(bbox):
-                    retDefectList.push_back(measAlg.Defect(nbbox))
+                    retDefectList.append(measAlg.Defect(nbbox))
                 else:
                     pass
             else:
-                retDefectList.push_back(measAlg.Defect(nbbox))
+                retDefectList.append(measAlg.Defect(nbbox))
         return retDefectList
 
     def combineMIList(self, miList, method='MEANCLIP'):
