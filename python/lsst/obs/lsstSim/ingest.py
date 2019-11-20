@@ -36,7 +36,6 @@ class SimIngestTask(IngestTask):
                         continue
                     ingest_list.append(set(info.items()))
                     self.register.addRow(registry, info, dryrun=args.dryrun, create=args.create)
-            self.register.addVisits(registry, dryrun=args.dryrun)
 
 
 class SimParseTask(ParseTask):
