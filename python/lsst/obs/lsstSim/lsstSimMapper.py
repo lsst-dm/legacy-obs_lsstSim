@@ -169,13 +169,6 @@ class LsstSimMapper(CameraMapper):
         dataId['sensor'] = m.group(1)
         return dataId
 
-    def _extractAmpId(self, dataId):
-        m = re.match(r'(\d),(\d)', dataId['channel'])
-        # Note that indices are swapped in the camera geometry vs. official
-        # channel specification.
-        return (self._extractDetectorName(dataId),
-                int(m.group(1)), int(m.group(2)))
-
     def _computeAmpExposureId(self, dataId):
         # visit, snap, raft, sensor, channel):
         """Compute the 64-bit (long) identifier for an amp exposure.
