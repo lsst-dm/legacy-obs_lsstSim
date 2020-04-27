@@ -103,7 +103,7 @@ def processRaft(raftDir, conn, done):
     nUnrecognized = 0
     for fits in glob.glob(os.path.join(raftDir, "S[0-2][0-2]",
                                        "imsim_*_R[0-4][0-4]_S[0-2][0-2]_C[01][0-7]_E00[01].fits*")):
-        m = re.search(r'v(\d+)-f(\w)/E00(\d)/R(\d)(\d)/S(\d)(\d)/' +
+        m = re.search(r'v(\d+)-f(\w)/E00(\d)/R(\d)(\d)/S(\d)(\d)/'
                       r'imsim_\1_R\4\5_S\6\7_C(\d)(\d)_E00\3\.fits', fits)
         if not m:
             print("Warning: Unrecognized file:", fits, file=sys.stderr)
